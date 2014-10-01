@@ -1,0 +1,82 @@
+swaggerVersion: 1.2
+apiVersion: 1.0
+basePath: api.datavalidation.com
+resourcePath: /rt
+produces:
+  - application/json
+consumes:
+  - application/json
+apis:
+  - path: /rt/{email}/
+    operations:
+      - method: GET
+        nickname: validateEmail
+        summary: Validate (quickly) a single email address
+        type: EmailResponse
+        parameters:
+          - name: email
+            description: Email address to validate
+            type: string
+            format: email
+            paramType: path
+            defaultValue: test@example.com
+models:
+  EmailResponse:
+    id: EmailResponse
+    required:
+      - address
+      - grade
+      - click
+      - open
+      - optout
+      - complain
+      - hard
+      - deceased
+      - trap
+    properties:
+      address:
+        type: string
+        format: email
+        description: The email address that was validated
+        defaultValue: test@example.com
+      grade:
+        type: string
+        enum: ['A+', 'A', 'B', 'D', 'F']
+        description: Grade marking the deliverability of an email
+        defaultValue: 'A+'
+      click:
+        type: string
+        enum: ['K4', 'K3', 'K2', 'K1', 'K0']
+        description: Subscriber's likelihood to click on links in emails
+        defaultValue: 'K4'
+      open:
+        type: string
+        enum: ['R4', 'R3', 'R2', 'R1', 'R0']
+        description: Subscriber's likelihood to open emails
+        defaultValue: 'R4'
+      optout:
+        type: string
+        enum: ['O4', 'O3', 'O2', 'O1', 'O0']
+        description: Subscriber's likelihood to opt-out of subscription
+        defaultValue: 'O1'
+      complain:
+        type: string
+        enum: ['W4', 'W3', 'W2', 'W1', 'W0']
+        description: Subscriber's likelihood to mark email as spam
+        defaultValue: 'W1'
+
+      hard:
+        type: string
+        enum: ['H4', 'H3', 'H2', 'H1', 'H0']
+        description: Does this address have hard bounce history?
+        defaultValue: 'H0'
+      deceased:
+        type: string
+        enum: ['D4', 'D3', 'D2', 'D1', 'D0']
+        description: Is there information indicating the user is deceased?
+        defaultValue: 'D0'
+      trap:
+        type: string
+        enum: ['T4', 'T3', 'T2', 'T1', 'T0']
+        description: Does there exist information indicating the address is a spam trap?
+        defaultValue: 'T0'

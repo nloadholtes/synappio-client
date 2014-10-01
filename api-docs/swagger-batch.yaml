@@ -33,6 +33,11 @@ apis:
             paramType: query
             type: boolean
             defaultValue: false
+          - name: pretty
+            description: Indent JSON output?
+            paramType: query
+            type: boolean
+            defaultValue: false
       - method: POST
         nickname: createList
         summary: Create a new list
@@ -71,6 +76,12 @@ apis:
         nickname: getList
         summary: Retrieve an individual list by its slug
         type: ListResponse
+        parameters:
+          - name: pretty
+            description: Indent JSON output?
+            paramType: query
+            type: boolean
+            defaultValue: false
       - method: DELETE
         nickname: deleteList
         summary: Delete an individual list and all its subscribers
