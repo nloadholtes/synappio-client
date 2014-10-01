@@ -77,6 +77,11 @@ apis:
         summary: Retrieve an individual list by its slug
         type: ListResponse
         parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list being updated
+            defaultValue: random-slug
           - name: pretty
             description: Indent JSON output?
             paramType: query
@@ -85,6 +90,12 @@ apis:
       - method: DELETE
         nickname: deleteList
         summary: Delete an individual list and all its subscribers
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list being updated
+            defaultValue: random-slug
   - path: /list/{list_slug}/subscribe.csv
     operations:
       - method: POST
@@ -98,6 +109,9 @@ apis:
         parameters:
           - name: list_slug
             paramType: path
+            type: string
+            description: The slug (ID) of the list being updated
+            defaultValue: random-slug
           - name: header
             paramType: query
             description: Is there a header row present in the CSV data
@@ -129,14 +143,182 @@ apis:
         produces: ['text/csv']
         notes: |
           Use this method for bulk export of list subscribers.
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list being updated
+            defaultValue: random-slug
+
+  - path: /list/{list_slug}/member/
+    operations:
+      - method: GET
+        nickname: getListMembers
+        summary: Get the members of a list
+        notes: |
+          Use this to retrieve / filter the members of your list
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list being updated
+            defaultValue: random-slug
+          - name: paging.skip
+            description: Paging offset
+            type: integer
+            paramType: query
+            defaultValue: 0
+          - name: paging.limit
+            description: Paging limit
+            type: integer
+            paramType: query
+            defaultValue: 50
+            maximum: 500
+          - name: _expand
+            description: Expand the list of items?
+            paramType: query
+            type: boolean
+            defaultValue: false
+          - name: pretty
+            description: Indent JSON output?
+            paramType: query
+            type: boolean
+            defaultValue: false
+      - method: POST
+        nickname: createListMember
+        summary: Create a new list member
+        type: MemberResponse
+        notes: |
+          Use this to create a single member on your list.
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list being updated
+            defaultValue: random-slug
+          - name: body
+            paramType: body
+            type: NewMember
+
+  - path: /list/{list_slug}/member/{member_slug}/
+    operations:
+      - method: GET
+        nickname: getListMember
+        type: MemberResponse
+        summary: Load a single member's data
+        notes: |
+          Use this to get a single member from your list.
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list being updated
+            defaultValue: random-slug
+          - name: member_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the member being updated
+            defaultValue: random-or-user-defined-slug
+          - name: pretty
+            description: Indent JSON output?
+            paramType: query
+            type: boolean
+            defaultValue: false
+      - method: PUT
+        nickname: putListMember
+        type: MemberResponse
+        summary: Update a single member's data
+        notes: |
+          Use this to update a single member on your list. Note that whatever you provide in
+          the request body will *replace* the information for that member in your list.
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list being updated
+            defaultValue: random-slug
+          - name: member_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the member being updated
+            defaultValue: random-or-user-defined-slug
+          - name: pretty
+            description: Indent JSON output?
+            paramType: query
+            type: boolean
+            defaultValue: false
+          - name: body
+            paramType: body
+            description: Member information
+            type: Member
+      - method: DELETE
+        nickname: deleteListMember
+        summary: Remove a single member from your list
+        notes: |
+          Use this to remove a single member on your list.
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list being updated
+            defaultValue: random-slug
+          - name: member_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the member being updated
+            defaultValue: random-or-user-defined-slug
+
 models:
+
+  NewMember:
+    id: NewMember
+    required: ['address']
+    properties:
+      slug: {type: string, defaultValue: random-or-user-defined-slug}
+      address: {type: string, format: email, defaultValue: test@example.com}
+      metadata: {$ref: Metadata}
+
+  Member:
+    id: Member
+    required: ['address']
+    properties:
+      address: {type: string, format: email, defaultValue: test@example.com}
+      metadata: {$ref: Metadata}
+
+  MemberResponse:
+    id: MemberResponse
+    required: ['meta', 'slug', 'address', 'metadata']
+    properties:
+      meta: {$ref: MetaRef}
+      slug: {type: string, defaultValue: random-or-user-defined-slug}
+      address: {type: string, format: email, defaultValue: test@example.com}
+      metadata: {$ref: Metadata}
+
+  MemberCollection:
+    id: MemberCollection
+    required: ['meta', 'paging', 'items']
+    properties:
+      meta: {$ref: MetaRef}
+      paging: {$ref: Paging}
+      items:
+        type: array
+        items: {$ref: MemberItem}
+
+  MemberItem:
+    id: MemberResponse
+    required: ['meta']
+    properties:
+      meta: {$ref: MetaRef}
+      slug: {type: string, defaultValue: random-or-user-defined-slug}
+      address: {type: string, format: email, defaultValue: test@example.com}
+      metadata: {$ref: Metadata}
 
   ListCollection:
     id: ListCollection
     required: ['meta', 'paging', 'items']
     properties:
-      meta: {$ref: MetaRef, required: true}
-      paging: {$ref: Paging, required: true}
+      meta: {$ref: MetaRef}
+      paging: {$ref: Paging}
       items:
         type: array
         items: {$ref: ListItem}
@@ -172,4 +354,11 @@ models:
     properties:
       rel: {type: string, defaultValue: relation}
       href: {type: string, format: url, defaultValue: 'http://example.com'}
+
+  Metadata:
+    id: Metadata
+    properties: []
+    description: 'Arbitrary metadata mapping (string => string)'
+    additionalProperties: true
+
 
