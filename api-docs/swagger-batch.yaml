@@ -129,17 +129,6 @@ apis:
         produces: ['text/csv']
         notes: |
           Use this method for bulk export of list subscribers.
-  - path: /list/{list_slug}/member/
-    operations:
-      - method: GET
-        nickname: getListMembers
-        summary: Export the subscribers in a list
-        produces: ['text/csv']
-        notes: |
-          Use this method for bulk export of list subscribers.
-  - path: /list/{lisg_slug}/member/{member_slug}
-    operations: []
-
 models:
 
   ListCollection:
