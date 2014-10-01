@@ -48,24 +48,24 @@ apis:
           the URL parameters as documented below.
         parameters:
           - name: header
-            in: query
+            paramType: query
             description: Is there a header row present in the CSV data
             required: true
             type: boolean
           - name: email_col
-            in: query
+            paramType: query
             description: Which column is the email address in? (0 = first column)
             required: true
             type: integer
           - name: metadata
-            in: query
+            paramType: query
             required: true
             type: string
             format: other
             description: Should the metadata (non-email) in the CSV be stored? (true or false)
           - name: slug_col
             required: false
-            in: query
+            paramType: query
             type: integer
             description: |
               The column in the csv containing a slug for each member. If this is omitted,
@@ -96,18 +96,20 @@ apis:
           This method is used to subscribe additional users to a list. Note that you must
           provide mapping data in the URL parameters as documented below.
         parameters:
+          - name: list_slug
+            paramType: path
           - name: header
-            in: query
+            paramType: query
             description: Is there a header row present in the CSV data
             required: true
             type: boolean
           - name: email_col
-            in: query
+            paramType: query
             description: Which column is the email address in? (0 = first column)
             required: true
             type: integer
           - name: metadata
-            in: query
+            paramType: query
             required: true
             type: string
             format: other
@@ -127,6 +129,17 @@ apis:
         produces: ['text/csv']
         notes: |
           Use this method for bulk export of list subscribers.
+  - path: /list/{list_slug}/member/
+    operations:
+      - method: GET
+        nickname: getListMembers
+        summary: Export the subscribers in a list
+        produces: ['text/csv']
+        notes: |
+          Use this method for bulk export of list subscribers.
+  - path: /list/{lisg_slug}/member/{member_slug}
+    operations: []
+
 models:
 
   ListCollection:
