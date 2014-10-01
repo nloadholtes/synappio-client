@@ -1,0 +1,10 @@
+apiVersion: 1.0
+swaggerVersion: 1.2
+apis:
+  - path: /swagger-batch.json
+    description: Public batch and real-time API
+info:
+  title: Synapp.io APIs
+  description: Synapp.io APIs
+  contact: sales@synapp.io
+  license: MIT maybe?

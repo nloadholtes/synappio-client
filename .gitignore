@@ -1,0 +1,13 @@
+build/*
+repos/*
+*.sublime-project
+*.sublime-workspace
+
+*~
+*.swp
+*.pyc
+*.log
+.coverage
+build/*
+*.egg-info/*
+.DS_Store
