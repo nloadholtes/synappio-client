@@ -343,7 +343,7 @@ models:
     id: MetaRef
     required: ['href', 'links']
     properties:
-      href: {type: string, format: url, defaultValue: "http://example.com"}
+      href: {type: string, format: uri, defaultValue: "http://example.com"}
       links:
         type: array
         items: {$ref: Link}
@@ -353,7 +353,7 @@ models:
     required: [rel, href]
     properties:
       rel: {type: string, defaultValue: relation}
-      href: {type: string, format: url, defaultValue: 'http://example.com'}
+      href: {type: string, format: uri, defaultValue: 'http://example.com'}
 
   Metadata:
     id: Metadata
