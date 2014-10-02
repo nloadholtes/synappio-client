@@ -1,9 +1,9 @@
 apiVersion: 1.0
 swaggerVersion: 1.2
 apis:
-  - path: /swagger-batch.json
+  - path: /batch.json
     description: Public batch API
-  - path: /swagger-realtime.json
+  - path: /realtime.json
     description: Public real-time API
 info:
   title: Synapp.io APIs
