@@ -8,32 +8,33 @@ class Model(object):
     __slots__ = ('_state',)
 
     def __init__(self, **kwargs):
-        self._state = kwargs.pop('_state', {})
-        for pname, prop in self.__meta__['properties'].items():
-            if prop.defaultValue is not Unset:
-                kwargs.setdefault(pname, prop.defaultValue)
+        self._state = kwargs.pop('_state', self.__meta__['default_state'])
         for k, v in kwargs.items():
             setattr(self, k, v)
 
     @classmethod
-    def factory(cls, api, model_or_id):
+    def class_factory(cls, api, model_or_id):
         if isinstance(model_or_id, basestring):
             js_model = api.spec.model(model_or_id)
         else:
             js_model = model_or_id
         required = set(js_model.get('required', []))
         properties = {}
+        default_state = {}
         dct = {
             '__slots__': (),
             '__meta__': dict(
                 api=api,
                 required=required,
                 properties=properties,
-                js_model=js_model)}
+                js_model=js_model,
+                default_state=default_state)}
         for pname, pdata in js_model['properties'].items():
             prop = Property.factory(api, pdata)
             dct[pname] = prop
             properties[pname] = prop
+            if prop.defaultValue is not Unset:
+                default_state = prop.defaultValue
         cls = type(js_model['id'].encode('utf-8'), (cls,), dct)
         for pname, prop in properties.items():
             prop.bind_name(pname)
@@ -44,6 +45,9 @@ class Model(object):
 
     def __json__(self):
         return self._state
+
+    def __contains__(self, key):
+        return key in self._state
 
     def __getattr__(self, name):
         try:
