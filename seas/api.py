@@ -1,3 +1,4 @@
+import json
 import funcsigs
 
 from .connection import Connection
@@ -38,18 +39,44 @@ class API(object):
         if spec.keys() == ['$ref']:
             Model = self.models[spec.value]
 
+class Models(object):
+
+    def __init__(self, api):
+        self._models = dict(
+            (model['id'], Model.factory(self, model))
+            for model in self.spec.iter_models())
+
+    def __getattr__(self, name):
+        try:
+            return self._models[name]
+        except:
+            raise AttributeError(name)
+
+    def __getitem__(self, name):
+        return self._models[name]
+
+
+
 class RPCOperations(object):
 
     def __init__(self, api):
-        self._operations = {}
-        for apispec in api.spec.iter_apis():
-            for opspec in apispec['operations']:
-                op = RPCOperation(api, apispec['path'], opspec)
-                self._operations[opspec['nickname']] = op
-                setattr(self, opspec['nickname'], op)
+        self._operations = dict(
+            (opspec['nickname'], RPCOp(api, apispec['path'], opspec))
+            for apispec in api.spec.iter_apis()
+            for opspec in apispec['operations'])
+
+    def __getattr__(self, name):
+        try:
+            return self._operations[name]
+        except:
+            raise AttributeError(name)
+
+    def __getitem__(self, name):
+        return self._operations[name]
 
 
-class RPCOperation(object):
+
+class RPCOp(object):
 
     def __init__(self, api, path, opspec):
         self.api = api
@@ -76,7 +103,7 @@ class RPCOperation(object):
             path=self.path.format(**path_args),
             params=query_args)
         if body is not None:
-            request_args['data'] = body.__json__()
+            request_args['data'] = json.dumps(body.__json__())
         res = self.api.connection.request(**request_args)
         if self.type is None:
             return None
@@ -86,7 +113,7 @@ class RPCOperation(object):
         result = {}
         for param in self.params:
             if param.paramType == paramType:
-                result[param.name] = arguments.get(param.name, param.defaultValue)
+                result[param.name] = arguments.get(param.py_name, param.defaultValue)
         if paramType == 'body':
             if result:
                 return result['body']
@@ -99,12 +126,13 @@ class RPCParam(object):
 
     def __init__(self, pinfo):
         self.name = pinfo['name']
+        self.py_name = pinfo['name'].replace('.', '_')
         self.defaultValue = pinfo.get('defaultValue')
         self.paramType = pinfo['paramType']
         func_param_kwargs = {}
         if 'defaultValue' in pinfo:
             func_param_kwargs['default'] = pinfo['defaultValue']
         self.func_param = funcsigs.Parameter(
-            pinfo['name'].replace('.', '_'),
+            self.py_name,
             funcsigs.Parameter.POSITIONAL_OR_KEYWORD,
             **func_param_kwargs)

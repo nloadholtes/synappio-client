@@ -2,11 +2,16 @@ from pyramid.decorator import reify
 
 class Unset(object):
     pass
+Unset = Unset()
 
 class Model(object):
+    __slots__ = ('_state',)
 
     def __init__(self, **kwargs):
         self._state = kwargs.pop('_state', {})
+        for pname, prop in self.__meta__['properties'].items():
+            if prop.defaultValue is not Unset:
+                kwargs.setdefault(pname, prop.defaultValue)
         for k, v in kwargs.items():
             setattr(self, k, v)
 
@@ -18,10 +23,13 @@ class Model(object):
             js_model = model_or_id
         required = set(js_model.get('required', []))
         properties = {}
-        dct = {'__meta__': dict(
-            api=api,
-            required=required,
-            properties=properties)}
+        dct = {
+            '__slots__': (),
+            '__meta__': dict(
+                api=api,
+                required=required,
+                properties=properties,
+                js_model=js_model)}
         for pname, pdata in js_model['properties'].items():
             prop = Property.factory(api, pdata)
             dct[pname] = prop
@@ -34,10 +42,27 @@ class Model(object):
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, repr(self._state))
 
+    def __json__(self):
+        return self._state
+
+    def __getattr__(self, name):
+        try:
+            return self._state[name]
+        except KeyError:
+            raise AttributeError(name)
+
+    def __setattr__(self, name, value):
+        if name == '_state':
+            super(Model, self).__setattr__(name, value)
+        elif self.__meta__['js_model'].get('additionalProperties'):
+            self._state[name] = value
+        else:
+            super(Model, self).__setattr__(name, value)
+
 
 class Property(object):
     _registry = {}
-    defaultValue = Unset()
+    defaultValue = Unset
 
     def __init__(self, api, **kwargs):
         self._api = api
