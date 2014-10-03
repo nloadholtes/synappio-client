@@ -1,4 +1,4 @@
-from pyramid.decorator import reify
+from .decorator import reify
 
 class Unset(object):
     pass

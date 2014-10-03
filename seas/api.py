@@ -182,7 +182,10 @@ class Resource(object):
 
     @property
     def links(self):
-        return self._state.meta.links
+        try:
+            return self._state.meta.links
+        except KeyError:
+            return []
 
     @property
     def href(self):
