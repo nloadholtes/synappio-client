@@ -105,7 +105,8 @@ class Resources(Collection):
 
     def alias(self, path, alias):
         '''Gives a short alias to a given path'''
-        self._state[alias] = self._state[path]
+        self._state[alias] = res = self._state[path]
+        res.__name__ = alias
 
     def lookup(self, href):
         if href.startswith(self.base_url):
