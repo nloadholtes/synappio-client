@@ -130,7 +130,7 @@ apis:
             description: Should the metadata (non-email) in the CSV be stored? (true or false)
           - name: slug_col
             required: false
-            in: query
+            paramType: query
             type: integer
             description: |
               The column in the csv containing a slug for each member. If this is omitted,
@@ -305,7 +305,7 @@ models:
         items: {$ref: MemberItem}
 
   MemberItem:
-    id: MemberResponse
+    id: MemberItem
     required: ['meta']
     properties:
       meta: {$ref: MetaRef}
@@ -357,7 +357,7 @@ models:
 
   Metadata:
     id: Metadata
-    properties: []
+    properties: {}
     description: 'Arbitrary metadata mapping (string => string)'
     additionalProperties: true
 
