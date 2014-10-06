@@ -76,7 +76,8 @@ class SwaggerSpec(object):
 
     def output(self, path, method):
         op = self.get_operation(path, method)
-        return self.model(op['type'])
+        if 'type' in op:
+            return self.model(op['type'])
 
     def get_api(self, path):
         try:

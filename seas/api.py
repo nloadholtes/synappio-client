@@ -1,4 +1,3 @@
-import re
 import json
 from urlparse import urljoin
 
@@ -7,6 +6,7 @@ import funcsigs
 from .connection import Connection
 from .model import Model
 from .swagger import SwaggerSpec
+from .util import pattern_for
 
 class API(object):
 
@@ -76,7 +76,6 @@ class Models(Collection):
 
 
 class Resources(Collection):
-    re_route = re.compile(r'(\{[a-zA-Z][^\}]*\})')
 
     def __init__(self, api, base_url):
         super(Resources, self).__init__()
@@ -86,22 +85,9 @@ class Resources(Collection):
         for apispec in api.spec.iter_apis():
             r = Resource.class_factory(api, apispec)
             path = r.__meta__['path']
-            path_pattern = self.pattern_for(path)
+            path_pattern = pattern_for(path)
             self._state[path] = r
             self._path_patterns.append((path_pattern, r))
-
-    def pattern_for(self, path):
-        '''Convert a swagger path spec to a url'''
-        if not path.startswith('/'):
-            path = '/' + path
-        parts = self.re_route.split(path)
-        pattern_parts = []
-        for part in parts:
-            if self.re_route.match(part):
-                pattern_parts.append('(.*)')
-            else:
-                pattern_parts.append(re.escape(part))
-        return re.compile(''.join(pattern_parts) + '$')
 
     def alias(self, path, alias):
         '''Gives a short alias to a given path'''
