@@ -1,11 +1,12 @@
 import json
 
 import yaml
-import requests
 import jsonschema as S
 
 import formencode as fe
 from formencode import validators as fev
+
+from seas.util import load_content
 
 
 class SwaggerSpec(object):
@@ -16,12 +17,7 @@ class SwaggerSpec(object):
             self.load(path)
 
     def load(self, path):
-        # Load content
-        if '://' in path:
-            content = requests.get(path).text
-        else:
-            with open(path) as fp:
-                content = fp.read()
+        content = load_content(path)
         # Deserialize
         if path.endswith('.json'):
             self._raw = json.loads(content)

@@ -1,6 +1,5 @@
 import threading
 import logging
-from urlparse import urljoin
 
 import requests
 

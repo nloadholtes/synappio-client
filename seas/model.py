@@ -158,6 +158,10 @@ class StringProperty(Property):
 class IntegerProperty(Property):
     pass
 
+@Property.register('number')
+class NumberProperty(Property):
+    pass
+
 @Property.register('boolean')
 class BooleanProperty(Property):
     pass
