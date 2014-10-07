@@ -24,7 +24,7 @@ class SwaggerSpec(object):
         elif path.endswith('.yaml'):
             self._raw = yaml.load(content)
         # Build resolver
-        self.resolver = S.RefResolver(path, self._raw)
+        self.resolver = ModelRefResolver(path, self._raw)
         self._index_operations()
         self.basePath = self._raw['basePath']
 
@@ -98,4 +98,10 @@ class SwaggerSpec(object):
             for op in api['operations']:
                 ops[op['method'].upper()] = op
 
+class ModelRefResolver(S.RefResolver):
+
+    def resolving(self, ref):
+        self.resolution_scope = self.base_uri
+        new_ref = '#/models/' + ref
+        return super(ModelRefResolver, self).resolving(new_ref)
 
