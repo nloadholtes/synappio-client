@@ -4,13 +4,16 @@ from urlparse import urljoin
 import funcsigs
 
 from .connection import Connection
-from .model import Model, ModelMeta
+from .model import Model, Meta, ModelMeta, Unset
 from .swagger import SwaggerSpec
 from .util import pattern_for, jsonify
 
 class API(object):
 
     def __init__(self, swagger_path, base_url=None, auth_header=None):
+        self.swagger_path = swagger_path
+        self.base_url = base_url
+        self.auth_header = auth_header
         self.spec = SwaggerSpec(swagger_path)
         if base_url is None:
             base_url = self.spec.basePath
@@ -31,7 +34,7 @@ class API(object):
         if ref is not None:
             Model = self.models[ref]
             state = {}
-            for pname, prop in Model.__meta__.properties:
+            for pname, prop in Meta.get(Model).properties.items():
                 if pname in value:
                     state[pname] = self.unmarshal(value[pname])
                 else:
@@ -83,8 +86,8 @@ class Resources(Collection):
         self.base_url = base_url
         self._items = []
         for apispec in api.spec.iter_apis():
-            r = Resource.class_factory(api, apispec)
-            path = r.__meta__['path']
+            r = ResourceMeta.resource_factory(api, apispec)
+            path = Meta.get(r).path
             self._state[path] = r
             self._items.append(r)
 
@@ -101,7 +104,7 @@ class Resources(Collection):
 
         matches = []
         for ResourceClass in self._items:
-            pattern = ResourceClass.__meta__['path_pattern']
+            pattern = Meta.get(ResourceClass).path_pattern
             match = pattern.match(path)
             if match:
                 matches.append(ResourceClass)
@@ -129,21 +132,42 @@ class RPCOperations(Collection):
                 self._state[opspec['nickname']] = op
 
 
+class ResourceMeta(Meta):
+
+    def __init__(self, api, apispec):
+        self.api = api
+        self._apispec = Unset
+        self.path = Unset
+        self.path_pattern = Unset
+        self.operations = Unset
+        self.apispec = apispec
+
+    @property
+    def apispec(self):
+        return self._apispec
+    @apispec.setter
+    def apispec(self, value):
+        self._apispec = value
+        self.path = value['path']
+        self.path_pattern = pattern_for(value['path'])
+        self.operations = {}
+        for op in value['operations']:
+            self.operations[op['method'].upper()] = self.api.rpc[op['nickname']]
+
+    @classmethod
+    def resource_factory(cls, api, apispec):
+        meta = cls(api, apispec)
+        name = '<{}>'.format(meta.path)
+        dct = {'__slots__': ()}
+        dct.update(meta.operations)
+        resource_class = type(name, (Resource,), dct)
+        meta.decorate(resource_class)
+        return resource_class
+
+
 class Resource(object):
     __slots__ = ('_state')
 
-    @classmethod
-    def class_factory(cls, api, apispec):
-        meta = {
-            'api': api,
-            'apispec': apispec,
-            'path': apispec['path'],
-            'path_pattern': pattern_for(apispec['path'])}
-        dct = {'__meta__': meta, '__slots__': ()}
-        for op in apispec['operations']:
-            dct[op['method'].lower()] = api.rpc[op['nickname']]
-        name = '{}<{}>'.format(cls.__name__, apispec['path'])
-        return type(name, (cls,), dct)
 
     @classmethod
     def mixin(cls, other):
@@ -205,11 +229,11 @@ class Resource(object):
                     key = link.href
                 else:
                     key = urljoin(self.href, link.href)
-                resource = self.__meta__['api'].resources.lookup(key)
+                resource = Meta.get(self).api.resources.lookup(key)
                 return resource
 
     def __repr__(self):
-        return '{}: {}'.format(self.__meta__['path'], self._state)
+        return '{}: {}'.format(self.__class__, self._state)
 
     def __json__(self):
         return self._state.__json__()
@@ -280,7 +304,7 @@ class RPCOp(object):
 
     def resource_op_factory(self, resource):
         '''Bind the path components known in this resource to the path params'''
-        mo = resource.__meta__['path_pattern'].search(resource.href)
+        mo = Meta.get(resource).path_pattern.search(resource.href)
         bindings = mo.groupdict()
         def call(*args, **kwargs):
             return self.__call__(*args, **dict(bindings, **kwargs))

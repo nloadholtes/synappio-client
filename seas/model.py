@@ -8,6 +8,7 @@ class Unset(object):
 Unset = Unset()
 
 class Meta(object):
+
     attr_name = '__meta__'
 
     def __init__(self, api):
