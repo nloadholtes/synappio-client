@@ -1,0 +1,6 @@
+swaggerVersion: 1.2
+apiVersion: 1.0
+basePath: http://localhost:8088/
+resourcePath: /
+apis: []
+models: {}

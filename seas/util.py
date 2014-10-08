@@ -4,6 +4,7 @@ import csv
 import base64
 import urlparse
 from datetime import datetime
+from cStringIO import StringIO
 
 import chardet
 import requests
@@ -30,6 +31,7 @@ def pattern_for(path):
             pattern_parts.append(re.escape(part))
     return re.compile(''.join(pattern_parts) + '$')
 
+
 def really_unicode(s):
     # Try to guess the encoding
     def encodings():
@@ -39,6 +41,7 @@ def really_unicode(s):
         yield chardet.detect(s)['encoding']
         yield 'latin-1'
     return _attempt_encodings(s, encodings())
+
 
 def load_content(url):
     '''Versatile text loader. Handles the following url types:

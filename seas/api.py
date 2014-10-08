@@ -4,7 +4,7 @@ from urlparse import urljoin
 import funcsigs
 
 from .connection import Connection
-from .model import Model
+from .model import Model, ModelMeta
 from .swagger import SwaggerSpec
 from .util import pattern_for, jsonify
 
@@ -72,7 +72,7 @@ class Models(Collection):
         super(Models, self).__init__()
         self.api = api
         for model in api.spec.iter_models():
-            self._state[model['id']] = Model.class_factory(api, model)
+            self._state[model['id']] = ModelMeta.model_factory(api, model)
 
 
 class Resources(Collection):
