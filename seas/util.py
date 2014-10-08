@@ -20,8 +20,9 @@ def pattern_for(path):
     parts = re_wildcard.split(path)
     pattern_parts = []
     for part in parts:
-        if re_wildcard.match(part):
-            pattern_parts.append('(.*)')
+        if part.startswith('{'):
+            name = part[1:-1]
+            pattern_parts.append('(?P<{}>[^/]+)'.format(name))
         else:
             pattern_parts.append(re.escape(part))
     return re.compile(''.join(pattern_parts) + '$')

@@ -81,13 +81,12 @@ class Resources(Collection):
         super(Resources, self).__init__()
         self.api = api
         self.base_url = base_url
-        self._path_patterns = []
+        self._items = []
         for apispec in api.spec.iter_apis():
             r = Resource.class_factory(api, apispec)
             path = r.__meta__['path']
-            path_pattern = pattern_for(path)
             self._state[path] = r
-            self._path_patterns.append((path_pattern, r))
+            self._items.append(r)
 
     def alias(self, path, alias):
         '''Gives a short alias to a given path'''
@@ -100,11 +99,24 @@ class Resources(Collection):
         else:
             path = href
 
-        for pattern, ResourceClass in self._path_patterns:
-            if pattern.match(path):
-                return ResourceClass
-        else:
-            return Resource
+        matches = []
+        for ResourceClass in self._items:
+            pattern = ResourceClass.__meta__['path_pattern']
+            match = pattern.match(path)
+            if match:
+                matches.append(ResourceClass)
+        if len(matches) > 1:
+            import ipdb; ipdb.set_trace();
+        if matches:
+            return matches[0]
+
+    def resource_for(self, model):
+        '''Try to make a model into a resource'''
+        if 'meta' in model:
+            cls = self.lookup(model.meta.href)
+            if cls:
+                return cls(model)
+        return None
 
 
 class RPCOperations(Collection):
@@ -125,7 +137,8 @@ class Resource(object):
         meta = {
             'api': api,
             'apispec': apispec,
-            'path': apispec['path']}
+            'path': apispec['path'],
+            'path_pattern': pattern_for(apispec['path'])}
         dct = {'__meta__': meta, '__slots__': ()}
         for op in apispec['operations']:
             dct[op['method'].lower()] = api.rpc[op['nickname']]
@@ -142,6 +155,8 @@ class Resource(object):
         self._state = state
 
     def __getattr__(self, name):
+        if name.startswith('_'):
+            return super(Resource, self).__getattr__(name)
         return getattr(self._state, name)
 
     def __setattr__(self, name, value):
@@ -190,7 +205,8 @@ class Resource(object):
                     key = link.href
                 else:
                     key = urljoin(self.href, link.href)
-                return self.__meta__['api'].resources.lookup(key)
+                resource = self.__meta__['api'].resources.lookup(key)
+                return resource
 
     def __repr__(self):
         return '{}: {}'.format(self.__meta__['path'], self._state)
@@ -235,10 +251,17 @@ class RPCOp(object):
             return None
         result_state = self.type(_state=res.json())
         if 'meta' in result_state:
-            ResultResource = self.api.resources.lookup(result_state.meta.href)
+            ResultResource = self.api.resources.lookup(
+                result_state.meta.href)
+            if ResultResource:
+                return ResultResource(result_state)
+        return result_state
+
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
         else:
-            ResultResource = Resource
-        return ResultResource(result_state)
+            return self.resource_op_factory(instance)
 
     def __repr__(self):
         return '<{} {}>'.format(self.method, self.path)
@@ -255,6 +278,14 @@ class RPCOp(object):
                 return None
         return result
 
+    def resource_op_factory(self, resource):
+        '''Bind the path components known in this resource to the path params'''
+        mo = resource.__meta__['path_pattern'].search(resource.href)
+        bindings = mo.groupdict()
+        def call(*args, **kwargs):
+            return self.__call__(*args, **dict(bindings, **kwargs))
+        return call
+
 
 class RPCParam(object):
 
@@ -266,6 +297,8 @@ class RPCParam(object):
         func_param_kwargs = {}
         if 'defaultValue' in pinfo:
             func_param_kwargs['default'] = pinfo['defaultValue']
+        if 'required' not in pinfo:
+            func_param_kwargs['default'] = None
         self.func_param = funcsigs.Parameter(
             self.py_name,
             funcsigs.Parameter.POSITIONAL_OR_KEYWORD,
