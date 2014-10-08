@@ -34,7 +34,7 @@ class Model(object):
             dct[pname] = prop
             properties[pname] = prop
             if prop.defaultValue is not Unset:
-                default_state = prop.defaultValue
+                default_state[pname] = prop.defaultValue
         cls = type(js_model['id'].encode('utf-8'), (cls,), dct)
         for pname, prop in properties.items():
             prop.bind_name(pname)
@@ -71,7 +71,7 @@ class Property(object):
     def __init__(self, api, **kwargs):
         self._api = api
         self._pinfo = kwargs
-        self._name = None
+        self._attr_name = None
         if 'defaultValue' in kwargs:
             setattr(self, 'defaultValue', kwargs['defaultValue'])
 

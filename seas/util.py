@@ -1,11 +1,14 @@
 import re
+import os
+import csv
+import base64
 import urlparse
 from datetime import datetime
 
+import chardet
 import requests
 import pkg_resources
-
-import chardet
+from bag import csv2
 
 
 TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -70,6 +73,39 @@ def jsonify(obj, **json_kwargs):
     elif isinstance(obj, list):
         return map(jsonify, obj)
     return obj
+
+
+def chunk(iterator, chunksize):
+    chunk = []
+    iterator = iter(iterator)
+    while True:
+        try:
+            chunk.append(iterator.next())
+        except StopIteration:
+            if chunk:
+                yield chunk
+            break
+        if len(chunk) >= chunksize:
+            yield chunk
+            chunk = []
+
+
+def csv_from_row_iter(it):
+    sio = StringIO()
+    wr = csv2.CsvWriter(sio)
+    for row in it:
+        sio.seek(0)
+        sio.truncate()
+        wr.put(row)
+        yield sio.getvalue()
+
+
+def nonce(size=48, encoding='base64url'):
+    raw = os.urandom(size)
+    if encoding == 'base64url':
+        return base64.urlsafe_b64encode(raw).strip()
+    else:
+        return raw.encode(encoding).strip()
 
 
 def _attempt_encodings(s, encodings):
