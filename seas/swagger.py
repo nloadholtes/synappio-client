@@ -53,7 +53,7 @@ class SwaggerSpec(object):
         for p in operation['parameters']:
             if p['paramType'] != paramType:
                 continue
-            properties[p['name']] = {'type': p['type']}
+            properties[p['name']] = dict(p)# {'type': p['type']}
             if p.get('required'):
                 required.append(p['name'])
         if paramType == 'body':

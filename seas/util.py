@@ -1,5 +1,6 @@
 import re
 import urlparse
+from datetime import datetime
 
 import requests
 import pkg_resources
@@ -56,6 +57,19 @@ def load_content(url):
         return open(fn).read()
     else:
         assert False, "Don't know how to handle {} URLs".format(parsed.scheme)
+
+
+def jsonify(obj, **json_kwargs):
+    if isinstance(obj, datetime):
+        return obj.strftime(TIMESTAMP_FORMAT)
+    elif hasattr(obj, '__json__'):
+        return jsonify(obj.__json__(**json_kwargs))
+    elif isinstance(obj, dict):
+        return dict((k, jsonify(v)) for k, v in obj.items())
+    elif isinstance(obj, list):
+        return map(jsonify, obj)
+    return obj
+
 
 def _attempt_encodings(s, encodings):
     if s is None:

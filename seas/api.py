@@ -6,7 +6,7 @@ import funcsigs
 from .connection import Connection
 from .model import Model
 from .swagger import SwaggerSpec
-from .util import pattern_for
+from .util import pattern_for, jsonify
 
 class API(object):
 
@@ -132,7 +132,13 @@ class Resource(object):
         name = '{}<{}>'.format(cls.__name__, apispec['path'])
         return type(name, (cls,), dct)
 
-    def __init__(self, state):
+    @classmethod
+    def mixin(cls, other):
+        cls.__bases__ += (other,)
+
+    def __init__(self, state=None):
+        if state is None:
+            state = {}
         self._state = state
 
     def __getattr__(self, name):
@@ -220,7 +226,10 @@ class RPCOp(object):
             path=self.path.format(**path_args),
             params=query_args)
         if body is not None:
-            request_args['data'] = json.dumps(body.__json__())
+            if 'application/json' in self.opspec.get('consumes', ['application/json']):
+                request_args['data'] = json.dumps(jsonify(body))
+            else:
+                request_args['data'] = body
         res = self.api.connection.request(**request_args)
         if self.type is None:
             return None
