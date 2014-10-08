@@ -68,7 +68,7 @@ def load_content(url):
 
 def jsonify(obj, **json_kwargs):
     if isinstance(obj, datetime):
-        return obj.strftime(TIMESTAMP_FORMAT)
+        return obj.isoformat() + 'Z'   #strftime(TIMESTAMP_FORMAT)
     elif hasattr(obj, '__json__'):
         return jsonify(obj.__json__(**json_kwargs))
     elif isinstance(obj, dict):

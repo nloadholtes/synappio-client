@@ -22,8 +22,9 @@ class Connection(object):
     def session(self):
         sess = getattr(self._local, 'session', None)
         if sess is None:
-            self._local.session = sess = requests.Session()
+            sess = requests.Session()
             sess.headers.update(self.headers)
+            self._local.session = sess
         return sess
 
     def href(self, path):
@@ -31,7 +32,16 @@ class Connection(object):
 
     def request(self, method, path='', **kwargs):
         url = self.href(path)
-        res = self.session.request(method, url, **kwargs)
+        sess = self.session
+        res = sess.request(method, url, **kwargs)
+        if not res.ok:
+            log.error('%s %s => %s', method, path, res.status_code)
+            body = res.text
+            try:
+                body = res.json()
+            except:
+                pass
+            log.error('Response was %s', body)
         res.raise_for_status()
         return res
 

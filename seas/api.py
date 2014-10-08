@@ -272,7 +272,7 @@ class RPCOp(object):
                 request_args['data'] = body
         res = self.api.connection.request(**request_args)
         if self.type is None:
-            return None
+            return res
         result_state = self.type(_state=res.json())
         if 'meta' in result_state:
             ResultResource = self.api.resources.lookup(

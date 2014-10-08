@@ -97,6 +97,8 @@ class Range(object):
 
     def paginate_query(self, q):
         self.total = q.count()
+        if self.end > self.total - 1:
+            self.end = self.total - 1
         if self.skip:
             q = q.skip(self.skip)
         if self.end is not None:
