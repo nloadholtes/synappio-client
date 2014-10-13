@@ -3,7 +3,6 @@ import logging
 
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3 import Retry
 
 from seas.range import Range
 
@@ -15,7 +14,7 @@ class Connection(object):
 
     def __init__(self, base_url, auth_header=None, max_retries=5):
         self.base_url = base_url
-        self.max_retries = Retry(connect=max_retries, read=max_retries, backoff_factor=0.1)
+        self.max_retries = max_retries
         if auth_header:
             self.headers = {'Authorization': auth_header}
         else:
