@@ -1,5 +1,6 @@
 import re
 import os
+import sys
 import csv
 import base64
 import urlparse
@@ -109,6 +110,22 @@ def nonce(size=48, encoding='base64url'):
         return base64.urlsafe_b64encode(raw).strip()
     else:
         return raw.encode(encoding).strip()
+
+class Retrying(object):
+    '''Class that retries its __call__() method n times on a given set of exceptions'''
+
+    def __init__(self, retries, *exception_classes):
+        self.retries = retries
+        self.exception_classes = exception_classes
+
+    def __call__(self, func, *args, **kwargs):
+        for attempt in range(self.retries + 1):
+            try:
+                return func(*args, **kwargs)
+            except self.exception_classes as err:
+                info = sys.exc_info()
+        raise info[0], info[1], info[2]
+
 
 
 def _attempt_encodings(s, encodings):
