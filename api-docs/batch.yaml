@@ -52,7 +52,7 @@ apis:
             description: Is there a header row present in the CSV data
             required: true
             type: boolean
-          - name: email_col
+          - name: email
             paramType: query
             description: Which column is the email address in? (0 = first column)
             required: true
@@ -96,6 +96,27 @@ apis:
             type: string
             description: The slug (ID) of the list being updated
             defaultValue: random-slug
+  - path: /list/{list_slug}/unsubscribe.csv
+    operations:
+      - method: POST
+        nickname: bulkRemoveFromList
+        summary: Remove subscribers from a given list via csv
+        parameters:
+        - name: list_slug
+          paramType: path
+          type: string
+          description: The slug (ID) of the list that members are to be unsubscribed from
+          defaultValue: random-slug
+        - name: header
+          paramType: query
+          description: Is there a header row present in the CSV data
+          required: true
+          type: boolean
+        - name: slug_col
+          required: true
+          paramType: query
+          type: integer
+          description: The column in the csv containing the slug for each member.
   - path: /list/{list_slug}/subscribe.csv
     operations:
       - method: POST
