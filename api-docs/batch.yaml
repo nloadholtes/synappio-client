@@ -101,6 +101,7 @@ apis:
       - method: POST
         nickname: bulkRemoveFromList
         summary: Remove subscribers from a given list via csv
+        consumes: ['text/csv']
         parameters:
         - name: list_slug
           paramType: path
