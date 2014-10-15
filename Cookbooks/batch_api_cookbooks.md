@@ -162,12 +162,11 @@ Remediating a List After Onboarding
 
 After reviewing the overall grades of a list, it may or may not be necessary to remediate the list. The DataValidation Batch API provides multiple methods for viewing validation grades for individual members of a list.
 
-To retrieve individual member grades for ALL members of a list:
+#### To retrieve individual member grades for ALL members of a list:
 
+Using the '/export.csv' endpoint will provide csv formatted output including only the member slugs, email addresses, and grades.
 
 /list/{list_slug}/export.csv:
-        
-Using the '/export.csv' endpoint will provide csv formatted output including only the member slugs, email addresses, and grades.
 
         Command:
 
@@ -178,6 +177,7 @@ Using the '/export.csv' endpoint will provide csv formatted output including onl
                 *********************************************
                 ************** sample output ****************
                 *********************************************
+
 
 /list/{list_slug}/member/:
         
@@ -196,12 +196,11 @@ Using the '/member/' endpoint will provide json formatted output including membe
 A Remediation Token will be charged for EACH member in a list when using the '/export.csv' or '/member/' endpoints to retrieve member grades.
 
 
-To retrieve individual grades for a single member of a list:
-
-    
-/list/{list_slug}/member/{member_slug}/:
+#### To retrieve individual grades for a single member of a list:
 
 Using the '/member/{member_slug}/' endpoint will provide output similar to the '/member/' endpoint above but for just a single member.
+    
+/list/{list_slug}/member/{member_slug}/:
 
         Command:
 
@@ -218,7 +217,6 @@ A single Remediation Token will be charged for each call to the '/member/{member
 
 #### Remediating an Existing List 
 
-
 Important!
     
 30 days after a list has been uploaded, list members that have not been updated will be removed from our system, potentially resulting in the absence of some or all list members. If you require remediation of a list that is more than 30 days old, it is important to re-upload the list. If your list is less than 30 days old, the remediation process is the same as above.
@@ -228,15 +226,15 @@ Important!
 Managing List Members 
 ====================
 
-#### Adding members to a list:
+### Adding members to a list:
 
 The DataValidation Batch API provides two methods for subscribing new members to an existing list. 
 
-To add a single member:
-
-/list/{list_slug}/member/:
+#### To add a single member:
 
 By sending a POST request to the '/{list_slug}/member/', you can subscribe a single member to a specified list (list_slug).
+
+/list/{list_slug}/member/:
 
         Command:
 
@@ -250,11 +248,11 @@ By sending a POST request to the '/{list_slug}/member/', you can subscribe a sin
                 *********************************************
 
 
-To add multiple members:
-
-/list/{list_slug}/subscribe.csv:
+#### To add multiple members:
 
 If you would like to subscribe multiple members to a list at one time, send POST request to the '/list/{list_slug}/subscribe.csv' endpoint. The required parameters are the same as the '/list/' endpoint when using a POST request to create new list.
+
+/list/{list_slug}/subscribe.csv:
 
         Parameters:
 
@@ -301,15 +299,15 @@ If you would like to subscribe multiple members to a list at one time, send POST
                 *********************************************
 
 
-#### Removing members from a list:
+### Removing members from a list:
 
 The DataValidation Batch API provides two methods for unsubscribing members from a list.
 
-To unsubscribe a single member form a list:
-
-/list/{list_slug}/member/{member_slug}/:
+#### To unsubscribe a single member from a list:
 
 By sending a DELETE request to the '/member/{member_slug}' endpoint, a single member of a list can be unsubscribed.
+
+/list/{list_slug}/member/{member_slug}/:
 
         Command:
 
@@ -321,11 +319,11 @@ By sending a DELETE request to the '/member/{member_slug}' endpoint, a single me
                 ************** sample output ****************
                 *********************************************
 
-To unsubscribe multiple members from a list:
-
-/list/{list_slug}/unsubscribe.csv:
+#### To unsubscribe multiple members from a list:
 
 By sending a POST request to /{list_slug}/unsubscribe.csv endpoint, you can specify multiple members to be unsubscribed by passing a csv list of members to remove.
+
+/list/{list_slug}/unsubscribe.csv:
 
             Parameters:
 
