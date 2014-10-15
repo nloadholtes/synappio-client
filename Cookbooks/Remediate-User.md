@@ -5,13 +5,15 @@ Remediate a List
 
 To begin processing a list, a job must be created to start validating members within a list.
 
-&nbsp; Note: An Onboarding Token will be charged for each member in the list when a job is created.
+Note: An Onboarding Token will be charged for each member in the list when a job is created.
 
 Command:
 
-    $ curl -X POST
-    -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/job"
+~~~~
+$ curl -X POST
+-H "Authorization: bearer {api_key}"
+"https://api.datavalidation.com/1.0/list/{list_slug}/job"
+~~~~
 
 Sample output:
 
