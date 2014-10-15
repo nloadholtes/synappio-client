@@ -55,7 +55,7 @@ Command:
 
 If the job is not finished, you should see a response similar to:
 
-    {
+<    {
         "job": [
             {
                 "status": "New",
@@ -79,7 +79,7 @@ If the job is not finished, you should see a response similar to:
                 "slug": "XLoklKeI"
             }
         ]
-    }
+    } />
 
 Notice the 'pct_complete' field representing the current percent of completion.
 
@@ -141,7 +141,7 @@ Using the '/member/{member_slug}/' endpoint will provide output similar to the '
 
 #### Remediating an Existing List 
 
-    Important!
-    
-    30 days after a list has been uploaded, list members that have not been updated will be removed from our system, potentially resulting in the absence of some or all list members. If you require remediation of a list that is more than 30 days old, it is important to re-upload the list. If your list is less than 30 days old, the remediation process is the same as above.
+>Important!
+>   
+>30 days after a list has been uploaded, list members that have not been updated will be removed from our system, potentially resulting in the absence of some or all list members. If you require remediation of a list that is more than 30 days old, it is important to re-upload the list. If your list is less than 30 days old, the remediation process is the same as above.
 
