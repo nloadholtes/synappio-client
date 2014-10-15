@@ -5,11 +5,7 @@ Remediate a List
 
 To begin processing a list, a job must be created to start validating members within a list.
 
-also you can do 
-
-<h1>HTML</h1>
-
-Note: An Onboarding Token will be charged for each member in the list when a job is created.
+&nbsp; Note: An Onboarding Token will be charged for each member in the list when a job is created.
 
 Command:
 
