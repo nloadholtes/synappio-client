@@ -1,8 +1,9 @@
-#####################
-# Onboarding a User #
-#####################
+Onboarding a User
+====================
 
----Uploading a List---
+
+#### Uploading a List 
+
 As an ESP, it may be useful to know the quality of a potential user's list(s) before accepting them as a customer. This set of instructions will provide a means of doing so.
 
 Before upload a list, a few questions must first be answered about the list being uploaded:
@@ -61,9 +62,7 @@ Sample outpout:
 Be sure to store the slug, as this will be needed to access the list in the future.
 
 
-############################
-# Running a Validation Job #
-############################
+#### Running a Validation Job 
 
 To begin processing a list, a job must be created to start validating members within a list.
 
@@ -145,9 +144,7 @@ If the job is not finished, you should see a response similar to:
 Notice the 'pct_complete' field representing the current percent of completion.
 
 
-#######################
-# Viewing List Grades #
-#######################
+#### Viewing List Grades 
 
 After a job is complete, repeating the GET request from above will yield a response similar to:
 
@@ -156,9 +153,8 @@ After a job is complete, repeating the GET request from above will yield a respo
                 *********************************************
 
 
-#######################################
-# Remediating a List After Onboarding #
-#######################################
+Remediating a List After Onboarding
+==================== 
 
 After reviewing the overall grades of a list, it may or may not be necessary to remediate the list. The DataValidation Batch API provides multiple methods for viewing validation grades for individual members of a list.
 
@@ -216,21 +212,19 @@ To retrieve individual grades for a single member of a list:
     A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
 
-################################
-# Remediating an Existing List #
-################################
+#### Remediating an Existing List 
+
 
     Important!
     
     30 days after a list has been uploaded, list members that have not been updated will be removed from our system, potentially resulting in the absence of some or all list members. If you require remediation of a list that is more than 30 days old, it is important to re-upload the list. If your list is less than 30 days old, the remediation process is the same as above.
 
 
-#########################
-# Managing List Members #
-#########################
 
+Managing List Members 
+====================
 
-Adding members to a list:
+#### Adding members to a list:
 
     The DataValidation Batch API provides two methods for subscribing new members to an existing list. 
 
@@ -304,7 +298,7 @@ Adding members to a list:
                 *********************************************
 
 
-Removing members from a list:
+#### Removing members from a list:
 
     The DataValidation Batch API provides two methods for unsubscribing members from a list.
 
