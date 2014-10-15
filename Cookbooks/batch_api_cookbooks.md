@@ -8,13 +8,16 @@ As an ESP, it may be useful to know the quality of a potential user's list(s) be
 
 Before upload a list, a few questions must first be answered about the list being uploaded:
 
-Does the csv have include a header on the first row?
+*   Does the csv have include a header on the first row?
+
     If yes, the query parameter 'header' should be set to 'true', otherwise 'false'.
 
-What collumn is the email address in?
+*   What collumn is the email address in?
+
     If the email address is in the first collumn, the query parameter 'email' should be set to '0'. If the email address is in the second collumn, it should be set to '1' etc.
 
-Is there data in each row (other than the email address) that you would like to store?
+*   Is there data in each row (other than the email address) that you would like to store?
+    
     You might want to store additional data such as first name, last name, unqiue ID etc. If so, the query parameter 'metadata' should be set to 'true', otherwise 'false'.
 
 After adding a list, individual member grades will be available via this endpoint: /list/{list_slug}/member/{member_slug}/
@@ -34,7 +37,7 @@ Sample command:
         bar@example.com,bar,002,
         baz@example.com,baz,003,"
 
-Sample outpout:
+Sample output:
 
     {
         "list": [
@@ -59,7 +62,7 @@ Sample outpout:
         ]
     }
 
-Be sure to store the slug, as this will be needed to access the list in the future.
+**Be sure to store the slug, as this will be needed to access the list in the future.**
 
 
 #### Running a Validation Job 
@@ -67,7 +70,6 @@ Be sure to store the slug, as this will be needed to access the list in the futu
 To begin processing a list, a job must be created to start validating members within a list.
 
 Note: An Onboarding Token will be charged for each member in the list when a job is created.
-
 
 Command:
 
@@ -104,7 +106,9 @@ Sample output:
     }
 
 
-If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list. To view the progress of a validation job, construct the following request using the job's slug from the above result:
+If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list. 
+
+To view the progress of a validation job, construct the following request using the job's slug from the above result:
 
 Command:
 
@@ -161,9 +165,9 @@ After reviewing the overall grades of a list, it may or may not be necessary to 
 To retrieve individual member grades for ALL members of a list:
 
 
-    /list/{list_slug}/export.csv:
+/list/{list_slug}/export.csv:
         
-        Using the '/export.csv' endpoint will provide csv formatted output including only the member slugs, email addresses, and grades.
+Using the '/export.csv' endpoint will provide csv formatted output including only the member slugs, email addresses, and grades.
 
         Command:
 
@@ -175,9 +179,9 @@ To retrieve individual member grades for ALL members of a list:
                 ************** sample output ****************
                 *********************************************
 
-    /list/{list_slug}/member/:
+/list/{list_slug}/member/:
         
-        Using the '/member/' endpoint will provide json formatted output including member slugs, member email addresses, update timestamps as well as any metadata that may have been included in the list.
+Using the '/member/' endpoint will provide json formatted output including member slugs, member email addresses, update timestamps as well as any metadata that may have been included in the list.
 
         Command:
 
@@ -189,15 +193,15 @@ To retrieve individual member grades for ALL members of a list:
                 ************** sample output ****************
                 *********************************************
 
-    A Remediation Token will be charged for EACH member in a list when using the '/export.csv' or '/member/' endpoints to retrieve member grades.
+A Remediation Token will be charged for EACH member in a list when using the '/export.csv' or '/member/' endpoints to retrieve member grades.
 
 
 To retrieve individual grades for a single member of a list:
 
     
-    /list/{list_slug}/member/{member_slug}/:
+/list/{list_slug}/member/{member_slug}/:
 
-        Using the '/member/{member_slug}/' endpoint will provide output similar to the '/member/' endpoint above but for just a single member.
+Using the '/member/{member_slug}/' endpoint will provide output similar to the '/member/' endpoint above but for just a single member.
 
         Command:
 
@@ -209,15 +213,15 @@ To retrieve individual grades for a single member of a list:
                 ************** sample output ****************
                 *********************************************
 
-    A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
+A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
 
 #### Remediating an Existing List 
 
 
-    Important!
+Important!
     
-    30 days after a list has been uploaded, list members that have not been updated will be removed from our system, potentially resulting in the absence of some or all list members. If you require remediation of a list that is more than 30 days old, it is important to re-upload the list. If your list is less than 30 days old, the remediation process is the same as above.
+30 days after a list has been uploaded, list members that have not been updated will be removed from our system, potentially resulting in the absence of some or all list members. If you require remediation of a list that is more than 30 days old, it is important to re-upload the list. If your list is less than 30 days old, the remediation process is the same as above.
 
 
 
@@ -226,33 +230,33 @@ Managing List Members
 
 #### Adding members to a list:
 
-    The DataValidation Batch API provides two methods for subscribing new members to an existing list. 
+The DataValidation Batch API provides two methods for subscribing new members to an existing list. 
 
-    To add a single member:
+To add a single member:
 
-        /list/{list_slug}/member/:
+/list/{list_slug}/member/:
 
-            By sending a POST request to the '/{list_slug}/member/', you can subscribe a single member to a specified list (list_slug).
+By sending a POST request to the '/{list_slug}/member/', you can subscribe a single member to a specified list (list_slug).
 
-            Command:
+        Command:
 
                 curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
                 -d "biz@example.com"
 
-            Sample output:
+        Sample output:
 
                 *********************************************
                 ************** sample output ****************
                 *********************************************
 
 
-    To add multiple members:
+To add multiple members:
 
-        /list/{list_slug}/subscribe.csv:
+/list/{list_slug}/subscribe.csv:
 
-            If you would like to subscribe multiple members to a list at one time, send POST request to the '/list/{list_slug}/subscribe.csv' endpoint. The required parameters are the same as the '/list/' endpoint when using a POST request to create new list.
+If you would like to subscribe multiple members to a list at one time, send POST request to the '/list/{list_slug}/subscribe.csv' endpoint. The required parameters are the same as the '/list/' endpoint when using a POST request to create new list.
 
-            Parameters:
+        Parameters:
 
               - name: header
                 paramType: query
@@ -277,10 +281,9 @@ Managing List Members
                 required: false
                 paramType: query
                 type: integer
-                description: The column in the csv containing a slug for each member. If this is omitted,
-                             a slug will be generated automatically.
+                description: The column in the csv containing a slug for each member. If this is omitted, a slug will be generated automatically.
 
-            Command:
+        Command:
 
                 curl -X POST
                 -H "Content-Type: text/csv
@@ -300,16 +303,15 @@ Managing List Members
 
 #### Removing members from a list:
 
-    The DataValidation Batch API provides two methods for unsubscribing members from a list.
+The DataValidation Batch API provides two methods for unsubscribing members from a list.
 
-    
-    To unsubscribe a single member form a list:
+To unsubscribe a single member form a list:
 
-        /list/{list_slug}/member/{member_slug}/:
+/list/{list_slug}/member/{member_slug}/:
 
-            By sending a DELETE request to the '/member/{member_slug}' endpoint, a single member of a list can be unsubscribed.
+By sending a DELETE request to the '/member/{member_slug}' endpoint, a single member of a list can be unsubscribed.
 
-            Command:
+        Command:
 
                 curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list/{list_slug}/member/{member_slug}"
 
@@ -319,11 +321,11 @@ Managing List Members
                 ************** sample output ****************
                 *********************************************
 
-    To unsubscribe multiple members from a list:
+To unsubscribe multiple members from a list:
 
-        /list/{list_slug}/unsubscribe.csv:
+/list/{list_slug}/unsubscribe.csv:
 
-            By sending a POST request to /{list_slug}/unsubscribe.csv endpoint, you can specify multiple members to be unsubscribed by passing a csv list of members to remove.
+By sending a POST request to /{list_slug}/unsubscribe.csv endpoint, you can specify multiple members to be unsubscribed by passing a csv list of members to remove.
 
             Parameters:
 
