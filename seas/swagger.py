@@ -1,3 +1,4 @@
+import re
 import json
 
 import yaml
@@ -6,13 +7,15 @@ import jsonschema as S
 import formencode as fe
 from formencode import validators as fev
 
-from seas.util import load_content
+from seas.util import load_content, pattern_for
 
 
 class SwaggerSpec(object):
 
     def __init__(self, path=None):
         self.resolver = None
+        self._operation_index = {}
+        self._path_patterns = None
         if path is not None:
             self.load(path)
 
@@ -93,10 +96,21 @@ class SwaggerSpec(object):
 
     def _index_operations(self):
         self._operation_index = {}
-        for api in self._raw['apis']:
-            self._operation_index[api['path']] = ops = {}
+        self._path_patterns = []
+        for i, api in enumerate(self._raw['apis']):
+            path = api['path']
+            self._path_patterns.append(
+                (pattern_for(api['path']), api['path']))
+            self._operation_index[path] = ops = {}
             for op in api['operations']:
                 ops[op['method'].upper()] = op
+
+    def path_by_request(self, request):
+        for regex, path in self._path_patterns:
+            if regex.search(request.path):
+                return path
+        return None
+
 
 class ModelRefResolver(S.RefResolver):
 
