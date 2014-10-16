@@ -152,9 +152,56 @@ Notice the 'pct_complete' field representing the current percent of completion.
 This is an overview of an email list’s quality. It includes the total number of subscribers in each grade category, A+, A, B, D, and F, and an overall grade for the list. This report does not provide data on specific email addresses.
 
 After a job is complete, repeating the GET request from above will yield a response similar to:
-
-                *********************************************
-                ************** sample output ****************
-                *********************************************
-
-
+    
+    {
+        "job": [
+            {
+                "status": "Ready",
+                "list_slug": "E5RIlS2B",
+                "stats": {
+                    "optout": {
+                        "O4": 3
+                    },
+                    "grade": {
+                        "D": 3
+                    },
+                    "hard": {
+                        "H4": 3
+                    },
+                    "complain": {
+                        "W4": 2,
+                        "W3": 1
+                    },
+                    "trap": {
+                        "T4": 2,
+                        "T1": 1
+                    },
+                    "open": {
+                        "R0": 3
+                    },
+                    "click": {
+                        "K0": 3
+                    },
+                    "deceased": {
+                        "D4": 3
+                    }
+                },
+                "created": "2014-10-15 20:46:53.218000",
+                "webhook": {
+                    "status": null,
+                    "complete": null
+                },
+                "priority": {
+                    "mu": 10,
+                    "sigma": 0
+                },
+                "original_chunks": 2,
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/job/zJSSU1HE/"
+                },
+                "current_chunks": 0,
+                "pct_complete": 100,
+                "slug": "zJSSU1HE"
+            }
+        ]
+    } 
