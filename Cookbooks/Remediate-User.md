@@ -155,7 +155,7 @@ Using the '/export.csv' endpoint will provide csv formatted output including onl
 
 Command:
 
-            curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv"
+    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv"
 
 Sample output:
 
@@ -170,7 +170,7 @@ Using the '/member/' endpoint will provide json formatted output including membe
 
 Command:
 
-            curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
+    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
 
 Sample output:
 
@@ -268,7 +268,7 @@ Using the '/member/{member_slug}/' endpoint will provide output similar to the '
 
 Command:
 
-            curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
+    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
 
 Sample output:
 

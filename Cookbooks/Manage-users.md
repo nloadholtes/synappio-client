@@ -13,8 +13,8 @@ By sending a POST request to the '/{list_slug}/member/', you can subscribe a sin
 
 Command:
 
-                curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
-                -d "biz@example.com"
+    curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
+    -d "biz@example.com"
 
 Sample output:
 
@@ -79,14 +79,14 @@ Parameters:
 
 Command:
 
-                curl -X POST
-                -H "Content-Type: text/csv
-                    Authorization: bearer {api_key}"
-                    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?header=true&email=0&metadata=true&member_slug=2"
-                -d "email_address,first_name,ID,
-                    oof@example.com,oof,005,
-                    rab@example.com,rab,006,
-                    baz@example.com,baz,007,"
+    curl -X POST
+    -H "Content-Type: text/csv
+    Authorization: bearer {api_key}"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?header=true&email=0&metadata=true&member_slug=2"
+    -d "email_address,first_name,ID,
+    oof@example.com,oof,005,
+    rab@example.com,rab,006,
+    baz@example.com,baz,007,"
 
 Sample output:
 
@@ -126,11 +126,11 @@ By sending a DELETE request to the '/member/{member_slug}' endpoint, a single me
 
 Command:
 
-                curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list/{list_slug}/member/{member_slug}"
+    curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list/{list_slug}/member/{member_slug}"
 
 Sample output:
 
-             Status code: 204 No Content
+    Status code: 204 No Content
 
 
 #### To unsubscribe multiple members from a list:
