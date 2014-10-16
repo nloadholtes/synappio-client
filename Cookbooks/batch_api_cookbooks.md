@@ -152,10 +152,58 @@ Notice the 'pct_complete' field representing the current percent of completion.
 
 After a job is complete, repeating the GET request from above will yield a response similar to:
 
-                *********************************************
-                ************** sample output ****************
-                *********************************************
-
+    {
+        "job": [
+            {
+                "status": "Ready",
+                "list_slug": "E5RIlS2B",
+                "stats": {
+                    "optout": {
+                        "O4": 3
+                    },
+                    "grade": {
+                        "D": 3
+                    },
+                    "hard": {
+                        "H4": 3
+                    },
+                    "complain": {
+                        "W4": 2,
+                        "W3": 1
+                    },
+                    "trap": {
+                        "T4": 2,
+                        "T1": 1
+                    },
+                    "open": {
+                        "R0": 3
+                    },
+                    "click": {
+                        "K0": 3
+                    },
+                    "deceased": {
+                        "D4": 3
+                    }
+                },
+                "created": "2014-10-15 20:46:53.218000",
+                "webhook": {
+                    "status": null,
+                    "complete": null
+                },
+                "priority": {
+                    "mu": 10,
+                    "sigma": 0
+                },
+                "original_chunks": 2,
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/job/zJSSU1HE/"
+                },
+                "current_chunks": 0,
+                "pct_complete": 100,
+                "slug": "zJSSU1HE"
+            }
+        ]
+    } 
 
 Remediating a List After Onboarding
 ==================== 
@@ -168,30 +216,109 @@ Using the '/export.csv' endpoint will provide csv formatted output including onl
 
 /list/{list_slug}/export.csv:
 
-        Command:
+Command:
 
             curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv"
 
-        Sample output:
+Sample output:
 
-                *********************************************
-                ************** sample output ****************
-                *********************************************
+    BPopxToE,foo@example.com,D,K0,R0,H4,O4,W3,T4,D4
+    FVCExahe,baz@example.com,D,K0,R0,H4,O4,W4,T1,D4
+    MPM-h7D1,bar@example.com,D,K0,R0,H4,O4,W4,T4,D4
 
 
 /list/{list_slug}/member/:
         
 Using the '/member/' endpoint will provide json formatted output including member slugs, member email addresses, update timestamps as well as any metadata that may have been included in the list.
 
-        Command:
+Command:
 
             curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
 
-        Sample output:
+Sample output:
 
-                *********************************************
-                ************** sample output ****************
-                *********************************************
+    {
+        "members": [
+            {
+                "updated": "2014-10-15 20:45:13.803000",
+                "list_slug": "E5RIlS2B",
+                "analysis": {
+                    "optout": "O4",
+                    "grade": "D",
+                    "hard": "H4",
+                    "click": "K0",
+                    "trap": "T4",
+                    "open": "R0",
+                    "complain": "W4",
+                    "deceased": "D4"
+                },
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/MPM-h7D1/"
+                },
+                "f_upload": false,
+                "address": "bar@example.com",
+                "slug": "MPM-h7D1",
+                "metadata": {
+                    "": "",
+                    "first_name": "bar",
+                    "email_address": "bar@example.com",
+                    "ID": "002"
+                }
+            },
+            {
+                "updated": "2014-10-15 20:45:13.802000",
+                "list_slug": "E5RIlS2B",
+                "analysis": {
+                    "optout": "O4",
+                    "grade": "D",
+                    "hard": "H4",
+                    "click": "K0",
+                    "trap": "T4",
+                    "open": "R0",
+                    "complain": "W3",
+                    "deceased": "D4"
+                },
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/BPopxToE/"
+                },
+                "f_upload": false,
+                "address": "foo@example.com",
+                "slug": "BPopxToE",
+                "metadata": {
+                    "": "",
+                    "first_name": "foo",
+                    "email_address": "foo@example.com",
+                    "ID": "001"
+                }
+            },
+            {
+                "updated": "2014-10-15 20:45:13.803000",
+                "list_slug": "E5RIlS2B",
+                "analysis": {
+                    "optout": "O4",
+                    "grade": "D",
+                    "hard": "H4",
+                    "click": "K0",
+                    "trap": "T1",
+                    "open": "R0",
+                    "complain": "W4",
+                    "deceased": "D4"
+                },
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/FVCExahe/"
+                },
+                "f_upload": false,
+                "address": "baz@example.com",
+                "slug": "FVCExahe",
+                "metadata": {
+                    "": "",
+                    "first_name": "baz",
+                    "email_address": "baz@example.com",
+                    "ID": "003"
+                }
+            }
+        ]
+    }
 
 A Remediation Token will be charged for EACH member in a list when using the '/export.csv' or '/member/' endpoints to retrieve member grades.
 
@@ -202,15 +329,43 @@ Using the '/member/{member_slug}/' endpoint will provide output similar to the '
     
 /list/{list_slug}/member/{member_slug}/:
 
-        Command:
+Command:
 
             curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
 
-        Sample output:
+Sample output:
 
-                *********************************************
-                ************** sample output ****************
-                *********************************************
+    {
+        "members": [
+            {
+                "updated": "2014-10-15 20:45:13.802000",
+                "list_slug": "E5RIlS2B",
+                "analysis": {
+                    "optout": "O4",
+                    "grade": "D",
+                    "hard": "H4",
+                    "click": "K0",
+                    "trap": "T4",
+                    "open": "R0",
+                    "complain": "W3",
+                    "deceased": "D4"
+                },
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/BPopxToE/"
+                },
+                "f_upload": false,
+                "address": "foo@example.com",
+                "slug": "BPopxToE",
+                "metadata": {
+                    "": "",
+                    "first_name": "foo",
+                    "email_address": "foo@example.com",
+                    "ID": "001"
+                }
+            }
+        ]
+    }
+
 
 A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
@@ -236,16 +391,37 @@ By sending a POST request to the '/{list_slug}/member/', you can subscribe a sin
 
 /list/{list_slug}/member/:
 
-        Command:
+Command:
 
                 curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
                 -d "biz@example.com"
 
-        Sample output:
+Sample output:
 
-                *********************************************
-                ************** sample output ****************
-                *********************************************
+    [
+        {
+            "updated": "2014-10-15 21:16:56.054000",
+            "list_slug": "E5RIlS2B",
+            "analysis": {
+                "optout": "O4",
+                "grade": "D",
+                "hard": "H4",
+                "click": "K0",
+                "trap": "T4",
+                "open": "R0",
+                "complain": "W4",
+                "deceased": "D4"
+            },
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/8UKN-s-H/"
+            },
+            "f_upload": true,
+            "address": "biz@example.com",
+            "slug": "8UKN-s-H",
+            "metadata": {}
+        }
+    ]
+
 
 
 #### To add multiple members:
@@ -254,7 +430,7 @@ If you would like to subscribe multiple members to a list at one time, send POST
 
 /list/{list_slug}/subscribe.csv:
 
-        Parameters:
+Parameters:
 
               - name: header
                 paramType: query
@@ -281,7 +457,7 @@ If you would like to subscribe multiple members to a list at one time, send POST
                 type: integer
                 description: The column in the csv containing a slug for each member. If this is omitted, a slug will be generated automatically.
 
-        Command:
+Command:
 
                 curl -X POST
                 -H "Content-Type: text/csv
@@ -292,11 +468,30 @@ If you would like to subscribe multiple members to a list at one time, send POST
                     rab@example.com,rab,006,
                     baz@example.com,baz,007,"
 
-            Sample output:
+Sample output:
 
-                *********************************************
-                ************** sample output ****************
-                *********************************************
+    {
+        "list": [
+            {
+                "status": "new",
+                "size": 6,
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/",
+                    "links": {
+                        "jobs": "job/",
+                        "batch_subscribe": "subscribe.csv",
+                        "member": "member/{member_slug}/",
+                        "job": "job/{job_slug}/",
+                        "batch_unsubscribe": "unsubscribe.csv",
+                        "export": "export.csv",
+                        "members": "member/"
+                    }
+                },
+                "slug": "E5RIlS2B",
+                "metadata": {}
+            }
+        ]
+    }
 
 
 ### Removing members from a list:
@@ -309,15 +504,14 @@ By sending a DELETE request to the '/member/{member_slug}' endpoint, a single me
 
 /list/{list_slug}/member/{member_slug}/:
 
-        Command:
+Command:
 
                 curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list/{list_slug}/member/{member_slug}"
 
-            Sample output:
+Sample output:
 
-                *********************************************
-                ************** sample output ****************
-                *********************************************
+             Status code: 204 No Content
+
 
 #### To unsubscribe multiple members from a list:
 
@@ -325,7 +519,7 @@ By sending a POST request to /{list_slug}/unsubscribe.csv endpoint, you can spec
 
 /list/{list_slug}/unsubscribe.csv:
 
-            Parameters:
+Parameters:
 
               - name: header
                 paramType: query
@@ -339,7 +533,7 @@ By sending a POST request to /{list_slug}/unsubscribe.csv endpoint, you can spec
                 type: integer
                 description: The column in the csv containing the slug for each member.
 
-            Command:
+Command:
 
                 curl -X POST
                 -H "Content-Type: text/csv
@@ -350,13 +544,30 @@ By sending a POST request to /{list_slug}/unsubscribe.csv endpoint, you can spec
                    rab@example.com,rab,006,
                    zab@example.com,zab,007"
 
-            Sample output:
+Sample output:
 
-                *********************************************
-                ************** sample output ****************
-                *********************************************
-
-
+    {
+    "list": [
+        {
+            "status": "new",
+            "size": 3,
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/",
+                "links": {
+                    "jobs": "job/",
+                    "batch_subscribe": "subscribe.csv",
+                    "member": "member/{member_slug}/",
+                    "job": "job/{job_slug}/",
+                    "batch_unsubscribe": "unsubscribe.csv",
+                    "export": "export.csv",
+                    "members": "member/"
+                }
+            },
+            "slug": "E5RIlS2B",
+            "metadata": {}
+        }
+    ]
+    }
 
 
 
