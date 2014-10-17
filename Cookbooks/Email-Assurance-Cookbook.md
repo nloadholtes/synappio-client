@@ -60,11 +60,15 @@ This report is an overview of an email list’s quality. It includes the total n
 
 This grade — A+, A, B, D, or F— indicates an emails likelihood to be deliverable. Additional deliverability data is provided with the grade. 
      
->A+ indicates Deliverable + Engagement History  
->A indicates Deliverable 
->B indicates Accepts-All 
->D indicates Indeterminate 
->F indicates Undeliverable
+&nbsp;&nbsp;&nbsp;&nbsp;A+ indicates Deliverable + Engagement History  
+
+&nbsp;&nbsp;&nbsp;&nbsp;A indicates Deliverable 
+
+&nbsp;&nbsp;&nbsp;&nbsp;B indicates Accepts-All 
+
+&nbsp;&nbsp;&nbsp;&nbsp;D indicates Indeterminate 
+
+&nbsp;&nbsp;&nbsp;&nbsp;F indicates Undeliverable
 
 **Uses of the grades:**
 
@@ -108,6 +112,3 @@ This is a measure of the historical level of engagement based on the amount of d
 This is a measure of the historical level of engagement based on the amount of deliverable mail sent to an address. This is a historical reference, and does not determine how likely one is to click your email.  
 
 
-
-Onboarding New Users
------------------
