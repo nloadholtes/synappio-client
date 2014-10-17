@@ -27,22 +27,21 @@ Ongoing remediation provides you with Email Assurance grades and deliverability 
 
 We run Email Assurance daily on all of the email addresses in our database. When you make an API call to retrieve a report or a member grade, we return the most recent data in our system. 
 
-This is important:
+**This is important:**
 
->You **must PUT member updates on *all* the members in your database at least once every 30 days**. When an email address or list has not been touched in 30 days, we remove it from our database. If this happens, the email list and all members will need to be created in the API again. 
->
->This API does not currently support scheduling jobs. You should set up a periodic task in your code to create jobs in the API. These periodic tasks can be utilized to set up ongoing monitoring and ongoing remediation. 
->
->Because the grades are being updated daily in our system, you can retrieve the member level grades for all lists daily or weekly. Export.csv does not PUT updates to the members on a list.
->
+You **must PUT member updates on *all* the members in your database at least once every 30 days**. When an email address or list has not been touched in 30 days, we remove it from our database. If this happens, the email list and all members will need to be created in the API again. 
+
+This API does not currently support scheduling jobs. You should set up a periodic task in your code to create jobs in the API. These periodic tasks can be utilized to set up ongoing monitoring and ongoing remediation. 
+
+Because the grades are being updated daily in our system, you can retrieve the member level grades for all lists daily or weekly. Export.csv does not PUT updates to the members on a list.
 
 This API does not currently support filtering members by grade. After calling export.csv you may want to input this data into your users' accounts and set up a task in your code to automatically unsubscribe the F results. 
 
 
+Email Assurance Reports and Grades
+-----------------
 
 #### Email Assurance Report
-
-[Go to API Documentation on retrieving reports.]()
 
 This report is an overview of an email list’s quality. It includes the total number of subscribers in each grade category, A+, A, B, D, and F, and an overall grade for the list. This report does not provide data on specific email addresses. 
 
@@ -61,11 +60,11 @@ This report is an overview of an email list’s quality. It includes the total n
 
 This grade — A+, A, B, D, or F— indicates an emails likelihood to be deliverable. Additional deliverability data is provided with the grade. 
      
-   A+ indicates Deliverable + Engagement History  
-   A indicates Deliverable 
-   B indicates Accepts-All 
-   D indicates Indeterminate 
-   F indicates Undeliverable
+>A+ indicates Deliverable + Engagement History  
+>A indicates Deliverable 
+>B indicates Accepts-All 
+>D indicates Indeterminate 
+>F indicates Undeliverable
 
 **Uses of the grades:**
 
