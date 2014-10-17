@@ -319,7 +319,7 @@ class RPCParam(object):
 
     def __init__(self, pinfo):
         self.name = pinfo['name']
-        self.py_name = pinfo['name'].replace('.', '_')
+        self.py_name = pinfo['name'].replace('.', '_').replace('-', '_')
         self.defaultValue = pinfo.get('defaultValue')
         self.paramType = pinfo['paramType']
         func_param_kwargs = {}
