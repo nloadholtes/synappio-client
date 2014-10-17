@@ -8,45 +8,6 @@ An email service provider can use these instructions to onboard new users, monit
 Overview of Email Assurance
 -----------------
 
-#### Email Assurance Report
-
-[Go to API Documentation on retrieving reports.]()
-
-This report is an overview of an email list’s quality. It includes the total number of subscribers in each grade category, A+, A, B, D, and F, and an overall grade for the list. This report does not provide data on specific email addresses. 
-
-**Uses of this report:** 
-
-*   **When onboarding a new user** - retrieve Email Assurance Reports on all of the lists a prospective/new user intends to use. These reports can be used to determine whether to accept the user as a trusted sender. If the user has several problematic lists, remediation can be recommended prior to deploying mail. If the user has highly questionable lists, it can be required that these lists be removed and not used in the ESP platform. 
-
-*   **Prior to deploying email from a previously inactive user account** - after a user has not deployed email for at least 3 months, retrieve an Email Assurance Report on the list prior to allowing the email to be deployed. If the data is acceptable, the user can move forward without remediation. If not, the user can be recommended remediation prior to deploying the campaign. 
-
-*   **When a current user imports a new list** - retrieve an Email Assurance Report prior to allowing email to be deployed. If the data is acceptable, the user can move forward without remediation. If not, the user can be recommended remediation prior to deploying the campaign. If the list is too risky, it can be disallowed altogether. 
-
-*   **Embed the data to allow users to always see the Email Assurance Report** - users can always know the list quality so it is not a surprise if remediation is recommended.
-
-
-#### Email Assurance Grade
-
-[Go to API Documentation on retrieving grades.]()
-
-This grade — A+, A, B, D, or F— indicates an emails likelihood to be deliverable. Additional deliverability data is provided with the grade. Email Assurance Grade data is provided with the usage of a remediation token, or subscription.  
-     
-   A+ indicates engagement history such as click or optin. 
-   A indicates successful delivery history or a positive SMTP response. 
-   B indicates an accepts all domain. 
-   D indicates no response from a server, or temporary failure. 
-   F indicates an undeliverable address due to history of bounces, or a negative SMTP response. 
-
-**Uses of the grades:**
-
-*   **Determine what grades a user can deploy email to** - A+ and A results are deliverable based on our most recent data. If a user is a trusted sender, perhaps B results can be allowed. D results should not be deployed email. F results should be unsubscribed.
-
-
-
-
-Onboarding New Users
------------------
-
 During the onboarding process, this API allows you to retrieve list level data and quickly view the data quality on an email list. Every email address is scanned on a list and you are provided an Email Assurance Report. This report is an overview of an email list’s quality. It includes the total number of subscribers in each grade category, A+, A, B, D, and F, and an overall grade for the list. 
 
 After viewing the Email Assurance Report, there are several possible scenarios:
@@ -76,3 +37,78 @@ This is important:
 >
 
 This API does not currently support filtering members by grade. After calling export.csv you may want to input this data into your users' accounts and set up a task in your code to automatically unsubscribe the F results. 
+
+
+
+#### Email Assurance Report
+
+[Go to API Documentation on retrieving reports.]()
+
+This report is an overview of an email list’s quality. It includes the total number of subscribers in each grade category, A+, A, B, D, and F, and an overall grade for the list. This report does not provide data on specific email addresses. 
+
+**Uses of this report:** 
+
+*   **When onboarding a new user** - retrieve Email Assurance Reports on all of the lists a prospective/new user intends to use. These reports can be used to determine whether to accept the user as a trusted sender. If the user has several problematic lists, remediation can be recommended prior to deploying mail. If the user has highly questionable lists, it can be required that these lists be removed and not used in the ESP platform. 
+
+*   **Prior to deploying email from a previously inactive user account** - after a user has not deployed email for at least 3 months, retrieve an Email Assurance Report on the list prior to allowing the email to be deployed. If the data is acceptable, the user can move forward without remediation. If not, the user can be recommended remediation prior to deploying the campaign. 
+
+*   **When a current user imports a new list** - retrieve an Email Assurance Report prior to allowing email to be deployed. If the data is acceptable, the user can move forward without remediation. If not, the user can be recommended remediation prior to deploying the campaign. If the list is too risky, it can be disallowed altogether. 
+
+*   **Embed the data to allow users to always see the Email Assurance Report** - users can always know the list quality so it is not a surprise if remediation is recommended.
+
+
+#### Email Assurance Grades 
+
+This grade — A+, A, B, D, or F— indicates an emails likelihood to be deliverable. Additional deliverability data is provided with the grade. 
+     
+   A+ indicates Deliverable + Engagement History  
+   A indicates Deliverable 
+   B indicates Accepts-All 
+   D indicates Indeterminate 
+   F indicates Undeliverable
+
+**Uses of the grades:**
+
+*   Determine what grades a user can deploy email to - A+ and A results are deliverable based on our most recent data. If a user is a trusted sender, perhaps B results can be allowed. D results should not be deployed email. F results should be unsubscribed.
+
+*	Emails graded with B or D cannot be confirmed deliverable or undeliverable unless mail is deployed to these codes. You may consider allowing these grades to remain on a user's list with the understanding that they cannot be mailed to *unless* the grade changes to an A+ or A. 
+
+
+#### Deliverability Codes
+
+In addition to the Email Assurance grade you are provided deliverability data for each email address. This data may influence the Email Assurance grade given to a particular address, and is intended to provide more insight into the deliverability history of the email address. 
+
+Deliverability codes are provided on a scale of 1-4, with 1 being the least deliverable and 4 being the most. You may see a 0 associated with Historical Opens (R) and Historical Clicks (K), meaning that we do not have any engagement data on that particular member. 
+
+**Hard Bounces (H)**
+
+Historical Hard Bounce information illustrates which emails have a hard bounce history and how many sources we've received this information from. 
+
+**Opt-Outs (O)**
+
+Historical Opt-Outs illustrates the members that have a history of opting-out from email lists. A subscriber's opt-out history is based on their overall email history and can help in determining the likelihood of opting-out from your emails as well. This is a good indication that the email address is most likely deliverable. 
+
+**Complainers (W)**
+
+Complainers are members who have a history of reporting email as spam. A historical complainer code will indicate whether a member has a history of complaining. Keep in mind that spam complaints can be correlated with expired permission or undesireable content. This is not a prediction as to whether the member will report a message as spam. 
+
+**Spam-Traps (T)**
+
+Email addresses that are associated with historical spam-trap data are indicated here. We do not include spam trap data in determining an Email Assurance Grades. This information changes frequently and we cannot guarantee every instance to be accurate. This information can used for segmenting.
+
+**Deceased Individuals (D)**
+
+This code indicates whether an email address belongs to a person who is deceased or not. 
+
+**Historical Opens (R)**
+
+This is a measure of the historical level of engagement based on the amount of deliverable mail sent to an address. This is a historical reference, and does not determine how likely one is to open your email. 
+
+**Historical Clicks (K)**
+
+This is a measure of the historical level of engagement based on the amount of deliverable mail sent to an address. This is a historical reference, and does not determine how likely one is to click your email.  
+
+
+
+Onboarding New Users
+-----------------
