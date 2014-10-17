@@ -260,11 +260,13 @@ class RPCOp(object):
         arguments = self.signature.bind(*args, **kwargs).arguments
         path_args = self.collect('path', arguments)
         query_args = self.collect('query', arguments)
+        header_args = self.collect('header', arguments)
         body = self.collect('body', arguments)
         request_args = dict(
             method=self.method,
             path=self.path.format(**path_args),
-            params=query_args)
+            params=query_args,
+            headers=header_args)
         if body is not None:
             if 'application/json' in self.opspec.get('consumes', ['application/json']):
                 request_args['data'] = json.dumps(jsonify(body))
