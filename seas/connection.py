@@ -36,7 +36,9 @@ class Connection(object):
     def request(self, method, path='', **kwargs):
         url = self.href(path)
         sess = self.session
-        res = sess.request(method, url, **kwargs)
+        headers = sess.headers
+        headers.update(kwargs.pop('headers'))
+        res = sess.request(method, url, headers=headers, **kwargs)
         if not res.ok:
             log.error('%s %s => %s', method, path, res.status_code)
             body = res.text
