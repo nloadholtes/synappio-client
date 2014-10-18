@@ -1,31 +1,27 @@
 import time
 import logging
 
-import boto.sqs
-from boto.sqs.message import RawMessage
-
 log = logging.getLogger(__name__)
 
 
 class Listener(object):
 
-    def __init__(self, region, key, secret, queue):
-        self.conn = boto.sqs.connect_to_region(
-            region, aws_access_key_id=key, aws_secret_access_key=secret)
-        self.queue = self.conn.get_queue(queue)
-        self.queue.set_message_class(RawMessage)
+    def __init__(self, queue):
+        self.queue = queue
 
     def handle(self, message):
         raise NotImplementedError()
 
     def run(self):
+        log.debug('Entering Listener.run')
         while True:
             try:
-                messages = self.queue.get_messages(8)
+                messages = self.queue.get_messages(10)
             except Exception:
                 log.exception('Failed to GET from queue, wait 5s')
                 time.sleep(5)
             for msg in messages:
+                log.debug('Got message %s', msg)
                 try:
                     self.handle(msg)
                 except Exception:

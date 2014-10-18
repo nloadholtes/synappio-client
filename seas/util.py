@@ -17,6 +17,14 @@ TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 re_wildcard = re.compile(r'(\{[a-zA-Z][^\}]*\})')
 manager = pkg_resources.ResourceManager()
 
+def strptime(s):
+    'Return a datetime object from an iso formatted string'
+    if '.' in s:
+        s, us = s.split('.')
+    else:
+        us = '0'
+    result = datetime.strptime(s, TIMESTAMP_FORMAT)
+    return result.replace(microsecond=int(us))
 
 def pattern_for(path):
     '''Convert a swagger path spec to a url'''
