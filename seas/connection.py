@@ -50,7 +50,7 @@ class Connection(object):
     def request(self, method, path='', **kwargs):
         url = self.href(path)
         sess = self.session
-        headers = sess.headers
+        headers = dict(sess.headers)
         headers.update(kwargs.pop('headers', {}))
         res = sess.request(method, url, headers=headers, **kwargs)
         if not res.ok:
