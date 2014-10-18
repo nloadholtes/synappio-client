@@ -262,7 +262,9 @@ class RPCOp(object):
         query_args = self.collect('query', arguments)
         header_args = self.collect('header', arguments)
         header_args = dict(
-            (k.replace('_', '-'), v) for k, v in header_args.items())
+            (k.replace('_', '-'), v)
+            for k, v in header_args.items()
+            if v)
         body = self.collect('body', arguments)
         request_args = dict(
             method=self.method,

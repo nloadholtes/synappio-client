@@ -1,5 +1,6 @@
-import threading
 import logging
+import threading
+from contextlib import contextmanager
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -19,6 +20,19 @@ class Connection(object):
             self.headers = {'Authorization': auth_header}
         else:
             self.headers = {}
+
+    @contextmanager
+    def setting_headers(self, **headers):
+        session = self.session
+        saved_headers = session.headers
+        session.headers = dict(saved_headers)
+        for k, v in headers.items():
+            if v is None:
+                session.headers.pop(k, None)
+            else:
+                session.headers[k] = v
+        yield self
+        session.headers = saved_headers
 
     @property
     def session(self):
