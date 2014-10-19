@@ -251,7 +251,14 @@ class RPCOp(object):
             self.type = None
         else:
             self.type = api.models[os_type]
-        self.params = [RPCParam(pinfo) for pinfo in opspec['parameters']]
+        pinfos = opspec['parameters']
+        # Sort the parameters: path, body, query, header
+        pinfos = (
+            [pinfo for pinfo in pinfos if pinfo['paramType'] == 'path']
+            + [pinfo for pinfo in pinfos if pinfo['paramType'] == 'body']
+            + [pinfo for pinfo in pinfos if pinfo['paramType'] == 'query']
+            + [pinfo for pinfo in pinfos if pinfo['paramType'] == 'header'])
+        self.params = [RPCParam(pinfo) for pinfo in pinfos]
         self.signature = funcsigs.Signature(
             [p.func_param for p in self.params])
         self.__doc__ = opspec.get('summary')
@@ -329,7 +336,9 @@ class RPCParam(object):
             func_param_kwargs['default'] = pinfo['defaultValue']
         if 'required' not in pinfo:
             func_param_kwargs['default'] = None
+        if self.paramType in ('path', 'body'):
+            sig_ptype = funcsigs.Parameter.POSITIONAL_OR_KEYWORD
+        else:
+            sig_ptype = funcsigs.Parameter.KEYWORD_ONLY
         self.func_param = funcsigs.Parameter(
-            self.py_name,
-            funcsigs.Parameter.POSITIONAL_OR_KEYWORD,
-            **func_param_kwargs)
+            self.py_name, sig_ptype, **func_param_kwargs)
