@@ -6,12 +6,13 @@ import base64
 import logging.config
 import urlparse
 import threading
-from datetime import datetime
-from cStringIO import StringIO
-
+import bson
 import chardet
 import requests
 import pkg_resources
+
+from datetime import datetime
+from cStringIO import StringIO
 from bag import csv2
 
 
@@ -111,6 +112,8 @@ def load_content(url):
 
 
 def jsonify(obj, **json_kwargs):
+    if isinstance(obj, bson.ObjectId):
+        return str(obj)
     if isinstance(obj, datetime):
         return obj.isoformat() + 'Z'   #strftime(TIMESTAMP_FORMAT)
     elif hasattr(obj, '__json__'):
