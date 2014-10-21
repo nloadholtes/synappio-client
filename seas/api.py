@@ -264,6 +264,8 @@ class RPCOp(object):
         self.__doc__ = opspec.get('summary')
 
     def __call__(self, *args, **kwargs):
+        request_args = kwargs.pop('_request_args', ())
+        request_kwargs = kwargs.pop('_request_kwargs', {})
         arguments = self.signature.bind(*args, **kwargs).arguments
         path_args = self.collect('path', arguments)
         query_args = self.collect('query', arguments)
@@ -273,17 +275,17 @@ class RPCOp(object):
             for k, v in header_args.items()
             if v)
         body = self.collect('body', arguments)
-        request_args = dict(
+        request_kwargs.update(
             method=self.method,
             path=self.path.format(**path_args),
             params=query_args,
             headers=header_args)
         if body is not None:
             if 'application/json' in self.opspec.get('consumes', ['application/json']):
-                request_args['data'] = json.dumps(jsonify(body))
+                request_kwargs['data'] = json.dumps(jsonify(body))
             else:
-                request_args['data'] = body
-        res = self.api.connection.request(**request_args)
+                request_kwargs['data'] = body
+        res = self.api.connection.request(*request_args, **request_kwargs)
         if self.type is None:
             return res
         result_state = self.type(_state=res.json())
