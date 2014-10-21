@@ -17,9 +17,11 @@ class Listener(object):
         while True:
             try:
                 messages = self.queue.get_messages(10)
+                log.debug('Got %d messages', len(messages))
             except Exception:
                 log.exception('Failed to GET from queue, wait 5s')
                 time.sleep(5)
+                continue
             for msg in messages:
                 log.debug('Got message %s', msg)
                 try:
