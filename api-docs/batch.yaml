@@ -289,6 +289,108 @@ apis:
             type: string
             description: The slug (ID) of the member being updated
             defaultValue: random-or-user-defined-slug
+  - path: /list/{list_slug}/job/
+    operations:
+      - method: GET
+        nickname: getJob
+        type: JobCollection
+        summary: Retrieve the validation jobs run on a list
+        notes: |
+          Use this to retrieve the validation jobs run on a list in reverse-chronological order.
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list
+            defaultValue: random-slug
+          - name: pretty
+            description: Indent JSON output?
+            paramType: query
+            type: boolean
+            defaultValue: false
+          - name: paging.skip
+            description: Paging offset
+            type: integer
+            paramType: query
+            defaultValue: 0
+          - name: paging.limit
+            description: Paging limit
+            type: integer
+            paramType: query
+            defaultValue: 50
+            maximum: 500
+          - name: _expand
+            description: Expand the list of items?
+            paramType: query
+            type: boolean
+            defaultValue: false
+      - method: POST
+        nickname: createJob
+        type: JobResponse
+        summary: Start processing a List
+        notes: |
+          Use this to get information about your jobs.
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list to be analyzed
+            defaultValue: random-slug
+          - name: pretty
+            description: Indent JSON output?
+            paramType: query
+            type: boolean
+            defaultValue: false
+  - path: /list/{list_slug}/job/{job_slug}/
+    operations:
+      - method: GET
+        nickname: getJob
+        type: JobResponse
+        summary: Information a specific Job
+        notes: |
+          Retrieve the results (or status) of a job
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list
+            defaultValue: random-slug
+          - name: job_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the job
+            defaultValue: random-slug
+          - name: pretty
+            description: Indent JSON output?
+            paramType: query
+            type: boolean
+            defaultValue: false
+  - path: /list/{list_slug}/job/{job_slug}/export.csv
+    operations:
+      - method: GET
+        nickname: exportJob
+        produces: ['text/csv']
+        summary: Retrives a CSV of Information from the specified Job
+        notes: |
+          Use this to get information about a job for a given list. This will return the bulk information for all of the members in the list.
+          The return includes a location header which indicates where on S3 the CSV file is located. Please note that the link is only valid for 300 seconds (5 minutes). After that time a new call to this endpoint will generate a new valid link to the CSV file.
+          The CSV will contain a header row, and will include the member slug, address, and analysis fields.
+        parameters:
+          - name: list_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the list
+            defaultValue: random-slug
+          - name: job_slug
+            paramType: path
+            type: string
+            description: The slug (ID) of the job
+            defaultValue: random-slug
+          - name: pretty
+            description: Indent JSON output?
+            paramType: query
+            type: boolean
+            defaultValue: false
 
 models:
 
@@ -383,4 +485,71 @@ models:
     description: 'Arbitrary metadata mapping (string => string)'
     additionalProperties: true
 
+  JobCollection:
+    id: JobCollection
+    required: ['meta', 'paging', 'items']
+    properties:
+      meta: {$ref: MetaRef}
+      paging: {$ref: Paging}
+      items:
+        type: array
+        items: {$ref: JobItem}
 
+  JobItem:
+    id: JobItem
+    required: [meta]
+    properties:
+      meta: {$ref: MetaRef}
+      slug: {type: string, defaultValue: random-slug}
+      pct_complete:
+        type: integer
+        description: Percentage of completion of current stage (Validating/Analyzing)
+        defaultValue: 0
+      priority: {$ref: Priority}
+      status:
+        type: string
+        description: Current status of the job
+        defaultValue: 'Ready'
+      created:
+        type: string
+        format: date-time
+        description: Datetime of the job's creation
+      analyze_only: {type: boolean, defaultValue: false}
+      stats_only: {type: boolean, defaultValue: false}
+      stats:
+        $ref: Stats
+        description: List analysis statistics
+
+  JobResponse:
+    id: JobResponse
+    required:
+      - meta
+      - slug
+      - pct_complete
+      - priority
+      - status
+      - created
+      - analyze_only
+      - stats_only
+      - stats
+    properties:
+      meta: {$ref: MetaRef}
+      slug: {type: string, defaultValue: random-slug}
+      pct_complete:
+        type: integer
+        description: Percentage of completion of current stage (Validating/Analyzing)
+        defaultValue: 0
+      priority: {$ref: Priority}
+      status:
+        type: string
+        description: Current status of the job
+        defaultValue: 'Ready'
+      created:
+        type: string
+        format: date-time
+        description: Datetime of the job's creation
+      analyze_only: {type: boolean, defaultValue: false}
+      stats_only: {type: boolean, defaultValue: false}
+      stats:
+        $ref: Stats
+        description: List analysis statistics
