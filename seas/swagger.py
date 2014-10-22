@@ -60,6 +60,8 @@ class SwaggerSpec(object):
             if p.get('required'):
                 required.append(p['name'])
         if paramType == 'body':
+            if not properties:
+                return None
             if properties.keys() != ['body']:
                 raise fe.Invalid(
                     'paramType="body" requires one property with the name "body"',
@@ -71,6 +73,8 @@ class SwaggerSpec(object):
             'additionalProperties': False}
         if required:
             model['required'] = required
+        if paramType == 'header':
+            model['additionalProperties'] = True
         return model
 
     def output(self, path, method):
@@ -105,11 +109,15 @@ class SwaggerSpec(object):
             for op in api['operations']:
                 ops[op['method'].upper()] = op
 
-    def path_by_request(self, request):
+    def swagger_path_by_request_path(self, request_path):
+        matches = []
         for regex, path in self._path_patterns:
-            if regex.search(request.path):
-                return path
-        return None
+            if regex.search(request_path):
+                matches.append(path)
+        if not matches:
+            return None
+        matches.sort(key=len)
+        return matches[-1]
 
 
 class ModelRefResolver(S.RefResolver):
