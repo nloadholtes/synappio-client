@@ -1,6 +1,7 @@
 import logging
 import threading
 from contextlib import contextmanager
+from pprint import pformat
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -60,7 +61,7 @@ class Connection(object):
                 body = res.json()
             except:
                 pass
-            log.error('Response was %s', body)
+            log.error('Response was\n%s', pformat(body))
         res.raise_for_status()
         return res
 
