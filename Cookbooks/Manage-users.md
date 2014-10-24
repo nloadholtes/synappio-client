@@ -113,6 +113,89 @@ Sample output:
         ]
     }
 
+#### Adding members via download url:
+
+By using the '/{list_slug}/import/' endpoint, you can subscribe multiple members to an existing list by providing us with a download link to a csv file containing the members you want to subscribe.
+
+/list/{list_slug}/import/:
+
+Command:
+
+~~~~
+curl -X POST
+-H "Authorization: bearer {api_key}
+Content-Type: application/json"
+"https://api.datavalidation.com/1.0/list/{list_slug}/"
+-d '{
+        "href": {csv_download_url_in_quotes}
+        "mapping":
+	    {
+    		"email_col":0,
+		    "slug_col":2,
+		    "header_row":true,
+		    "include_metadata":false,
+	    }
+    }'
+~~~~
+
+Output:
+
+~~~~
+[
+    {
+        "status": "New",
+        "created": "2014-10-24T21:52:31.225000Z",
+        "mapping": {
+            "header_row": true,
+            "email_col": 0,
+            "include_metadata": false,
+            "slug_col": 2
+        },
+        "note": "",
+        "href": {csv_download_url_in_quotes},
+        "meta": {
+            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+        },
+        "slug": "vYG7J_XT"
+    }
+]
+~~~~
+
+You can now send a GET request to the slug received in the previous request to view the status of the import job.
+
+list/{list_slug}/import/{import_slug}/:
+
+Command:
+
+~~~~
+curl -X GET
+-H "Authorization: bearer {api_key}"
+"https://api.datavalidation.com/1.0/list/{list_slug}/import/{import_slug}/"
+~~~~
+
+Output (when complete):
+
+~~~~
+[
+    {
+        "status": "Complete",
+        "created": "2014-10-24T21:52:31.225000Z",
+        "mapping": {
+            "header_row": true,
+            "email_col": 0,
+            "include_metadata": false,
+            "slug_col": 2
+        },
+        "note": "",
+        "href": {csv_download_url_in_quotes},
+        "meta": {
+            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+        },
+        "slug": "vYG7J_XT"
+    }
+]
+~~~~
+
 
 ### Removing members from a list:
 
