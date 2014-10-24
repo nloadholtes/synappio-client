@@ -3,7 +3,7 @@ Managing List Members
 
 ### Adding members to a list:
 
-The DataValidation Batch API provides two methods for subscribing new members to an existing list. 
+The DataValidation Batch API provides multiple methods for subscribing new members to an existing list. 
 
 #### To add a single member:
 
