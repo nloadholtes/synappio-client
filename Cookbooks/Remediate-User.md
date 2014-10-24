@@ -260,6 +260,34 @@ Sample output:
 A Remediation Token will be charged for EACH member in a list when using the '/export.csv' or '/member/' endpoints to retrieve member grades.
 
 
+#### To retrieve individual member grades from a specific job:
+
+Using the '/{job_slug}/export.csv' endpoint will provide a url linking to the results of a previous run job. These results are provided in csv format. The provided url will be valid for 300 seconds (5 minutes). After this time expires, a new call to this endpoint will generate a new valid link to the csv results. This csv will contain a header row, and will include the member slug, address, and analysis fields.
+
+/list/{list_slug}/job/{job_slug}/export.csv:
+
+Command:
+
+curl -X GET
+-H "Authorization: bearer {api_key}"
+"https://api.datavalidation.com/1.0/list/{list_slug}/job/{job_slug}/export.csv"
+
+Sample output:
+
+{
+    "href": "https://dv-prod.s3.amazonaws.com/db/20141023/fGilGyUrDnw0bGhfnsnvLfAZhuenLVM9vhFM5d3LZDVWG6udAvRK6o6GVx3vkXNZ/M2V8TPTA-_qZc.csv?Signature=Sdu3I4jq08wvImEsXzfE8TDTUWc%3D&Expires=1414099679&AWSAccessKeyId=AKIAJ6DQJUDEB7L7MRZA"
+}
+
+Link output:
+
+slug,address,grade,click,open,hard,optout,complain,trap,deceased
+R18y23L8,baz@example.com,D,K0,R0,H4,O4,W4,T1,D4
+Zl42d0zw,bar@example.com,D,K0,R0,H4,O4,W4,T4,D4
+fZS_PEs-,foo@example.com,D,K0,R0,H4,O4,W3,T4,D4
+
+A Remediation Token will be charged for EACH member in a list when usling the '/{job_slug}/export.csv' endpoint to retrieve member grades.
+
+
 #### To retrieve individual grades for a single member of a list:
 
 Using the '/member/{member_slug}/' endpoint will provide output similar to the '/member/' endpoint above but for just a single member.
