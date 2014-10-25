@@ -27,6 +27,56 @@ class Key(object):
         socket.curve_secretkey = self.secret
 
 
+class MaxRetryError(Exception):
+    pass
+
+
+class LazyPirateClient(object):
+
+    def __init__(self, ctx, uri, timeout, retries=3):
+        self.ctx = ctx
+        self.uri = uri
+        self.timeout_ms = int(timeout * 1000)
+        self.retries = retries
+        self.socket = ctx.socket(zmq.REQ)
+        self.socket.connect(uri)
+        self.poll = zmq.Poller()
+        self.poll.register(self.socket, zmq.POLLIN)
+
+    def send(self, request):
+        for attempt in range(self.retries):
+            self.socket.send(request)
+            socks = dict(self.poll.poll(self.timeout_ms))
+            if socks.get(self.socket) == zmq.POLLIN:
+                reply = self.socket.recv()
+                return reply
+            else:
+                log.info('timeout')
+                self._bounce_socket()
+        raise MaxRetryError('Tried {} times'.format(attempt))
+
+    def send_multipart(self, request):
+        for attempt in range(self.retries):
+            self.socket.send_multipart(request)
+            socks = dict(self.poll.poll(self.timeout_ms))
+            if socks.get(self.socket) == zmq.POLLIN:
+                reply = self.socket.recv_multipart()
+                return reply
+            else:
+                self._bounce_socket()
+        raise MaxRetryError('Tried {} times'.format(attempt))
+
+    def _bounce_socket(self):
+        # Socket is confused. Close and remove it.
+        self.socket.setsockopt(zmq.LINGER, 0)
+        self.socket.close()
+        self.poll.unregister(self.socket)
+        # Create new connection
+        self.socket = self.ctx.socket(zmq.REQ)
+        self.socket.connect(self.uri)
+        self.poll.register(self.socket, zmq.POLLIN)
+
+
 class Worker(threading.Thread):
 
     def __init__(self, ctx, uri, handler, *args, **kwargs):
