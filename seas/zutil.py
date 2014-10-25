@@ -200,15 +200,14 @@ class TimeoutReactor(object):
             # Someone else handled this
             return
         # Handle the reply
-        if client_addr != 'READY':
-            empty, reply = msg[3:]
-            assert empty == ''
-            self.frontend.send_multipart([client_addr, '', reply])
+        empty, reply = msg[3:]
+        assert empty == ''
+        self.frontend.send_multipart([client_addr, '', reply])
 
     def handle_frontend(self, msg, req_id=None):
         log.debug("Frontend: %s", msg)
         worker_addr = self.available.pop()
-        log.debug("... route to %s", worker_addr)
+        log.debug("... route to %r", worker_addr)
         if req_id is None:
             req_id = self.request_id
             self.request_id += 1
@@ -227,8 +226,7 @@ class TimeoutReactor(object):
             heapq.heappop(self.timeouts)
             old_worker_addr, msg = self.requests.pop(req_id, (None, None))
             if old_worker_addr is None:
-                # requests handled successfully
+                # request was handled successfully
                 continue
-            del self.busy[old_worker_addr]
             log.debug('Timeout req %s', req_id)
             self.handle_frontend(msg, req_id)
