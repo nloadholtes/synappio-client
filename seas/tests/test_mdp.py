@@ -40,6 +40,22 @@ class TestMajorDomoClient(TestMajorDomo):
         self.assertEqual(len(service.requests), 2)
         cli.destroy()
 
+    def test_worker_gets_queued_requests(self):
+        cli = mdp.MajorDomoClient(self.uri, timeout=0)
+        req = cli.send_async('echo', 'hello')
+        self.broker_reactor.next()
+        wrk = mdp.MajorDomoWorker(self.uri, 'echo', _echo)
+        wrk_reactor = wrk.reactor()
+        wrk_reactor.next()
+        self.broker_reactor.next()  # handle worker registration / dispatch request
+        wrk_reactor.next()       # handle client req
+        self.broker_reactor.next()  # handle worker resp
+        self.assertEqual(req.recv(), ['hello'])
+        cli.destroy()
+        wrk.stop()
+        list(wrk_reactor)
+        wrk.destroy()
+
 class TestMajorDomoWorker(TestMajorDomo):
 
     def setUp(self):
@@ -67,15 +83,26 @@ class TestRoundTrip(TestMajorDomoWorker):
 
     def setUp(self):
         super(TestRoundTrip, self).setUp()
+        self.broker_reactor.next()  # handle worker registration
         self.client = mdp.MajorDomoClient(self.uri, timeout=0)
+
+    def _roundtrip(self):
+        self.broker_reactor.next()  # handle client req
+        self.worker_reactor.next()  # handle client req
+        self.broker_reactor.next()  # handle worker resp
 
     def test_echo(self):
         req = self.client.send_async('echo', 'hello')
-        self.broker_reactor.next()  # handle registration
-        self.broker_reactor.next()  # handle client req
-        self.worker_reactor.next()
-        self.broker_reactor.next()  # handle worker resp
+        self._roundtrip()
         self.assertEqual(req.recv(), ['hello'])
+
+    def test_echo2(self):
+        req = self.client.send_async('echo', 'hello1')
+        self._roundtrip()
+        self.assertEqual(req.recv(), ['hello1'])
+        req = self.client.send_async('echo', 'hello2')
+        self._roundtrip()
+        self.assertEqual(req.recv(), ['hello2'])
 
 
 def _echo(message):

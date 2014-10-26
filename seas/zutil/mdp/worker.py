@@ -54,12 +54,12 @@ class MajorDomoWorker(threading.Thread):
             elif self._socket in socks:
                 msg = self._socket.recv_multipart()
                 log.debug('recv\n%r', msg)
-                self._handle_message(msg)
+                self._handle_message(context, msg)
             else:
-                self._handle_timeout()
+                self._handle_timeout(context)
             if time.time() > self._heartbeat_at:
                 self._send(MDP.W_HEARTBEAT)
-                self._heartbeat_at = time.time() + self.heartbeat
+                self._heartbeat_at = time.time() + self.heartbeat_interval
 
     def stop(self, context=None):
         if context is None:
@@ -99,7 +99,7 @@ class MajorDomoWorker(threading.Thread):
         self._socket.send_multipart(msg)
         self._heartbeat_at = time.time() + self.heartbeat_interval
 
-    def _handle_message(self, msg):
+    def _handle_message(self, context, msg):
         self._cur_liveness = self.heartbeat_liveness
         assert len(msg) >= 3
         empty, magic, command = msg[:3]
@@ -107,7 +107,7 @@ class MajorDomoWorker(threading.Thread):
         if command == MDP.W_HEARTBEAT:
             return
         elif command == MDP.W_DISCONNECT:
-            self.reconnect()
+            self.reconnect(context)
         elif command == MDP.W_REQUEST:
             client, empty = msg[3:5]
             assert empty == ''
@@ -118,11 +118,11 @@ class MajorDomoWorker(threading.Thread):
         else:
             log.error('Invalid message\n%r', msg)
 
-    def _handle_timeout(self):
+    def _handle_timeout(self, context):
         self._cur_liveness -= 1
         if self._cur_liveness == 0:
             log.debug('Disconnected, retry')
             time.sleep(self.reconnect_delay)
-            self.reconnect()
+            self.reconnect(context)
 
 

@@ -158,7 +158,7 @@ class Worker(object):
             self._broker.send(self.addr, '', MDP.W_WORKER, MDP.W_DISCONNECT)
         if self.service is not None:
             self.service.workers.remove(self)
-        self.broker.workers.pop(self.addr)
+        self.broker._workers.pop(self.addr)
 
     def handle_client(self, client_addr, rmsg):
         payload = list(reversed(rmsg))
@@ -189,7 +189,7 @@ class Service(object):
             worker.handle_client(client_addr, rmsg)
 
     def purge_workers(self):
-        if self.workers[0].expires < time.time():
+        while self.workers and self.workers[0].expires < time.time():
             self.workers[0].delete(False)
 
 
