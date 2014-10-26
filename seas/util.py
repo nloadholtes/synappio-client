@@ -4,6 +4,7 @@ import sys
 import csv
 import base64
 import urlparse
+import threading
 from datetime import datetime
 from cStringIO import StringIO
 
@@ -135,7 +136,6 @@ class Retrying(object):
         raise info[0], info[1], info[2]
 
 
-
 def _attempt_encodings(s, encodings):
     if s is None:
         return u''
@@ -149,3 +149,23 @@ def _attempt_encodings(s, encodings):
             pass
     # Return the repr of the str -- should always be safe
     return unicode(repr(str(s)))[1:-1]
+
+
+class BetterJoiningThread(threading.Thread):
+
+    def __init__(self, *args, **kwargs):
+        self.result = None
+        self.exc_info = None
+        super(BetterJoiningThread, self).__init__(*args, **kwargs)
+
+    def run(self):
+        try:
+            self.result = super(BetterJoiningThread, self).run()
+        except Exception:
+            self.exc_info = sys.exc_info()
+
+    def join(self):
+        super(BetterJoiningThread, self).join()
+        if self.exc_info is not None:
+            raise self.exc_info[0], self.exc_info[1], self.exc_info[2]
+        return self.result

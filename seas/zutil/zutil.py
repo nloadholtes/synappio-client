@@ -31,6 +31,143 @@ class MaxRetryError(Exception):
     pass
 
 
+class MDP(object):
+    W_READY = '\x01'
+    W_REQUEST = '\x02'
+    W_REPLY = '\x03'
+    W_HEARTBEAT = '\x04'
+    W_DISCONNECT = '\x05'
+    W_WORKER = 'MDPW01'
+    C_CLIENT = 'MDPC01'
+
+
+class MajorDomoClient(object):
+
+    def __init__(self, uri, timeout, retries=3, context=None):
+        self.uri = uri
+        self.timeout = timeout
+        if context is None:
+            context = zmq.Context.instance()
+        self.context = context
+        self.socket = None
+        self.poller = zmq.Poller()
+        self.reconnect()
+
+    def reconnect(self):
+        if self.socket:
+            self.poller.unregister(self.socket)
+            self.socket.close()
+        self.socket = self.ctx.socket(zmq.REQ)
+        self.socket.linger = 0
+        self.socket.connect(self.broker)
+        self.poller.register(self.socket, zmq.POLLIN)
+
+    def send(self, service, request):
+        if not isinstance(request, list):
+            request = [request]
+        request = [MDP.C_CLIENT, service] + request
+        log.debug('send request to %r service\n%r', service, request)
+
+        retries = self.retries
+        while retries > 0:
+            self.socket.send_multipart(request)
+            items = self.poller.poll(self.timeout)
+            if items:
+                msg = self.client.recv_multipart()
+                log.debug('recv reply\n%r', msg)
+                assert len(msg) >= 3
+                assert msg[:2] == [MDP.C_CLIENT, service]
+                return msg[2]
+            elif retries:
+                log.debug('timeout, reconnect')
+                self.reconnect()
+                retries -= 1
+            else:
+                log.debug('timeout, retries exhausted')
+                raise MaxRetryError()
+
+
+class MajorDomoWorker(threading.Thread):
+
+    def __init__(self, uri, service, target, *args, **kwargs):
+        self.uri = uri
+        self.service = service
+        self.target = target
+        self.heartbeat_delay = kwargs.pop('heartbeat_delay', 2.5)
+        self.heartbeat_liveness = kwargs.pop('heartbeat_liveness', 3)
+        self.reconnect_delay = kwargs.pop('reconnect_delay', 2.5)
+        self.poller_timeout = kwargs.pop('poller_timeout', 2.5)
+        context = kwargs.pop('context', None)
+        if context is None:
+            context = zmq.Context.instance()
+        self.context = context
+        super(MajorDomoWorker, self).__init__(*args, **kwargs)
+        self._socket = None
+        self._poller = zmq.Poller()
+        self._cur_liveness = 0
+        self._heartbeat_at = 0
+
+    def _reconnect(self):
+        """Connect or reconnect to broker"""
+        if self._socket:
+            self._poller.unregister(self._socket)
+            self._socket.close()
+        self._socket = self.ctx._socket(zmq.DEALER)
+        self._socket.linger = 0
+        self._socket.connect(self.uri)
+        self._poller.register(self._socket, zmq.POLLIN)
+        log.debug('Connect to broker at %s', self.uri)
+        self._send(MDP.W_READY, self.service)
+        self._cur_liveness = self.liveness
+        self._heartbeat_at = time.time() + self.timeout
+
+    def _send(self, command, *parts):
+        msg = ['', MDP.W_WORKER, command] + list(parts)
+        log.debug('send %r\n%r', command, msg)
+        self._socket.send_multipart(msg)
+        self._heartbeat_at = time.time() + self.timeout
+
+    def run(self):
+        self._reconnect()
+        while True:
+            items = self.poller.poll(self.timeout)
+            if items:
+                msg = self.worker.recv_multipart()
+                log.debug('recv\n%r', msg)
+                self._handle_message(msg)
+            else:
+                self._handle_timeout()
+            if time.time() > self._heartbeat_at:
+                self._send(MDP.W_HEARTBEAT)
+                self.heartbeat_at = time.time() + self.heartbeat
+
+    def _handle_message(self, msg):
+        self._cur_liveness = self.heartbeat_liveness
+        assert len(msg) >= 3
+        empty, magic, command = msg[:3]
+        assert [empty, magic] == ['', MDP.W_WORKER]
+        if command == MDP.W_HEARTEAT:
+            continue
+        elif command == MDP.W_DISCONNECT:
+            self._reconnect()
+        elif command == MDP.W_REQUEST:
+            client, empty = msg[3:5]
+            assert empty == ''
+            response = self.target(*msg[5:])
+            self._send(MDP.W_REPLY, client, empty, *response)
+        elif command == MDP.W_HEARTEAT:
+            pass
+        else:
+            log.error('Invalid message\n%r', msg)
+
+    def _handle_timeout(self):
+        self._cur_liveness -= 1
+        if self._cur_liveness == 0:
+            log.debug('Disconnected, retry')
+            time.sleep(self.reconnect_delay)
+            self._reconnect()
+
+
 class LazyPirateClient(object):
 
     def __init__(self, ctx, uri, timeout, retries=3):
