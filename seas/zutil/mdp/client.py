@@ -49,6 +49,7 @@ class _Request(object):
 
     def __init__(self, client, service, *body):
         self.client = client
+        self.service = service
         self.message = [MDP.C_CLIENT, service] + list(body)
 
     def send(self):
@@ -60,7 +61,9 @@ class _Request(object):
         while True:
             items = self.client.poller.poll(self.client.timeout)
             if items:
-                return self.client.socket.recv_multipart()
+                msg = self.client.socket.recv_multipart()
+                assert msg[:2] == [MDP.C_CLIENT, self.service]
+                return msg[2:]
             elif retries:
                 log.debug('timeout, reconnect')
                 self.client.reconnect()

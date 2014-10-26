@@ -52,7 +52,7 @@ class MajorDomoWorker(threading.Thread):
                     self._socket = None
                     break
             elif self._socket in socks:
-                msg = self.worker.recv_multipart()
+                msg = self._socket.recv_multipart()
                 log.debug('recv\n%r', msg)
                 self._handle_message(msg)
             else:
@@ -73,7 +73,7 @@ class MajorDomoWorker(threading.Thread):
 
     def destroy(self):
         if self._socket:
-            self.socket.close()
+            self._socket.close()
 
     def reconnect(self, context):
         """Connect or reconnect to broker"""
@@ -104,7 +104,7 @@ class MajorDomoWorker(threading.Thread):
         assert len(msg) >= 3
         empty, magic, command = msg[:3]
         assert [empty, magic] == ['', MDP.W_WORKER]
-        if command == MDP.W_HEARTEAT:
+        if command == MDP.W_HEARTBEAT:
             return
         elif command == MDP.W_DISCONNECT:
             self.reconnect()

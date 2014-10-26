@@ -19,6 +19,7 @@ class MajorDomoBroker(object):
         self.heartbeat_interval = kwargs.pop('heartbeat_interval', 1.0)
         self.heartbeat_interval = kwargs.pop('heartbeat_interval', 1.0)
         self.heartbeat_liveness = kwargs.pop('heartbeat_liveness', 3)
+        self.request_timeout = kwargs.pop('request_timeout', 5)
         self.socket = None
         self._control_uri = 'inproc://mdp-broker-{}'.format(id(self))
         self._services = {}
@@ -79,7 +80,8 @@ class MajorDomoBroker(object):
     def handle_client(self, sender_addr, rmsg):
         service_name = rmsg.pop()
         service = self.require_service(service_name)
-        service.handle_client(sender_addr, rmsg)
+        service.queue_request(sender_addr, rmsg, self.request_timeout)
+        service.dispatch()
 
     def handle_worker(self, sender_addr, rmsg):
         command = rmsg.pop()
@@ -87,6 +89,15 @@ class MajorDomoBroker(object):
             worker = self.require_worker(sender_addr)
             service = self.require_service(rmsg.pop())
             worker.register(service)
+            worker.ready()
+            service.dispatch()
+        elif command == MDP.W_REPLY:
+            worker = self.require_worker(sender_addr)
+            client_addr = rmsg.pop()
+            assert rmsg.pop() == ''
+            payload = list(reversed(rmsg))
+            self.send(
+                client_addr, '', MDP.C_CLIENT, worker.service.name, *payload)
             worker.ready()
         else:
             raise NotImplementedError()
@@ -104,6 +115,9 @@ class MajorDomoBroker(object):
     def destroy(self):
         if self.socket:
             self.socket.close()
+
+    def send(self, *parts):
+        self.socket.send_multipart(list(parts))
 
     def require_service(self, service_name):
         service = self._services.get(service_name)
@@ -146,21 +160,36 @@ class Worker(object):
             self.service.workers.remove(self)
         self.broker.workers.pop(self.addr)
 
+    def handle_client(self, client_addr, rmsg):
+        payload = list(reversed(rmsg))
+        self.broker._workers_ready.remove(self)
+        self.broker.send(
+            self.addr, '', MDP.W_WORKER, MDP.W_REQUEST, client_addr, '', *payload)
+
 
 class Service(object):
 
     def __init__(self, broker, name):
         self.broker = broker
         self.name = name
-        self.requests = deque()     # (time, sender, body)
+        self.requests = deque()     # (exp, sender, body)
         self.workers = deque()      # workers available
 
-    def handle_client(self, client_addr, rmsg):
-        if self.workers:
+    def queue_request(self, client_addr, rmsg, timeout):
+        log.debug('queueing request from %s', client_addr)
+        self.requests.appendleft((time.time() + timeout, client_addr, rmsg))
+
+    def dispatch(self):
+        self.purge_workers()
+        while self.requests and self.workers:
+            (exp, client_addr, rmsg) = self.requests.pop()
+            if exp < time.time():
+                continue
             worker = self.workers.pop()
-            log.debug('route request from %s to %s', client_addr, worker)
             worker.handle_client(client_addr, rmsg)
-        else:
-            log.debug('queueing request from %s', client_addr)
-            self.requests.appendleft((time.time(), client_addr, rmsg))
+
+    def purge_workers(self):
+        if self.workers[0].expires < time.time():
+            self.workers[0].delete(False)
+
 

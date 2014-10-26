@@ -67,12 +67,14 @@ class TestRoundTrip(TestMajorDomoWorker):
 
     def setUp(self):
         super(TestRoundTrip, self).setUp()
-        self.client = mdp.MajorDomoClient(self.uri)
+        self.client = mdp.MajorDomoClient(self.uri, timeout=0)
 
     def test_echo(self):
         req = self.client.send_async('echo', 'hello')
-        self.broker_reactor.next()
+        self.broker_reactor.next()  # handle registration
+        self.broker_reactor.next()  # handle client req
         self.worker_reactor.next()
+        self.broker_reactor.next()  # handle worker resp
         self.assertEqual(req.recv(), ['hello'])
 
 
