@@ -172,7 +172,7 @@ class Worker(object):
         if disconnect:
             self._broker.send_to_worker(self.addr, MDP.W_DISCONNECT)
         if self.service is not None:
-            self.service.reap_worker(self)
+            self.service.unregister_worker(self)
         self.brokers.heartbeat.discard_peer(self.addr)
 
     def handle_client(self, client_addr, rmsg):
