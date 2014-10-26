@@ -63,6 +63,18 @@ class TestMajorDomoWorker(TestMajorDomo):
         self.assertEqual(len(service.workers), 1)
 
 
+class TestRoundTrip(TestMajorDomoWorker):
+
+    def setUp(self):
+        super(TestRoundTrip, self).setUp()
+        self.client = mdp.MajorDomoClient(self.uri)
+
+    def test_echo(self):
+        req = self.client.send_async('echo', 'hello')
+        self.broker_reactor.next()
+        self.worker_reactor.next()
+        self.assertEqual(req.recv(), ['hello'])
+
 
 def _echo(message):
     return [message]
