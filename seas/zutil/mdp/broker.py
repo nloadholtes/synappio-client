@@ -6,6 +6,7 @@ import zmq
 
 from . import constants as MDP
 from . import err
+from seas.zutil.heartbeat import HeartbeatManager
 
 
 log = logging.getLogger(__name__)
@@ -15,16 +16,15 @@ class MajorDomoBroker(object):
 
     def __init__(self, uri, **kwargs):
         self.uri = uri
+        self.heartbeat = HeartbeatManager(
+            kwargs.pop('heartbeat_interval', 1.0),
+            kwargs.pop('heartbeat_liveness', 3))
         self.poll_interval = kwargs.pop('poll_interval', 1.0)
-        self.heartbeat_interval = kwargs.pop('heartbeat_interval', 1.0)
-        self.heartbeat_interval = kwargs.pop('heartbeat_interval', 1.0)
-        self.heartbeat_liveness = kwargs.pop('heartbeat_liveness', 3)
         self.request_timeout = kwargs.pop('request_timeout', 5)
         self.socket = None
         self._control_uri = 'inproc://mdp-broker-{}'.format(id(self))
         self._services = {}
         self._workers = {}
-        self._workers_ready = deque()
 
     def serve_forever(self, context=None):
         if context is None:
@@ -61,6 +61,9 @@ class MajorDomoBroker(object):
                 log.debug('recv:\n%r', msg)
                 self.handle_message(list(reversed(msg)))
 
+        self.send_heartbeats()
+        self.reap_workers()
+
     def make_socket(self, context, socktype):
         socket = context.socket(socktype)
         socket.linger = 0
@@ -85,6 +88,7 @@ class MajorDomoBroker(object):
 
     def handle_worker(self, sender_addr, rmsg):
         command = rmsg.pop()
+        self.heartbeat.hear_from(sender_addr)
         if command == MDP.W_READY:
             worker = self.require_worker(sender_addr)
             service = self.require_service(rmsg.pop())
@@ -96,8 +100,7 @@ class MajorDomoBroker(object):
             client_addr = rmsg.pop()
             assert rmsg.pop() == ''
             payload = list(reversed(rmsg))
-            self.send(
-                client_addr, '', MDP.C_CLIENT, worker.service.name, *payload)
+            self.send_to_client(client_addr, worker.service.name, *payload)
             worker.ready()
         else:
             raise NotImplementedError()
@@ -116,8 +119,14 @@ class MajorDomoBroker(object):
         if self.socket:
             self.socket.close()
 
-    def send(self, *parts):
-        self.socket.send_multipart(list(parts))
+    def send_to_client(self, client_addr, service_name, *parts):
+        prefix = [client_addr, '', MDP.C_CLIENT, service_name]
+        self.socket.send_multipart(prefix + list(parts))
+
+    def send_to_worker(self, worker_addr, command, *parts):
+        prefix = [worker_addr, '', MDP.W_WORKER, command]
+        self.heartbeat.send_to(worker_addr)
+        self.socket.send_multipart(prefix + list(parts))
 
     def require_service(self, service_name):
         service = self._services.get(service_name)
@@ -129,18 +138,25 @@ class MajorDomoBroker(object):
     def require_worker(self, worker_addr):
         worker = self._workers.get(worker_addr)
         if worker is None:
-            lifetime = self.heartbeat_interval * self.heartbeat_liveness
-            worker = Worker(self, worker_addr, lifetime)
+            worker = Worker(self, worker_addr)
             self._workers[worker_addr] = worker
         return worker
+
+    def send_heartbeats(self):
+        for addr in self.heartbeat.need_beats():
+            self.send_to_worker(addr, MDP.HEARTBEAT)
+
+    def reap_workers(self):
+        for addr in self.heartbeat.reap():
+            worker = self.require_worker(addr)
+            worker.delete(False)
 
 
 class Worker(object):
 
-    def __init__(self, broker, addr, lifetime):
+    def __init__(self, broker, addr):
         self.broker = broker
         self.addr = addr
-        self.expires = time.time() + lifetime
         self.service = None
 
     def register(self, service):
@@ -150,21 +166,19 @@ class Worker(object):
         self.service = service
 
     def ready(self):
-        self.broker._workers_ready.appendleft(self)
-        self.service.workers.appendleft(self)
+        self.service.worker_ready(self)
 
     def delete(self, disconnect):
         if disconnect:
-            self._broker.send(self.addr, '', MDP.W_WORKER, MDP.W_DISCONNECT)
+            self._broker.send_to_worker(self.addr, MDP.W_DISCONNECT)
         if self.service is not None:
-            self.service.workers.remove(self)
-        self.broker._workers.pop(self.addr)
+            self.service.reap_worker(self)
+        self.brokers.heartbeat.discard_peer(self.addr)
 
     def handle_client(self, client_addr, rmsg):
         payload = list(reversed(rmsg))
-        self.broker._workers_ready.remove(self)
-        self.broker.send(
-            self.addr, '', MDP.W_WORKER, MDP.W_REQUEST, client_addr, '', *payload)
+        self.broker.send_to_worker(
+            self.addr, MDP.W_REQUEST, client_addr, '', *payload)
 
 
 class Service(object):
@@ -172,24 +186,40 @@ class Service(object):
     def __init__(self, broker, name):
         self.broker = broker
         self.name = name
-        self.requests = deque()     # (exp, sender, body)
-        self.workers = deque()      # workers available
+        self.requests = deque()         # (exp, sender, body)
+        self._workers_ready = deque()    # workers available
+        self.workers = {}
+
+    def worker_ready(self, worker):
+        self._workers_ready.appendleft(worker.addr)
+        self.workers[worker.addr] = worker
+
+    def unregister_worker(self, worker):
+        self.workers.pop(worker.addr, None)
 
     def queue_request(self, client_addr, rmsg, timeout):
         log.debug('queueing request from %s', client_addr)
         self.requests.appendleft((time.time() + timeout, client_addr, rmsg))
 
     def dispatch(self):
-        self.purge_workers()
-        while self.requests and self.workers:
+        while self.requests and self._workers_ready:
             (exp, client_addr, rmsg) = self.requests.pop()
             if exp < time.time():
                 continue
-            worker = self.workers.pop()
+            worker = self.pop_ready_worker()
+            if worker is None:
+                self.requests.append((exp, client_addr, rmsg))
+                break
             worker.handle_client(client_addr, rmsg)
 
-    def purge_workers(self):
-        while self.workers and self.workers[0].expires < time.time():
-            self.workers[0].delete(False)
+    def pop_ready_worker(self):
+        while self._workers_ready:
+            addr = self._workers_ready.pop()
+            worker = self.workers.get(addr)
+            if worker is not None:
+                return worker
+        return None
+
+
 
 
