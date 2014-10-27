@@ -3,7 +3,7 @@ Managing List Members
 
 ### Adding members to a list:
 
-The DataValidation Batch API provides two methods for subscribing new members to an existing list. 
+The DataValidation Batch API provides multiple methods for subscribing new members to an existing list. 
 
 #### To add a single member:
 
@@ -113,6 +113,157 @@ Sample output:
         ]
     }
 
+#### Adding members via download url:
+
+By using the '/{list_slug}/import/' endpoint, you can subscribe multiple members to an existing list by providing us with a download link to a csv file containing the members you want to subscribe.
+
+/list/{list_slug}/import/:
+
+Command:
+
+~~~~
+curl -X POST
+-H "Authorization: bearer {api_key}"
+-H "Content-Type: application/json"
+"https://api.datavalidation.com/1.0/list/{list_slug}/"
+-d '{
+        "href": {csv_download_url_in_quotes}
+        "mapping":
+	    {
+    		"email_col":0,
+		    "slug_col":2,
+		    "header_row":true,
+		    "include_metadata":false,
+	    }
+    }'
+~~~~
+
+Sample output:
+
+~~~~
+[
+    {
+        "status": "New",
+        "created": "2014-10-24T21:52:31.225000Z",
+        "mapping": {
+            "header_row": true,
+            "email_col": 0,
+            "include_metadata": false,
+            "slug_col": 2
+        },
+        "note": "",
+        "href": {csv_download_url_in_quotes},
+        "meta": {
+            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+        },
+        "slug": "vYG7J_XT"
+    }
+]
+~~~~
+
+You can now send a GET request to the slug received in the previous request to view the status of the import job.
+
+list/{list_slug}/import/{import_slug}/:
+
+Command:
+
+~~~~
+curl -X GET
+-H "Authorization: bearer {api_key}"
+"https://api.datavalidation.com/1.0/list/{list_slug}/import/{import_slug}/"
+~~~~
+
+Output (when complete):
+
+~~~~
+[
+    {
+        "status": "Complete",
+        "created": "2014-10-24T21:52:31.225000Z",
+        "mapping": {
+            "header_row": true,
+            "email_col": 0,
+            "include_metadata": false,
+            "slug_col": 2
+        },
+        "note": "",
+        "href": {csv_download_url_in_quotes},
+        "meta": {
+            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+        },
+        "slug": "vYG7J_XT"
+    }
+]
+~~~~
+
+To view a list of previous import jobs, send a GET request to the '{list_slug}/import/' endpoint. This endpoint will return a list of all imports jobs that have been run on the list. The list will be in reverse-chronological order (newest first).
+
+list/{list_slug}/import/:
+
+Command:
+
+~~~~
+curl -X GET
+-H "Authorization: bearer {api_key}"
+"https://api.datavalidation.com/1.0/list/{list_slug}/import/"
+~~~~
+
+Sample output:
+
+~~~~
+{
+    "imports": [
+        {
+            "items": [
+                {
+                    "meta": {
+                        "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/x_jFVU7B/"
+                    }
+                },
+                {
+                    "meta": {
+                        "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+                    }
+                }
+            ],
+            "paging": {
+                "skip": 0,
+                "total": 2,
+                "limit": 2
+            },
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/",
+                "links": [
+                    {
+                        "href": "{slug}/",
+                        "rel": "item"
+                    }
+                ]
+            }
+        }
+    ]
+}
+~~~~
+
+To clean up the list of import jobs correlating to a list, send a DELETE request to the 'import/{import_slug}/' endpoint to remove a specific import job entry.
+
+/list/{list_slug}/import/{import_slug}/:
+
+Command:
+
+~~~~
+curl -X DELETE
+-H "Authorization: bearer {api_key}"
+"https://api.datavalidation.com/1.0/list/{list_slug}/import/{import_slug}/"
+~~~~
+
+Response:
+~~~~
+204: No Content
+~~~~
+
+After sending this request, you will notice that your list of import jobs no longer contains the entry you have deleted.
+
 
 ### Removing members from a list:
 
@@ -128,9 +279,9 @@ Command:
 
     curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list/{list_slug}/member/{member_slug}"
 
-Sample output:
+Response:
 
-    Status code: 204 No Content
+    204: No Content
 
 
 #### To unsubscribe multiple members from a list:
