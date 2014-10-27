@@ -123,8 +123,8 @@ Command:
 
 ~~~~
 curl -X POST
--H "Authorization: bearer {api_key}
-Content-Type: application/json"
+-H "Authorization: bearer {api_key}"
+-H "Content-Type: application/json"
 "https://api.datavalidation.com/1.0/list/{list_slug}/"
 -d '{
         "href": {csv_download_url_in_quotes}
@@ -195,6 +195,74 @@ Output (when complete):
     }
 ]
 ~~~~
+
+To view a list of previously import jobs, send a GET request to the '{list_slug}/import/' endpoint. This endpoint will return a list of all imports jobs that have been run on the list. The list will be in reverse-chronological order (newest first).
+
+list/{list_slug}/import/:
+
+Command:
+
+~~~~
+curl -X GET
+-H "Authorization: bearer {api_key}"
+"https://api.datavalidation.com/1.0/list/{list_slug}/import/"
+~~~~
+
+Output:
+
+~~~~
+{
+    "imports": [
+        {
+            "items": [
+                {
+                    "meta": {
+                        "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/x_jFVU7B/"
+                    }
+                },
+                {
+                    "meta": {
+                        "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+                    }
+                }
+            ],
+            "paging": {
+                "skip": 0,
+                "total": 2,
+                "limit": 2
+            },
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/",
+                "links": [
+                    {
+                        "href": "{slug}/",
+                        "rel": "item"
+                    }
+                ]
+            }
+        }
+    ]
+}
+~~~~
+
+If you want to clean up the list a import jobs correlating to a list, simply send a DELETE request to the 'import/{import_slug}/' endpoint to delete a specific import job entry.
+
+/list/{list_slug}/import/{import_slug}/:
+
+Command:
+
+~~~~
+curl -X DELETE
+-H "Authorization: bearer {api_key}"
+"https://api.datavalidation.com/1.0/list/{list_slug}/import/{import_slug}/"
+~~~~
+
+Response:
+~~~~
+204: No Content
+~~~~
+
+After sending this request, you will notice that your list of import jobs no longer contains the entry you have deleted.
 
 
 ### Removing members from a list:
