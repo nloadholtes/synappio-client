@@ -73,7 +73,7 @@ Command:
 
     $ curl -X POST
     -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/job"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/job/"
 
 Sample output:
 
