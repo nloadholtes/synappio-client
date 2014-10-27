@@ -25,7 +25,7 @@ def setup_logging(config_file):
     '''Setup logging like pyramid.paster.setup_logging but does
     NOT disable existing loggers
     '''
-    path, _ = config_file.split('#')
+    path = config_file.split('#')[0]
     full_path = os.path.abspath(path)
     here = os.path.dirname(full_path)
     return logging.config.fileConfig(
