@@ -59,7 +59,7 @@ class MajorDomoWorker(object):
             else:
                 self._handle_timeout(context)
             if time.time() > self._heartbeat_at:
-                log_heartbeat.info('send heartbeat')
+                log_heartbeat.debug('send heartbeat')
                 self._send(MDP.W_HEARTBEAT)
                 self._heartbeat_at = time.time() + self.heartbeat_interval
 
@@ -107,7 +107,7 @@ class MajorDomoWorker(object):
         empty, magic, command = msg[:3]
         assert [empty, magic] == ['', MDP.W_WORKER]
         if command == MDP.W_HEARTBEAT:
-            log_heartbeat.info('recv heartbeat')
+            log_heartbeat.debug('recv heartbeat')
             return
         elif command == MDP.W_DISCONNECT:
             self.reconnect(context)

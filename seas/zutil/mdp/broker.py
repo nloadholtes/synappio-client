@@ -107,7 +107,7 @@ class MajorDomoBroker(object):
             self.send_to_client(client_addr, worker.service.name, *payload)
             worker.service.worker_ready(worker)
         elif command == MDP.W_HEARTBEAT:
-            log_heartbeat.info('recv heartbeat %s', hexlify(sender_addr))
+            log_heartbeat.debug('recv heartbeat %s', hexlify(sender_addr))
             return
         else:
             log.error('Unknown command from %s: %s', hexlify(sender_addr), command)
@@ -152,7 +152,7 @@ class MajorDomoBroker(object):
 
     def send_heartbeats(self):
         for addr in self.heartbeat.need_beats():
-            log_heartbeat.info('send heartbeat %s', hexlify(addr))
+            log_heartbeat.debug('send heartbeat %s', hexlify(addr))
             self.send_to_worker(addr, MDP.W_HEARTBEAT)
 
     def reap_workers(self):
