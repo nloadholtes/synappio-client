@@ -7,6 +7,8 @@ import logging.config
 import urlparse
 import threading
 import bson
+import calendar
+import time
 import chardet
 import requests
 import pkg_resources
@@ -110,13 +112,21 @@ def load_content(url):
     else:
         assert False, "Don't know how to handle {} URLs".format(parsed.scheme)
 
+def stripe_filter_factory(field, value):
+    if field == 'fingerprint':
+        return lambda x: x['card'][field] == value
+    return lambda x: x[field] == value
 
-def datetime_spec_from_strings(before, after, ts_field='ts', template='%Y-%m-%d'):
-    if before and isinstance(before, basestring):
-        before = datetime.strptime(before, template)
-    if after and isinstance(after, basestring):
-        after = datetime.strptime(after, template)
-    return {ts_field: {'$gte': after, '$lte': before}}
+def daterange_filter_factory(before, after, ts_field='ts'):
+    return lambda x: x[ts_field] >= after and x[ts_field] <= before
+
+def timestamp_from_string(datestring, template='%Y-%m-%d'):
+    return calendar.timegm(time.strptime(datestring, '%Y-%m-%d'))
+
+def datetime_from_string(datestring, template='%Y-%m-%d'):
+    if datestring:
+        return datetime.strptime(datestring, template)
+    return None
 
 def jsonify(obj, **json_kwargs):
     if isinstance(obj, bson.ObjectId):
