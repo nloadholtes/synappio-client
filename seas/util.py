@@ -3,6 +3,7 @@ import os
 import sys
 import csv
 import base64
+import logging.config
 import urlparse
 import threading
 from datetime import datetime
@@ -16,7 +17,21 @@ from bag import csv2
 
 TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 re_wildcard = re.compile(r'(\{[a-zA-Z][^\}]*\})')
+re_newline = re.compile('(\r(?=[^\n]))|\r\n')
 manager = pkg_resources.ResourceManager()
+
+
+def setup_logging(config_file):
+    '''Setup logging like pyramid.paster.setup_logging but does
+    NOT disable existing loggers
+    '''
+    path, _ = config_file.split('#')
+    full_path = os.path.abspath(path)
+    here = os.path.dirname(full_path)
+    return logging.config.fileConfig(
+        full_path, dict(__file__=full_path, here=here),
+        disable_existing_loggers=False)
+
 
 def strptime(s):
     'Return a datetime object from an iso formatted string'
@@ -26,6 +41,7 @@ def strptime(s):
         us = '0'
     result = datetime.strptime(s, TIMESTAMP_FORMAT)
     return result.replace(microsecond=int(us))
+
 
 def pattern_for(path):
     '''Convert a swagger path spec to a url'''
@@ -40,6 +56,24 @@ def pattern_for(path):
         else:
             pattern_parts.append(re.escape(part))
     return re.compile(''.join(pattern_parts) + '$')
+
+
+def actual_response_lines(resp):
+    '''requests.Response.iter_lines() is BROKEN. It does not handle \r\n in
+    as sane way. This generator does.
+    '''
+    cur_buf = ''
+    for chunk in resp.iter_content(requests.models.ITER_CHUNK_SIZE):
+        cur_buf += chunk
+        cur_buf = re_newline.sub('\n', cur_buf)
+        lines = cur_buf.split('\n')
+        for line in lines[:-1]:
+            yield line + '\n'
+        cur_buf = lines[-1]
+    if cur_buf:
+        for line in cur_buf.split('\n'):
+            yield line + '\n'
+
 
 
 def really_unicode(s):
