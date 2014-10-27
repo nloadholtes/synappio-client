@@ -115,13 +115,16 @@ def load_content(url):
 def stripe_filter_factory(field, value):
     if field == 'fingerprint':
         return lambda x: x['card'][field] == value
+    if field.endswith('_id'):
+        field = 'id'
     return lambda x: x[field] == value
 
 def daterange_filter_factory(before, after, ts_field='ts'):
     return lambda x: x[ts_field] >= after and x[ts_field] <= before
 
 def timestamp_from_string(datestring, template='%Y-%m-%d'):
-    return calendar.timegm(time.strptime(datestring, '%Y-%m-%d'))
+    if datestring:
+        return calendar.timegm(time.strptime(datestring, '%Y-%m-%d'))
 
 def datetime_from_string(datestring, template='%Y-%m-%d'):
     if datestring:
