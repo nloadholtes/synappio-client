@@ -3,4 +3,5 @@ from . import constants as MDP
 from .client import MajorDomoClient
 from .worker import MajorDomoWorker
 from .broker import MajorDomoBroker
+from .proxy import MajorDomoProxy
 

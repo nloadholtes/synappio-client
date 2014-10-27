@@ -1,6 +1,5 @@
 import time
 import logging
-import threading
 
 import zmq
 
@@ -8,10 +7,13 @@ from . import constants as MDP
 
 
 log = logging.getLogger(__name__)
+log_dump = logging.getLogger('seas.zutil.dump')
+log_heartbeat = logging.getLogger(__name__ + '.heartbeat')
 
-class MajorDomoWorker(threading.Thread):
 
-    def __init__(self, uri, service, target, *args, **kwargs):
+class MajorDomoWorker(object):
+
+    def __init__(self, uri, service, target, **kwargs):
         self.uri = uri
         self.service = service
         self.target = target
@@ -19,7 +21,6 @@ class MajorDomoWorker(threading.Thread):
         self.heartbeat_interval = kwargs.pop('heartbeat_interval', 1.0)
         self.heartbeat_liveness = kwargs.pop('heartbeat_liveness', 3)
         self.reconnect_delay = kwargs.pop('reconnect_delay', 2.5)
-        super(MajorDomoWorker, self).__init__(*args, **kwargs)
         self._socket = None
         self._poller = zmq.Poller()
         self._cur_liveness = 0
@@ -41,23 +42,24 @@ class MajorDomoWorker(threading.Thread):
         self.reconnect(context)
         while True:
             yield self._poller
-            socks = dict(self._poller.poll(self.poll_interval))
+            socks = dict(self._poller.poll(1000 * self.poll_interval))
             if control in socks:
                 msg = control.recv()
-                log.debug('control: %s', msg)
+                log.info('control: %s', msg)
                 if msg == 'TERMINATE':
-                    log.debug('Terminating reactor')
+                    log.info('Terminating reactor')
                     control.close()
                     self._socket.close()
                     self._socket = None
                     break
             elif self._socket in socks:
                 msg = self._socket.recv_multipart()
-                log.debug('recv\n%r', msg)
+                log_dump.debug('recv\n%r', msg)
                 self._handle_message(context, msg)
             else:
                 self._handle_timeout(context)
             if time.time() > self._heartbeat_at:
+                log_heartbeat.info('send heartbeat')
                 self._send(MDP.W_HEARTBEAT)
                 self._heartbeat_at = time.time() + self.heartbeat_interval
 
@@ -65,7 +67,7 @@ class MajorDomoWorker(threading.Thread):
         if context is None:
             context = zmq.Context.instance()
         if self._socket:
-            log.debug('Send TERMINATE to %s', self._control_uri)
+            log.info('Send TERMINATE to %s', self._control_uri)
             sock = self.make_socket(context, zmq.PUSH)
             sock.connect(self._control_uri)
             sock.send('TERMINATE')
@@ -83,7 +85,7 @@ class MajorDomoWorker(threading.Thread):
         self._socket = self.make_socket(context, zmq.DEALER)
         self._socket.connect(self.uri)
         self._poller.register(self._socket, zmq.POLLIN)
-        log.debug('Connect to broker at %s', self.uri)
+        log.info('Connect to broker at %s', self.uri)
         self._send(MDP.W_READY, self.service)
         self._cur_liveness = self.heartbeat_liveness
         self._heartbeat_at = time.time() + self.heartbeat_interval
@@ -95,7 +97,7 @@ class MajorDomoWorker(threading.Thread):
 
     def _send(self, command, *parts):
         msg = ['', MDP.W_WORKER, command] + list(parts)
-        log.debug('send %r\n%r', command, msg)
+        log_dump.debug('send %r\n%r', command, msg)
         self._socket.send_multipart(msg)
         self._heartbeat_at = time.time() + self.heartbeat_interval
 
@@ -105,6 +107,7 @@ class MajorDomoWorker(threading.Thread):
         empty, magic, command = msg[:3]
         assert [empty, magic] == ['', MDP.W_WORKER]
         if command == MDP.W_HEARTBEAT:
+            log_heartbeat.info('recv heartbeat')
             return
         elif command == MDP.W_DISCONNECT:
             self.reconnect(context)
@@ -113,8 +116,6 @@ class MajorDomoWorker(threading.Thread):
             assert empty == ''
             response = self.target(*msg[5:])
             self._send(MDP.W_REPLY, client, empty, *response)
-        elif command == MDP.W_HEARTEAT:
-            pass
         else:
             log.error('Invalid message\n%r', msg)
 

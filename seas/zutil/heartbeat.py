@@ -1,5 +1,10 @@
 import time
+import logging
+from binascii import hexlify
 from collections import deque
+
+
+log = logging.getLogger(__name__)
 
 
 class HeartbeatManager(object):
@@ -15,6 +20,8 @@ class HeartbeatManager(object):
         peer = self.peers.get(addr, None)
         if peer is None:
             peer = self.peers[addr] = Peer(addr)
+            self.heard_from.appendleft((time.time(), addr))
+            self.sent_to.appendleft((time.time(), addr))
         return peer
 
     def discard_peer(self, addr):

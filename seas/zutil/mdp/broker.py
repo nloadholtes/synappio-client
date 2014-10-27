@@ -1,6 +1,7 @@
 import time
 import logging
 from collections import deque
+from binascii import hexlify
 
 import zmq
 
@@ -10,6 +11,8 @@ from seas.zutil.heartbeat import HeartbeatManager
 
 
 log = logging.getLogger(__name__)
+log_dump = logging.getLogger('seas.zutil.dump')
+log_heartbeat = logging.getLogger(__name__ + '.heartbeat')
 
 
 class MajorDomoBroker(object):
@@ -20,7 +23,7 @@ class MajorDomoBroker(object):
             kwargs.pop('heartbeat_interval', 1.0),
             kwargs.pop('heartbeat_liveness', 3))
         self.poll_interval = kwargs.pop('poll_interval', 1.0)
-        self.request_timeout = kwargs.pop('request_timeout', 5)
+        self.request_timeout = kwargs.pop('request_timeout', 60)
         self.socket = None
         self._control_uri = 'inproc://mdp-broker-{}'.format(id(self))
         self._services = {}
@@ -46,7 +49,7 @@ class MajorDomoBroker(object):
 
         while True:
             yield self.poller
-            socks = dict(self.poller.poll(self.poll_interval))
+            socks = dict(self.poller.poll(1000 * self.poll_interval))
             if control in socks:
                 msg = control.recv()
                 log.debug('control: %s', msg)
@@ -58,11 +61,11 @@ class MajorDomoBroker(object):
                     break
             if self.socket in socks:
                 msg = self.socket.recv_multipart()
-                log.debug('recv:\n%r', msg)
+                log_dump.debug('recv:\n%r', msg)
                 self.handle_message(list(reversed(msg)))
 
-        self.send_heartbeats()
-        self.reap_workers()
+            self.send_heartbeats()
+            self.reap_workers()
 
     def make_socket(self, context, socktype):
         socket = context.socket(socktype)
@@ -90,10 +93,11 @@ class MajorDomoBroker(object):
         command = rmsg.pop()
         self.heartbeat.hear_from(sender_addr)
         if command == MDP.W_READY:
+            self.heartbeat.send_to(sender_addr)
             worker = self.require_worker(sender_addr)
             service = self.require_service(rmsg.pop())
             worker.register(service)
-            worker.ready()
+            service.worker_ready(worker)
             service.dispatch()
         elif command == MDP.W_REPLY:
             worker = self.require_worker(sender_addr)
@@ -101,8 +105,12 @@ class MajorDomoBroker(object):
             assert rmsg.pop() == ''
             payload = list(reversed(rmsg))
             self.send_to_client(client_addr, worker.service.name, *payload)
-            worker.ready()
+            worker.service.worker_ready(worker)
+        elif command == MDP.W_HEARTBEAT:
+            log_heartbeat.info('recv heartbeat %s', hexlify(sender_addr))
+            return
         else:
+            log.error('Unknown command from %s: %s', hexlify(sender_addr), command)
             raise NotImplementedError()
 
     def stop(self, context=None):
@@ -144,7 +152,8 @@ class MajorDomoBroker(object):
 
     def send_heartbeats(self):
         for addr in self.heartbeat.need_beats():
-            self.send_to_worker(addr, MDP.HEARTBEAT)
+            log_heartbeat.info('send heartbeat %s', hexlify(addr))
+            self.send_to_worker(addr, MDP.W_HEARTBEAT)
 
     def reap_workers(self):
         for addr in self.heartbeat.reap():
@@ -165,15 +174,13 @@ class Worker(object):
             self.delete(True)
         self.service = service
 
-    def ready(self):
-        self.service.worker_ready(self)
-
     def delete(self, disconnect):
+        log.info('Disconnecting worker %s', hexlify(self.addr))
         if disconnect:
             self._broker.send_to_worker(self.addr, MDP.W_DISCONNECT)
         if self.service is not None:
             self.service.unregister_worker(self)
-        self.brokers.heartbeat.discard_peer(self.addr)
+        self.broker.heartbeat.discard_peer(self.addr)
 
     def handle_client(self, client_addr, rmsg):
         payload = list(reversed(rmsg))
@@ -191,14 +198,19 @@ class Service(object):
         self.workers = {}
 
     def worker_ready(self, worker):
+        log.info('%s: ready worker %s', self.name, hexlify(worker.addr))
         self._workers_ready.appendleft(worker.addr)
         self.workers[worker.addr] = worker
 
     def unregister_worker(self, worker):
+        log.info('%s: unregister %s', self.name, hexlify(worker.addr))
         self.workers.pop(worker.addr, None)
 
     def queue_request(self, client_addr, rmsg, timeout):
-        log.debug('queueing request from %s', client_addr)
+        log.debug('queueing request from %s on %s', hexlify(client_addr), self.name)
+        log.debug('workers ready:')
+        for addr in self._workers_ready:
+            log.debug(' - %s', hexlify(addr))
         self.requests.appendleft((time.time() + timeout, client_addr, rmsg))
 
     def dispatch(self):
@@ -207,10 +219,10 @@ class Service(object):
             if exp < time.time():
                 continue
             worker = self.pop_ready_worker()
-            if worker is None:
-                self.requests.append((exp, client_addr, rmsg))
+            if worker is not None:
+                worker.handle_client(client_addr, rmsg)
                 break
-            worker.handle_client(client_addr, rmsg)
+            self.requests.append((exp, client_addr, rmsg))
 
     def pop_ready_worker(self):
         while self._workers_ready:

@@ -11,7 +11,10 @@ class MajorDomoClient(object):
 
     def __init__(self, uri, timeout=None, retries=3, context=None):
         self.uri = uri
-        self.timeout = timeout
+        if timeout is None:
+            self.timeout_ms = None
+        else:
+            self.timeout_ms = int(1000 * timeout)
         self.retries = retries
         if context is None:
             context = zmq.Context.instance()
@@ -59,7 +62,7 @@ class _Request(object):
     def recv(self):
         retries = self.client.retries
         while True:
-            items = self.client.poller.poll(self.client.timeout)
+            items = self.client.poller.poll(self.client.timeout_ms)
             if items:
                 msg = self.client.socket.recv_multipart()
                 assert msg[:2] == [MDP.C_CLIENT, self.service]
