@@ -196,7 +196,7 @@ Output (when complete):
 ]
 ~~~~
 
-To view a list of previously import jobs, send a GET request to the '{list_slug}/import/' endpoint. This endpoint will return a list of all imports jobs that have been run on the list. The list will be in reverse-chronological order (newest first).
+To view a list of previous import jobs, send a GET request to the '{list_slug}/import/' endpoint. This endpoint will return a list of all imports jobs that have been run on the list. The list will be in reverse-chronological order (newest first).
 
 list/{list_slug}/import/:
 
@@ -245,7 +245,7 @@ Output:
 }
 ~~~~
 
-If you want to clean up the list a import jobs correlating to a list, simply send a DELETE request to the 'import/{import_slug}/' endpoint to delete a specific import job entry.
+To clean up the list of import jobs correlating to a list, send a DELETE request to the 'import/{import_slug}/' endpoint to remove a specific import job entry.
 
 /list/{list_slug}/import/{import_slug}/:
 
