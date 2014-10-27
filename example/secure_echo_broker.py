@@ -19,7 +19,11 @@ def main():
 
     key = Key.load('example/broker.key_secret')
     broker = SecureMajorDomoBroker(key, sys.argv[1])
-    broker.serve_forever()
+    try:
+        broker.serve_forever()
+    except KeyboardInterrupt:
+        auth.stop()
+        raise
 
 if __name__ == '__main__':
     main()
