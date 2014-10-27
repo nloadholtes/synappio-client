@@ -138,7 +138,7 @@ curl -X POST
     }'
 ~~~~
 
-Output:
+Sample output:
 
 ~~~~
 [
@@ -208,7 +208,7 @@ curl -X GET
 "https://api.datavalidation.com/1.0/list/{list_slug}/import/"
 ~~~~
 
-Output:
+Sample output:
 
 ~~~~
 {
@@ -279,9 +279,9 @@ Command:
 
     curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list/{list_slug}/member/{member_slug}"
 
-Sample output:
+Response:
 
-    Status code: 204 No Content
+    204: No Content
 
 
 #### To unsubscribe multiple members from a list:
