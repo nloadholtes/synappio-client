@@ -11,3 +11,5 @@ repos/*
 build/*
 *.egg-info/*
 .DS_Store
+*.key_secret
+*.key

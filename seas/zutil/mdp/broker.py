@@ -40,7 +40,7 @@ class MajorDomoBroker(object):
             context = zmq.Context.instance()
         log.debug('In reactor %s', self._control_uri)
         self.socket = self.make_socket(context, zmq.ROUTER)
-        control = self.make_socket(context, zmq.PULL)
+        control = context.socket(zmq.PULL)
         self.socket.bind(self.uri)
         control.bind(self._control_uri)
         self.poller = zmq.Poller()
@@ -159,6 +159,19 @@ class MajorDomoBroker(object):
         for addr in self.heartbeat.reap():
             worker = self.require_worker(addr)
             worker.delete(False)
+
+
+class SecureMajorDomoBroker(MajorDomoBroker):
+
+    def __init__(self, key, *args, **kwargs):
+        self.key = key
+        super(SecureMajorDomoBroker, self).__init__(*args, **kwargs)
+
+    def make_socket(self, context, socktype):
+        socket = super(SecureMajorDomoBroker, self).make_socket(context, socktype)
+        self.key.apply(socket)
+        socket.curve_server = True
+        return socket
 
 
 class Worker(object):

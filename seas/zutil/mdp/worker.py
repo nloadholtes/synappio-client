@@ -36,7 +36,7 @@ class MajorDomoWorker(object):
     def reactor(self, context=None):
         if context is None:
             context = zmq.Context.instance()
-        control = self.make_socket(context, zmq.PULL)
+        control = context.socket(zmq.PULL)
         control.bind(self._control_uri)
         self._poller.register(control, zmq.POLLIN)
         self.reconnect(context)
@@ -127,3 +127,15 @@ class MajorDomoWorker(object):
             self.reconnect(context)
 
 
+class SecureMajorDomoWorker(MajorDomoWorker):
+
+    def __init__(self, server_key, client_key, *args, **kwargs):
+        self.server_key = server_key
+        self.client_key = client_key
+        super(SecureMajorDomoWorker, self).__init__(*args, **kwargs)
+
+    def make_socket(self, context, socktype):
+        socket = super(SecureMajorDomoWorker, self).make_socket(context, socktype)
+        self.client_key.apply(socket)
+        socket.curve_serverkey = self.server_key.public
+        return socket

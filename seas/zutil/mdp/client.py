@@ -27,10 +27,14 @@ class MajorDomoClient(object):
         if self.socket:
             self.poller.unregister(self.socket)
             self.socket.close()
-        self.socket = self.context.socket(zmq.REQ)
-        self.socket.linger = 0
+        self.socket = self.make_socket(self.context, zmq.REQ)
         self.socket.connect(self.uri)
         self.poller.register(self.socket, zmq.POLLIN)
+
+    def make_socket(self, context, socktype):
+        socket = context.socket(socktype)
+        socket.linger = 0
+        return socket
 
     def send(self, service, *body):
         req = _Request(self, service, *body)
@@ -46,6 +50,20 @@ class MajorDomoClient(object):
         if self.socket:
             self.poller.unregister(self.socket)
             self.socket.close()
+
+
+class SecureMajorDomoClient(MajorDomoClient):
+
+    def __init__(self, server_key, client_key, *args, **kwargs):
+        self.server_key = server_key
+        self.client_key = client_key
+        super(SecureMajorDomoClient, self).__init__(*args, **kwargs)
+
+    def make_socket(self, context, socktype):
+        socket = super(SecureMajorDomoClient, self).make_socket(context, socktype)
+        self.client_key.apply(socket)
+        socket.curve_serverkey = self.server_key.public
+        return socket
 
 
 class _Request(object):

@@ -1,4 +1,4 @@
-import zmq
+import zmq.auth
 
 class Key(object):
 
@@ -9,6 +9,11 @@ class Key(object):
     @classmethod
     def generate(cls):
         public, secret = zmq.curve_keypair()
+        return cls(public, secret)
+
+    @classmethod
+    def load(cls, filename):
+        public, secret = zmq.auth.load_certificate(filename)
         return cls(public, secret)
 
     def apply(self, socket):
