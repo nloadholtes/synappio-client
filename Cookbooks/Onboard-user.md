@@ -27,8 +27,8 @@ Note: If you intend on accessing individual member grades and not ALL member gra
 Sample command:
 
     $ curl -X POST
-    -H "Content-Type: text/csv
-        Authorization: bearer {api_key}"
+    -H "Content-Type: text/csv"
+    -H "Authorization: bearer {api_key}"
     "https://api.datavalidation.com/1.0/list/?header=true&email=0&metadata=true&slug_col=2"
     -d "email_address,first_name,ID,
         foo@example.com,foo,001,
