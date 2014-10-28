@@ -302,7 +302,7 @@ Using the '/member/{member_slug}/' endpoint will provide output similar to the '
 
 Command:
 
-    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
+    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/{member_slug}"
 
 Sample output:
 
