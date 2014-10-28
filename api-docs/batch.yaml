@@ -34,7 +34,8 @@ apis:
             paramType: query
             type: boolean
             defaultValue: false
-          - name: pretty
+          - &pretty
+            name: pretty
             description: Indent JSON output?
             paramType: query
             type: boolean
@@ -84,21 +85,12 @@ apis:
             type: string
             description: The slug (ID) of the list being updated
             defaultValue: random-slug
-          - &pretty
-            name: pretty
-            description: Indent JSON output?
-            paramType: query
-            type: boolean
-            defaultValue: false
+          - *pretty
       - method: DELETE
         nickname: deleteList
         summary: Delete an individual list and all its subscribers
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list being updated
-            defaultValue: random-slug
+          - *list_slug
   - path: /list/{list_slug}/unsubscribe.csv
     operations:
       - method: POST
@@ -106,11 +98,7 @@ apis:
         summary: Remove subscribers from a given list via csv
         consumes: ['text/csv']
         parameters:
-        - name: list_slug
-          paramType: path
-          type: string
-          description: The slug (ID) of the list that members are to be unsubscribed from
-          defaultValue: random-slug
+        - *list_slug
         - name: header
           paramType: query
           description: Is there a header row present in the CSV data
@@ -132,11 +120,7 @@ apis:
           This method is used to subscribe additional users to a list. Note that you must
           provide mapping data in the URL parameters as documented below.
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list being updated
-            defaultValue: random-slug
+          - *list_slug
           - name: header
             paramType: query
             description: Is there a header row present in the CSV data
@@ -170,11 +154,7 @@ apis:
         notes: |
           Use this method for bulk export of list subscribers.
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list being updated
-            defaultValue: random-slug
+          - *list_slug
 
   - path: /1.0/list/{list_slug}/import/
     operations:
@@ -262,16 +242,8 @@ apis:
             paramType: query
             defaultValue: 50
             maximum: 500
-          - name: _expand
-            description: Expand the list of items?
-            paramType: query
-            type: boolean
-            defaultValue: false
-          - name: pretty
-            description: Indent JSON output?
-            paramType: query
-            type: boolean
-            defaultValue: false
+          - *_expand
+          - *pretty
       - method: POST
         nickname: createListMember
         summary: Create a new list member
@@ -279,11 +251,7 @@ apis:
         notes: |
           Use this to create a single member on your list.
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list being updated
-            defaultValue: random-slug
+          - *list_slug
           - name: body
             paramType: body
             type: NewMember
@@ -297,21 +265,13 @@ apis:
         notes: |
           Use this to get a single member from your list.
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list being updated
-            defaultValue: random-slug
+          - *list_slug
           - name: member_slug
             paramType: path
             type: string
             description: The slug (ID) of the member being updated
             defaultValue: random-or-user-defined-slug
-          - name: pretty
-            description: Indent JSON output?
-            paramType: query
-            type: boolean
-            defaultValue: false
+          - *pretty
       - method: PUT
         nickname: putListMember
         type: MemberResponse
@@ -320,21 +280,13 @@ apis:
           Use this to update a single member on your list. Note that whatever you provide in
           the request body will *replace* the information for that member in your list.
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list being updated
-            defaultValue: random-slug
+          - *list_slug
           - name: member_slug
             paramType: path
             type: string
             description: The slug (ID) of the member being updated
             defaultValue: random-or-user-defined-slug
-          - name: pretty
-            description: Indent JSON output?
-            paramType: query
-            type: boolean
-            defaultValue: false
+          - *pretty
           - name: body
             paramType: body
             description: Member information
@@ -345,11 +297,7 @@ apis:
         notes: |
           Use this to remove a single member on your list.
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list being updated
-            defaultValue: random-slug
+          - *list_slug
           - name: member_slug
             paramType: path
             type: string
@@ -364,16 +312,8 @@ apis:
         notes: |
           Use this to retrieve the validation jobs run on a list in reverse-chronological order.
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list
-            defaultValue: random-slug
-          - name: pretty
-            description: Indent JSON output?
-            paramType: query
-            type: boolean
-            defaultValue: false
+          - *list_slug
+          - *pretty
           - name: paging.skip
             description: Paging offset
             type: integer
@@ -385,11 +325,7 @@ apis:
             paramType: query
             defaultValue: 50
             maximum: 500
-          - name: _expand
-            description: Expand the list of items?
-            paramType: query
-            type: boolean
-            defaultValue: false
+          - *_expand
       - method: POST
         nickname: createJob
         type: JobResponse
@@ -397,16 +333,8 @@ apis:
         notes: |
           Use this to get information about your jobs.
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list to be analyzed
-            defaultValue: random-slug
-          - name: pretty
-            description: Indent JSON output?
-            paramType: query
-            type: boolean
-            defaultValue: false
+          - *list_slug
+          - *pretty
   - path: /list/{list_slug}/job/{job_slug}/
     operations:
       - method: GET
@@ -416,21 +344,13 @@ apis:
         notes: |
           Retrieve the results (or status) of a job
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list
-            defaultValue: random-slug
+          - *list_slug
           - name: job_slug
             paramType: path
             type: string
             description: The slug (ID) of the job
             defaultValue: random-slug
-          - name: pretty
-            description: Indent JSON output?
-            paramType: query
-            type: boolean
-            defaultValue: false
+          - *pretty
   - path: /list/{list_slug}/job/{job_slug}/export.csv
     operations:
       - method: GET
@@ -442,21 +362,13 @@ apis:
           The return includes a location header which indicates where on S3 the CSV file is located. Please note that the link is only valid for 300 seconds (5 minutes). After that time a new call to this endpoint will generate a new valid link to the CSV file.
           The CSV will contain a header row, and will include the member slug, address, and analysis fields.
         parameters:
-          - name: list_slug
-            paramType: path
-            type: string
-            description: The slug (ID) of the list
-            defaultValue: random-slug
+          - *list_slug
           - name: job_slug
             paramType: path
             type: string
             description: The slug (ID) of the job
             defaultValue: random-slug
-          - name: pretty
-            description: Indent JSON output?
-            paramType: query
-            type: boolean
-            defaultValue: false
+          - *pretty
 
 models:
 
@@ -528,6 +440,7 @@ models:
   ListCollection:
     id: ListCollection
     required: ['meta', 'paging', 'items']
+    type: array
     properties:
       meta: {$ref: MetaRef}
       paging: {$ref: Paging}
@@ -545,11 +458,9 @@ models:
 
   ListResponse:
     id: ListResponse
-    required: ['meta', 'slug', 'size']
+    required: ['list']
     properties:
-      meta: {$ref: MetaRef}
-      slug: {type: string, defaultValue: random-slug}
-      size: {type: integer}
+      list: {$ref: ListItem}
 
   MetaRef:
     id: MetaRef
