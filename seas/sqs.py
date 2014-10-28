@@ -16,7 +16,7 @@ class Listener(object):
         log.debug('Entering Listener.run')
         while True:
             try:
-                messages = self.queue.get_messages(10)
+                messages = self.queue.get_messages(10, wait_time_seconds=10)
                 log.debug('Got %d messages', len(messages))
             except Exception:
                 log.exception('Failed to GET from queue, wait 5s')
