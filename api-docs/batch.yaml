@@ -156,7 +156,7 @@ apis:
         parameters:
           - *list_slug
 
-  - path: /1.0/list/{list_slug}/import/
+  - path: /list/{list_slug}/import/
     operations:
       - method: GET
         nickname: getImports
@@ -195,7 +195,7 @@ apis:
             type: Import
             paramType: body
 
-  - path: /1.0/list/{list_slug}/import/{import_slug}/
+  - path: /list/{list_slug}/import/{import_slug}/
     operations:
       - method: GET
         nickname: getImport
