@@ -404,19 +404,20 @@ models:
 
   Member:
     id: Member
-    required: ['address']
+    required: ['address', 'meta', 'slug']
     properties:
       address: {type: string, format: email, defaultValue: test@example.com}
       metadata: {$ref: Metadata}
+      tags: {type: array}
+      changed: {type: boolean}
+      meta: {$ref: MetaRef}
+      slug: {type: string, defaultValue: random-or-user-defined-slug}
 
   MemberResponse:
     id: MemberResponse
-    required: ['meta', 'slug', 'address', 'metadata']
+    required: ['member']
     properties:
-      meta: {$ref: MetaRef}
-      slug: {type: string, defaultValue: random-or-user-defined-slug}
-      address: {type: string, format: email, defaultValue: test@example.com}
-      metadata: {$ref: Metadata}
+      member: {$ref: Member}
 
   MemberCollection:
     id: MemberCollection
