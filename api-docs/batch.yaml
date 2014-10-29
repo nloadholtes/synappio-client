@@ -528,8 +528,17 @@ models:
         $ref: Stats
         description: List analysis statistics
 
+
   JobResponse:
     id: JobResponse
+    required: ['job']
+    properties:
+      job:
+        type: array
+        job: {$ref: JobResponseDetail}
+
+  JobResponseDetail:
+    id: JobResponseDetail
     required:
       - meta
       - slug
