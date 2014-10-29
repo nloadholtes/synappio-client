@@ -80,8 +80,8 @@ Parameters:
 Command:
 
     curl -X POST
-    -H "Content-Type: text/csv
-    Authorization: bearer {api_key}"
+    -H "Content-Type: text/csv"
+    -H "Authorization: bearer {api_key}"
     "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?header=true&email=0&metadata=true&member_slug=2"
     -d "email_address,first_name,ID,
     oof@example.com,oof,005,
@@ -307,8 +307,8 @@ Parameters:
 Command:
 
                 curl -X POST
-                -H "Content-Type: text/csv
-                    Authorization: bearer {api_key}"
+                -H "Content-Type: text/csv"
+                -H "Authorization: bearer {api_key}"
                    "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2"
                 -d "email_address,first_name,ID,
                     oof@example.com,oof,005,
