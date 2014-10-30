@@ -290,7 +290,7 @@ apis:
           - name: body
             paramType: body
             description: Member information
-            type: Member
+            type: NewMember
       - method: DELETE
         nickname: deleteListMember
         summary: Remove a single member from your list
