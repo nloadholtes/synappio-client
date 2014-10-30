@@ -127,7 +127,7 @@ curl -X POST
 -H "Content-Type: application/json"
 "https://api.datavalidation.com/1.0/list/{list_slug}/"
 -d '{
-        "href": {csv_download_url_in_quotes}
+        "href": {csv_download_url_in_quotes},
         "mapping":
 	    {
     		"email_col":0,
