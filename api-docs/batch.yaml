@@ -400,15 +400,14 @@ models:
     properties:
       slug: {type: string, defaultValue: random-or-user-defined-slug}
       address: {type: string, format: email, defaultValue: test@example.com}
-      metadata: {$ref: Metadata}
+      tags: {type: array, items: {$ref: Tag}}
 
   Member:
     id: Member
     required: ['address', 'meta', 'slug']
     properties:
       address: {type: string, format: email, defaultValue: test@example.com}
-      metadata: {$ref: Metadata}
-      tags: {type: array}
+      tags: {type: array, items: {$ref: Tag}}
       changed: {type: boolean}
       meta: {$ref: MetaRef}
       slug: {type: string, defaultValue: random-or-user-defined-slug}
@@ -418,25 +417,6 @@ models:
     required: ['member']
     properties:
       member: {$ref: Member}
-
-  MemberCollection:
-    id: MemberCollection
-    required: ['meta', 'paging', 'items']
-    properties:
-      meta: {$ref: MetaRef}
-      paging: {$ref: Paging}
-      items:
-        type: array
-        items: {$ref: MemberItem}
-
-  MemberItem:
-    id: MemberItem
-    required: ['meta']
-    properties:
-      meta: {$ref: MetaRef}
-      slug: {type: string, defaultValue: random-or-user-defined-slug}
-      address: {type: string, format: email, defaultValue: test@example.com}
-      metadata: {$ref: Metadata}
 
   ListCollection:
     id: ListCollection
@@ -487,11 +467,12 @@ models:
       rel: {type: string, defaultValue: relation}
       href: {type: string, format: uri, defaultValue: 'http://example.com'}
 
-  Metadata:
-    id: Metadata
-    properties: {}
-    description: 'Arbitrary metadata mapping (string => string)'
-    additionalProperties: true
+  Tag:
+    id: Tag
+    required: ['name', 'value']
+    properties:
+      name: {type: string, defaultValue: Some name}
+      value: {type: string, defaultValue: Some value}
 
   JobCollection:
     id: JobCollection
