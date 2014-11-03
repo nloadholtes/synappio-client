@@ -255,6 +255,19 @@ apis:
           - name: body
             paramType: body
             type: NewMember
+      - method: PATCH
+        authorizations: {oauth2: {scope: admin}}
+        nickname: updateMembers
+        summary: Batch update of several members
+        type: BatchUpdateResponse
+        notes: |
+          Use this to bulk update the members for a new analysis run on the list
+        parameters:
+          - *list_slug
+          - name: body
+            type: MemberUpdate
+            paramType: body
+
 
   - path: /list/{list_slug}/member/{member_slug}/
     operations:
@@ -418,6 +431,14 @@ models:
     properties:
       member: {$ref: Member}
 
+  MemberUpdate:
+    id: MemberUpdate
+    properties:
+      changed:
+        type: boolean
+        defaultValue: false
+      tags: {$ref: TagsUpdate}
+
   ListCollection:
     id: ListCollection
     required: ['meta', 'paging', 'items']
@@ -551,3 +572,11 @@ models:
       stats:
         $ref: Stats
         description: List analysis statistics
+
+  BatchUpdateResponse:
+    id: BatchUpdateResponse
+    required: ['subscribed', 'unsubscribed']
+    properties:
+      subscribed: {type: integer, defaultValue: 0}
+      unsubscribed: {type: integer, defaultValue: 0}
+      updated: {type: integer, defaultValue: 0}
