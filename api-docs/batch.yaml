@@ -244,6 +244,11 @@ apis:
             maximum: 500
           - *_expand
           - *pretty
+          - name: changed
+            description: Filter the members based on the changed flag
+            required: false
+            paramType: query
+            type: string
       - method: POST
         nickname: createListMember
         summary: Create a new list member
