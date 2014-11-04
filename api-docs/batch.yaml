@@ -409,10 +409,8 @@ models:
 
   NewMember:
     id: NewMember
-    required: ['address']
     properties:
       slug: {type: string, defaultValue: random-or-user-defined-slug}
-      address: {type: string, format: email, defaultValue: test@example.com}
       tags: {type: array, items: {$ref: Tag}}
 
   Member:
