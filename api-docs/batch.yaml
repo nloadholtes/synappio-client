@@ -308,7 +308,7 @@ apis:
           - name: body
             paramType: body
             description: Member information
-            type: NewMember
+            type: UpdateMember
       - method: DELETE
         nickname: deleteListMember
         summary: Remove a single member from your list
@@ -414,6 +414,13 @@ models:
 
   NewMember:
     id: NewMember
+    properties:
+      slug: {type: string, defaultValue: random-or-user-defined-slug}
+      address: {type: string, format: email, defaultValue: test@example.com}
+      tags: {type: array, items: {$ref: Tag}}
+
+  UpdateMember:
+    id: UpdateMember
     properties:
       slug: {type: string, defaultValue: random-or-user-defined-slug}
       tags: {type: array, items: {$ref: Tag}}
