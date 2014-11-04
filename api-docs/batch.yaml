@@ -261,7 +261,6 @@ apis:
             paramType: body
             type: NewMember
       - method: PATCH
-        authorizations: {oauth2: {scope: admin}}
         nickname: updateMembers
         summary: Batch update of several members
         type: BatchUpdateResponse
