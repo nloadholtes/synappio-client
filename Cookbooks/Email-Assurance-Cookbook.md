@@ -111,4 +111,300 @@ This is a measure of the historical level of engagement based on the amount of d
 
 This is a measure of the historical level of engagement based on the amount of deliverable mail sent to an address. This is a historical reference, and does not determine how likely one is to click your email.  
 
+Setting Up Email Assurance
+-----------------
 
+The following process should be repeated in order to monitor your list(s) and keep them up to date with respect to new subscribers, unsubscribers, and grade changes.
+
+#### Resetting the 'changed' Flag
+
+First, you will want to reset the 'changed' flag of the members of your list. The following command will set the 'changed' flag to 'false' for each member in your list.
+
+/list/{list_slug}/member/:
+
+Command:
+
+~~~~
+    curl -X PATCH
+    -H "Authorization: bearer {api_key}"
+    -H "Content-Type: application/json"
+    "https://api/datavalidation.com/1.0/list/{list_slug}/member/"
+    -d "{'changed':false}"
+~~~~
+
+Sample output:
+    
+~~~~
+    {
+        "updated": -1,
+        "unsubscribed": 0,
+        "subscribed": 0
+    }
+~~~~
+
+#### Removing Unsubscribers
+
+After resetting the 'changed' flag for list members, you should remove members from your list that have unsubscribed. The following command will remove specified members from a list by supplying CSV input via POST to the unsubscribe.csv endpoint.
+
+/list/{list_slug}/unsubscribe.csv
+
+Parameters:
+
+~~~~
+    name: header
+    paramType: query
+    description: Is there a header row present in the CSV data
+    required: true
+    type: boolean
+
+    name: slug_col
+    paramType: query    
+    required: true
+    description: The column in the csv containing the slug for each member.
+    type: integer
+~~~~
+
+Command:
+
+~~~~
+    curl -X POST
+    -H "Content-Type: text/csv"
+    -H "Authorization: bearer {api_key}"
+       "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2"
+    -d "email_address,first_name,ID,
+        oof@example.com,oof,005,
+        rab@example.com,rab,006,
+        zab@example.com,zab,007"
+~~~~
+
+Sample output:
+
+~~~~
+    {
+        "list": [
+            {
+                "status": "new",
+                "size": 3,
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/{list_slug}/",
+                    "links": {
+                        "jobs": "job/",
+                        "batch_subscribe": "subscribe.csv",
+                        "member": "member/{member_slug}/",
+                        "job": "job/{job_slug}/",
+                        "batch_unsubscribe": "unsubscribe.csv",
+                        "export": "export.csv",
+                        "members": "member/"
+                    }
+                },
+                "slug": "E5RIlS2B",
+                "metadata": {}
+            }
+        ]
+    }
+~~~~
+
+#### Adding New Subscribers
+
+Once you have remove members that have unsubscribed, you will want to add any new subscribers to your list.  The following command will add specified members to a list by supplying CSV input via POST to the subscribe.csv endpoint.
+
+/list/{list_slug}/subscribe.csv
+
+Parameters:
+
+~~~~
+    name: header
+    paramType: query
+    description: Is there a header row present in the CSV data
+    required: true
+    type: boolean
+
+    name: email_col
+    paramType: query
+    description: Which column is the email address in? (0 = first column)
+    required: true
+    type: integer
+
+    name: metadata
+    paramType: query
+    description: Should the metadata (non-email) in the CSV be stored? (true or false)
+    required: true
+    type: string
+    format: other
+    
+    name: slug_col
+    paramType: query
+    description: The column in the csv containing a slug for each member. If this is omitted, a slug will be generated automatically.
+    required: false
+    type: integer
+~~~~
+
+Command:
+
+~~~~
+    curl -X POST
+    -H "Content-Type: text/csv"
+    -H "Authorization: bearer {api_key}"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?header=true&email=0&metadata=true&member_slug=2"
+    -d "email_address,first_name,ID,
+        oof@example.com,oof,005,
+        rab@example.com,rab,006,
+        baz@example.com,baz,007,"
+~~~~
+
+Sample output:
+
+~~~~
+    {
+        "list": [
+            {
+                "status": "new",
+                "size": 6,
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/",
+                    "links": {
+                        "jobs": "job/",
+                        "batch_subscribe": "subscribe.csv",
+                        "member": "member/{member_slug}/",
+                        "job": "job/{job_slug}/",
+                        "batch_unsubscribe": "unsubscribe.csv",
+                        "export": "export.csv",
+                        "members": "member/"
+                    }
+                },
+                "slug": "E5RIlS2B",
+                "metadata": {}
+            }
+        ]
+    }
+~~~~
+
+#### Running Validation
+
+Now that you list has been updated with new subscribers, its time to run a validation job. To run validation, send a POST request to the /list/job/ endpoint.
+
+Command:
+
+~~~~
+    curl -X POST
+    -H "Authorization: bearer {api_key}"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/job/"
+~~~~
+
+Sample output:
+
+~~~~
+    {
+        "job": [
+            {
+                "status": "New",
+                "list_slug": "{list_slug}",
+                "stats": {},
+                "created": "2014-10-15 14:36:21.749000",
+                "webhook": {
+                    "status": null,
+                    "complete": null
+                },
+                "priority": {
+                    "mu": 10,
+                    "sigma": 0
+                },
+                "original_chunks": null,
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/JItNx3th/job/{job_slug}/"
+                },
+                "current_chunks": null,
+                "pct_complete": 0,
+                "slug": "{job_slug}"
+            }
+        ]
+    }
+~~~~
+
+To monitor the progress of the job started above, send a GET request to the list/{list_slug}/job/{job_slug}/ endpoint and monitor the 'pct_complete' field. Once this has reached 100, proceed to the next step.
+
+#### View Changed Results
+
+At this point you may want to know which members have changed. To retrieve a list of changed members, send a GET requets to the member/{member_slug}/ endpoint and use the changed query parameter.
+
+Command:
+
+~~~~
+    curl -X GET
+    -H "Authorization: bearer {api_key}"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/member/?changed=true"
+~~~~
+
+Sample output:
+
+~~~~
+    {
+        "members": [
+            {
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/ftL5TysJ/"
+                }
+            },
+            {
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/wxM4337f/"
+                }
+            },
+            {
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/HqghS1Cv/"
+                }
+            }
+        ]
+    }
+~~~~
+
+If you would like more detailed member output, add the '_expand' query parameter to your GET command.
+
+Command:
+
+~~~~
+    curl -X GET
+    -H "Authorization: bearer {api_key}"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/member/?changed=true&_expand=true"
+~~~~
+
+Sample output:
+
+~~~~
+    {
+        "members": [
+            {
+                "address": "oof@example.com",
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/ftL5TysJ/"
+                },
+                "slug": "ftL5TysJ",
+                "tags": [],
+                "changed": true
+            },
+            {
+                "address": "rab@example.com",
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/wxM4337f/"
+                },
+                "slug": "wxM4337f",
+                "tags": [],
+                "changed": true
+            },
+            {
+                "address": "bar@example.com",
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/HqghS1Cv/"
+                },
+                "slug": "HqghS1Cv",
+                "tags": [],
+                "changed": true
+            }
+        ]
+    }
+~~~~
+
+#### Rerunning Email Assurance
+
+You should repeat this process every 24 hours or as needed to maintain your list integrity.
