@@ -114,11 +114,11 @@ This is a measure of the historical level of engagement based on the amount of d
 Setting Up Email Assurance
 -----------------
 
-The following process should be repeated in order to monitor your list(s) and keep them up to date with respect to new subscribers, unsubscribers, and grade changes.
+The following process should be repeated in order to monitor your list(s) and keep them up to date with respect to new subscribers, unsubscribes, and grade changes. This process should be used if you are setting up daily or weekly monitoring and remediation. Please use this endpoint in place of the list/list_slug/{csv_link}/import endpoint if you are monitoring lists daily or weekly. 
 
 #### Resetting the 'changed' Flag
 
-First, you will want to reset the 'changed' flag of the members of your list. The following command will set the 'changed' flag to 'false' for each member in your list.
+First, you will want to reset the `changed` flag on the members of a list. The following command will set the `changed` flag to `false` for each member in a list.
 
 /list/{list_slug}/member/:
 
@@ -142,9 +142,9 @@ Sample output:
     }
 ~~~~
 
-#### Removing Unsubscribers
+#### Removing Unsubscribes
 
-After resetting the 'changed' flag for list members, you should remove members from your list that have unsubscribed. The following command will remove specified members from a list by supplying CSV input via POST to the unsubscribe.csv endpoint.
+After resetting the 'changed' flag for list members, you should remove members from a list that have unsubscribed. The following command will remove specified members from a list by supplying CSV input via POST to the unsubscribe.csv endpoint.
 
 /list/{list_slug}/unsubscribe.csv
 
@@ -206,7 +206,7 @@ Sample output:
 
 #### Adding New Subscribers
 
-Once you have remove members that have unsubscribed, you will want to add any new subscribers to your list.  The following command will add specified members to a list by supplying CSV input via POST to the subscribe.csv endpoint.
+Once unsubscribed members have been removed, you will want to add any new subscribers to the list.  The following command will add specified members to a list by supplying CSV input via POST to the subscribe.csv endpoint.
 
 /list/{list_slug}/subscribe.csv
 
@@ -281,7 +281,7 @@ Sample output:
 
 #### Running Validation
 
-Now that you list has been updated with new subscribers, its time to run a validation job. To run validation, send a POST request to the /list/job/ endpoint.
+Now that your list has been updated with new subscribers, it's time to run a validation job. To run validation, send a POST request to the /list/job/ endpoint.
 
 Command:
 
@@ -325,7 +325,7 @@ To monitor the progress of the job started above, send a GET request to the list
 
 #### View Changed Results
 
-At this point you may want to know which members have changed. To retrieve a list of changed members, send a GET requets to the member/{member_slug}/ endpoint and use the changed query parameter.
+At this point, you only want to retrieve data for members that have changed. To retrieve a list of changed members, send a GET request to the member/{member_slug}/ endpoint and use the changed query parameter.
 
 Command:
 
@@ -405,6 +405,6 @@ Sample output:
     }
 ~~~~
 
-#### Rerunning Email Assurance
+#### Running Email Assurance Daily
 
-You should repeat this process every 24 hours or as needed to maintain your list integrity.
+You should repeat this process every 24 hours or as needed to maintain your clients' lists.
