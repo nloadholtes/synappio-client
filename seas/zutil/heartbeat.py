@@ -1,6 +1,5 @@
 import time
 import logging
-from binascii import hexlify
 from collections import deque
 
 
