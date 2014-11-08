@@ -3,6 +3,8 @@ import logging
 
 import zmq
 
+from seas.zutil import zutil
+
 from . import constants as MDP
 
 
@@ -33,13 +35,13 @@ class MajorDomoWorker(object):
               to reconnect to the broker after it has missed too many heartbeats?
             - context=None: zmq.Context to use
         '''
-        self.uri = uri
-        self.service = service
-        self.target = target
-        self.poll_interval = kwargs.pop('poll_interval', 1.0)
-        self.heartbeat_interval = kwargs.pop('heartbeat_interval', 1.0)
-        self.heartbeat_liveness = kwargs.pop('heartbeat_liveness', 3)
-        self.reconnect_delay = kwargs.pop('reconnect_delay', 2.5)
+        self._uri = uri
+        self._service = service
+        self._target = target
+        self._poll_interval_ms = int(1000 * kwargs.pop('poll_interval', 1.0))
+        self._heartbeat_interval = kwargs.pop('heartbeat_interval', 1.0)
+        self._heartbeat_liveness = kwargs.pop('heartbeat_liveness', 3)
+        self._reconnect_delay = kwargs.pop('reconnect_delay', 2.5)
         self._context = kwargs.pop('context')
         if self._context is None:
             self._context = zmq.Context.instance()
@@ -54,10 +56,10 @@ class MajorDomoWorker(object):
             pass
 
     def reactor(self):
-        self.reconnect()
+        self._reconnect()
         while not self._shutting_down:
             yield self._poller
-            socks = dict(self._poller.poll(1000 * self.poll_interval))
+            socks = dict(self._poller.poll(self._poll_interval_ms))
             if self._socket in socks:
                 msg = self._socket.recv_multipart()
                 log_dump.debug('recv\n%r', msg)
@@ -67,7 +69,7 @@ class MajorDomoWorker(object):
             if time.time() > self._next_heartbeat:
                 log_heartbeat.debug('send heartbeat')
                 self._send(MDP.W_HEARTBEAT)
-                self._next_heartbeat = time.time() + self.heartbeat_interval
+                self._next_heartbeat = time.time() + self._heartbeat_interval
         log.info('Terminating reactor')
         self._socket.close()
         self._socket = None
@@ -78,20 +80,21 @@ class MajorDomoWorker(object):
     def destroy(self):
         if self._socket:
             self._socket.close()
+            self._socket = None
 
-    def reconnect(self):
+    def _reconnect(self):
         """Connect or reconnect to broker"""
         if self._socket:
             self._poller.unregister(self._socket)
             self._socket.close()
-        self._socket = self.make_socket(zmq.DEALER)
+        self._socket = self._make_socket(zmq.DEALER)
         self._socket.connect(self.uri)
         self._poller.register(self._socket, zmq.POLLIN)
-        log.info('Connect to broker at %s', self.uri)
-        self._send(MDP.W_READY, self.service)
-        self._broker_liveness = self.heartbeat_liveness
+        log.info('Connect to broker at %s', self._uri)
+        self._send(MDP.W_READY, self._service)
+        self._broker_liveness = self._heartbeat_liveness
 
-    def make_socket(self, socktype):
+    def _make_socket(self, socktype):
         socket = self._context.socket(socktype)
         socket.linger = 0
         return socket
@@ -100,10 +103,10 @@ class MajorDomoWorker(object):
         msg = ['', MDP.W_WORKER, command] + list(parts)
         log_dump.debug('send %r\n%r', command, msg)
         self._socket.send_multipart(msg)
-        self._next_heartbeat = time.time() + self.heartbeat_interval
+        self._next_heartbeat = time.time() + self._heartbeat_interval
 
     def _handle_message(self, rmsg):
-        self._broker_liveness = self.heartbeat_liveness
+        self._broker_liveness = self._heartbeat_liveness
         assert '' == rmsg.pop()
         assert MDP.W_WORKER == rmsg.pop()
         command = rmsg.pop()
@@ -111,12 +114,12 @@ class MajorDomoWorker(object):
             log_heartbeat.debug('recv heartbeat')
             return
         elif command == MDP.W_DISCONNECT:
-            self.reconnect()
+            self._reconnect()
         elif command == MDP.W_REQUEST:
             client = rmsg.pop()
             assert '' == rmsg.pop()
             args = list(reversed(rmsg))
-            response = self.target(*args)
+            response = self._target(*args)
             self._send(MDP.W_REPLY, client, '', *response)
         else:
             log.error('Invalid command: %r', command)
@@ -125,19 +128,11 @@ class MajorDomoWorker(object):
         self._broker_liveness -= 1
         if self._broker_liveness == 0:
             log.debug('Disconnected, retry in %ss', self.reconnect_delay)
-            time.sleep(self.reconnect_delay)
-            self.reconnect()
+            time.sleep(self._reconnect_delay)
+            self._reconnect()
 
-
-class SecureMajorDomoWorker(MajorDomoWorker):
+class SecureMajorDomoWorker(zutil.SecureClient, MajorDomoWorker):
 
     def __init__(self, server_key, client_key, *args, **kwargs):
-        self.server_key = server_key
-        self.client_key = client_key
-        super(SecureMajorDomoWorker, self).__init__(*args, **kwargs)
-
-    def make_socket(self, socktype):
-        socket = super(SecureMajorDomoWorker, self).make_socket(socktype)
-        self.client_key.apply(socket)
-        socket.curve_serverkey = self.server_key.public
-        return socket
+        zutil.SecureClient.__init__(self, server_key, client_key)
+        MajorDomoWorker.__init__(self, *args, **kwargs)

@@ -27,6 +27,46 @@ class Key(object):
         socket.curve_secretkey = self.secret
 
 
+class SecureClient(object):
+    '''Mixin for providing a secure _make_socket method'''
+
+    def __init__(self, server_key, client_key):
+        '''Create a secure client using CURVE cryptography.
+
+        Required parameters:
+
+            - server_key: the server's (broker's) public zutil.Key
+            - client_key: the client's private zutil.Key
+        '''
+        self._server_key = server_key
+        self._client_key = client_key
+
+    def _make_socket(self, socktype):
+        socket = super(SecureClient, self).make_socket(socktype)
+        self._client_key.apply(socket)
+        socket._curve_serverkey = self.server_key.public
+        return socket
+
+
+class SecureServer(object):
+    '''Mixin for providing a secure _make_socket method'''
+
+    def __init__(self, key, context=None):
+        '''Create a secure client using CURVE cryptography.
+
+        Required parameter:
+
+            - key: the server's private zutil.Key
+        '''
+        self._key = key
+
+    def _make_socket(self, socktype):
+        socket = super(SecureServer, self).make_socket(socktype)
+        self._key.apply(socket)
+        socket.curve_server = True
+        return socket
+
+
 class MaxRetryError(Exception):
     pass
 
