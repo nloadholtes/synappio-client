@@ -42,9 +42,9 @@ class SecureClient(object):
         self._client_key = client_key
 
     def _make_socket(self, socktype):
-        socket = super(SecureClient, self).make_socket(socktype)
+        socket = super(SecureClient, self)._make_socket(socktype)
         self._client_key.apply(socket)
-        socket._curve_serverkey = self.server_key.public
+        socket.curve_serverkey = self._server_key.public
         return socket
 
 
@@ -61,7 +61,7 @@ class SecureServer(object):
         self._key = key
 
     def _make_socket(self, socktype):
-        socket = super(SecureServer, self).make_socket(socktype)
+        socket = super(SecureServer, self)._make_socket(socktype)
         self._key.apply(socket)
         socket.curve_server = True
         return socket

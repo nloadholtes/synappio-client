@@ -178,7 +178,7 @@ class SecureMajorDomoBroker(zutil.SecureServer, MajorDomoBroker):
 
     def __init__(self, key, *args, **kwargs):
         zutil.SecureServer.__init__(self, key)
-        MajorDomoBroker.__init__(*args, **kwargs)
+        MajorDomoBroker.__init__(self, *args, **kwargs)
 
 
 class _Worker(object):

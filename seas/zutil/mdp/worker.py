@@ -4,6 +4,7 @@ Run an echo worker.
 
 Options:
     -h --help   show this help message and exit
+    -k KEYPAIR  use the specified keys (SERVER-PUB_CLIENT-PUB_CLIENT-PRI)
 '''
 import time
 import logging
@@ -25,7 +26,14 @@ def main():
     logging.basicConfig(level=logging.DEBUG)
     log_dump.setLevel(logging.INFO)
     args = docopt.docopt(__doc__)
-    worker = MajorDomoWorker(args['<uri>'], 'echo', echo)
+    if args['-k']:
+        broker_public, client_public, client_secret = args['-k'].split('_')
+        broker_key = zutil.Key(broker_public)
+        client_key = zutil.Key(client_public, client_secret)
+        worker = SecureMajorDomoWorker(
+            broker_key, client_key, args['<uri>'], 'echo', echo)
+    else:
+        worker = MajorDomoWorker(args['<uri>'], 'echo', echo)
     worker.serve_forever()
 
 def echo(*args):

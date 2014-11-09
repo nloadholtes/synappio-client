@@ -32,6 +32,7 @@ setup(
     [paste.server_factory]
 
     [console_scripts]
+    mdp-broker = seas.zutil.mdp.script:run_mdp_broker
 
     """,
 )
