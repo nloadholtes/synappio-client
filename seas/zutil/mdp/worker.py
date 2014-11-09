@@ -1,7 +1,15 @@
+'''Usage: worker [options] <uri>
+
+Run an echo worker.
+
+Options:
+    -h --help   show this help message and exit
+'''
 import time
 import logging
 
 import zmq
+import docopt
 
 from seas.zutil import zutil
 
@@ -11,6 +19,18 @@ from . import constants as MDP
 log = logging.getLogger(__name__)
 log_dump = logging.getLogger('seas.zutil.dump')
 log_heartbeat = logging.getLogger(__name__ + '.heartbeat')
+
+
+def main():
+    logging.basicConfig(level=logging.DEBUG)
+    log_dump.setLevel(logging.INFO)
+    args = docopt.docopt(__doc__)
+    worker = MajorDomoWorker(args['<uri>'], 'echo', echo)
+    worker.serve_forever()
+
+def echo(*args):
+    return list(args)
+
 
 
 class MajorDomoWorker(object):
@@ -42,9 +62,10 @@ class MajorDomoWorker(object):
         self._heartbeat_interval = kwargs.pop('heartbeat_interval', 1.0)
         self._heartbeat_liveness = kwargs.pop('heartbeat_liveness', 3)
         self._reconnect_delay = kwargs.pop('reconnect_delay', 2.5)
-        self._context = kwargs.pop('context')
-        if self._context is None:
-            self._context = zmq.Context.instance()
+        context = kwargs.pop('context', None)
+        if context is None:
+            context = zmq.Context.instance()
+        self._context = context
         self._socket = None
         self._poller = zmq.Poller()
         self._broker_liveness = 0
@@ -88,7 +109,7 @@ class MajorDomoWorker(object):
             self._poller.unregister(self._socket)
             self._socket.close()
         self._socket = self._make_socket(zmq.DEALER)
-        self._socket.connect(self.uri)
+        self._socket.connect(self._uri)
         self._poller.register(self._socket, zmq.POLLIN)
         log.info('Connect to broker at %s', self._uri)
         self._send(MDP.W_READY, self._service)
@@ -127,12 +148,19 @@ class MajorDomoWorker(object):
     def _handle_timeout(self):
         self._broker_liveness -= 1
         if self._broker_liveness == 0:
-            log.debug('Disconnected, retry in %ss', self.reconnect_delay)
+            log.debug('Disconnected, retry in %ss', self._reconnect_delay)
             time.sleep(self._reconnect_delay)
             self._reconnect()
+
 
 class SecureMajorDomoWorker(zutil.SecureClient, MajorDomoWorker):
 
     def __init__(self, server_key, client_key, *args, **kwargs):
         zutil.SecureClient.__init__(self, server_key, client_key)
         MajorDomoWorker.__init__(self, *args, **kwargs)
+
+
+if __name__ == '__main__':
+    main()
+
+

@@ -187,7 +187,7 @@ class MajorDomoWorker(threading.Thread):
         empty, magic, command = msg[:3]
         assert [empty, magic] == ['', MDP.W_WORKER]
         if command == MDP.W_HEARTEAT:
-            continue
+            pass
         elif command == MDP.W_DISCONNECT:
             self._reconnect()
         elif command == MDP.W_REQUEST:

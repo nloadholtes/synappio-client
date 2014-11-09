@@ -1,9 +1,15 @@
+'''Usage: broker [options] <uri>
+
+Options:
+    -h --help   show this help message and exit
+'''
 import time
 import logging
 from collections import deque
 from binascii import hexlify
 
 import zmq
+import docopt
 
 from seas.zutil import zutil
 from seas.zutil.heartbeat import HeartbeatManager
@@ -15,6 +21,14 @@ from . import err
 log = logging.getLogger(__name__)
 log_dump = logging.getLogger('seas.zutil.dump')
 log_heartbeat = logging.getLogger(__name__ + '.heartbeat')
+
+
+def main():
+    logging.basicConfig(level=logging.INFO)
+    log_dump.setLevel(logging.INFO)
+    args = docopt.docopt(__doc__)
+    broker = MajorDomoBroker(args['<uri>'])
+    broker.serve_forever()
 
 
 class MajorDomoBroker(object):
@@ -42,7 +56,7 @@ class MajorDomoBroker(object):
         self.heartbeat = HeartbeatManager(
             kwargs.pop('heartbeat_interval', 1.0),
             kwargs.pop('heartbeat_liveness', 3))
-        self._context = kwargs.pop('context')
+        self._context = kwargs.pop('context', None)
         if self._context is None:
             self._context = zmq.Context.instance()
         self._socket = None
@@ -56,14 +70,14 @@ class MajorDomoBroker(object):
 
     def reactor(self):
         log.debug('In reactor')
-        self.socket = self._make_socket(zmq.ROUTER)
-        self.socket.bind(self.uri)
-        self.poller = zmq.Poller()
-        self.poller.register(self.socket, zmq.POLLIN)
+        self._socket = self._make_socket(zmq.ROUTER)
+        self._socket.bind(self._uri)
+        poller = zmq.Poller()
+        poller.register(self.socket, zmq.POLLIN)
 
         while not self._shutting_down:
-            yield self.poller
-            socks = dict(self.poller.poll(self._poll_interval_ms))
+            yield poller
+            socks = dict(poller.poll(self._poll_interval_ms))
             if self._socket in socks:
                 msg = self._socket.recv_multipart()
                 log_dump.debug('recv:\n%r', msg)
@@ -93,8 +107,8 @@ class MajorDomoBroker(object):
     def forget_worker(self, worker_addr):
         self._workers.pop(worker_addr)
 
-    def _make_socket(self, context, socktype):
-        socket = context.socket(socktype)
+    def _make_socket(self, socktype):
+        socket = self._context.socket(socktype)
         socket.linger = 0
         return socket
 
@@ -129,7 +143,7 @@ class MajorDomoBroker(object):
             worker.handle_reply(client_addr, rmsg)
             worker.ready()
         elif command == MDP.W_HEARTBEAT:
-            log_heartbeat.debug('recv heartbeat %s', hexlify(sender_addr))
+            log_heartbeat.debug('recv heartbeat %s', worker)
             return
         else:
             log.error('Unknown command from %s: %s', hexlify(sender_addr), command)
@@ -174,12 +188,19 @@ class _Worker(object):
         self._addr = addr
         self._service = None
 
+    @property
+    def addr(self):
+        return self._addr
+
+    def __repr__(self):
+        return '<Worker {}: {}>'.format(hexlify(self._addr), self._service)
+
     def register(self, service):
         if self._service:
             log.debug('Worker already registered for %s', self._service)
             self.delete(True)
         else:
-            self.service = service
+            self._service = service
 
     def ready(self):
         self._service.worker_ready(self)
@@ -234,31 +255,31 @@ class _Service(object):
         self._broker.socket.send_multipart(prefix + payload)
 
     def worker_ready(self, worker):
-        log.info('%s: ready worker %s', self.name, hexlify(worker.addr))
+        log.debug('%s: ready worker %s', self.name, worker)
         self._workers_ready.appendleft(worker.addr)
         self._workers[worker.addr] = worker
 
     def unregister_worker(self, worker):
-        log.info('%s: unregister %s', self.name, hexlify(worker.addr))
-        self.workers.pop(worker.addr, None)
+        log.info('%s: unregister %s', self.name, worker)
+        self._workers.pop(worker.addr, None)
 
     def queue_request(self, client_addr, rmsg, timeout):
         log.debug('queueing request from %s on %s', hexlify(client_addr), self.name)
         log.debug('workers ready:')
         for addr in self._workers_ready:
             log.debug(' - %s', hexlify(addr))
-        self.requests.appendleft((time.time() + timeout, client_addr, rmsg))
+        self._requests.appendleft((time.time() + timeout, client_addr, rmsg))
 
     def dispatch(self):
-        while self.requests and self._workers_ready:
-            (exp, client_addr, rmsg) = self.requests.pop()
+        while self._requests and self._workers_ready:
+            (exp, client_addr, rmsg) = self._requests.pop()
             if exp < time.time():       # Skip expired requests
                 continue
             worker = self.pop_ready_worker()
             if worker is not None:
                 worker.handle_request(client_addr, rmsg)
                 break
-            self.requests.append((exp, client_addr, rmsg))
+            self._requests.append((exp, client_addr, rmsg))
 
     def pop_ready_worker(self):
         while self._workers_ready:
@@ -268,6 +289,7 @@ class _Service(object):
                 return worker
         return None
 
-
+if __name__ == '__main__':
+    main()
 
 

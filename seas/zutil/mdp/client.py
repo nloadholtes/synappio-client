@@ -1,6 +1,17 @@
+'''Usage: client [options] <uri>
+
+Run an interactive client.
+
+Options:
+    -h --help   show this help message and exit
+'''
+import time
+import shlex
 import logging
 
 import zmq
+import docopt
+import readline
 
 from seas.zutil import zutil
 
@@ -9,6 +20,36 @@ from . import err
 
 
 log = logging.getLogger(__name__)
+
+
+def main():
+    logging.basicConfig(level=logging.DEBUG)
+    args = docopt.docopt(__doc__)
+    client = MajorDomoClient(args['<uri>'], 1.0)
+    while True:
+        result = []
+        try:
+            line = raw_input('{}> '.format(args['<uri>']))
+        except EOFError:
+            break
+        words = shlex.split(line)
+        if words[0].startswith('#'):
+            count = int(words[0][1:])
+            words = words[1:]
+        else:
+            count = 1
+        begin = time.time()
+        for x in range(count):
+            try:
+                client.send_async(*words)
+                result = client.recv()
+            except err.MaxRetryError:
+                print 'No response, giving up!'
+        end = time.time()
+        elapsed_ms = 1e3 * (end-begin)
+        print '{:-3.3f} ms: {}'.format(elapsed_ms, ' '.join(result))
+        if count > 1:
+            print '    {:-3.3f} ms per iteration'.format(elapsed_ms / count)
 
 
 class MajorDomoClient(object):
@@ -40,7 +81,7 @@ class MajorDomoClient(object):
         self._socket = None
         self._poller = zmq.Poller()
         self._message = None
-        self.reconnect()
+        self._reconnect()
 
     def send(self, service, *body):
         self.send_async(service, *body)
@@ -59,9 +100,9 @@ class MajorDomoClient(object):
                 assert msg[:2] == self._message[:2]     # service must match request
                 self._message = None
                 return msg[2:]
-            elif retries:
-                log.debug('timeout, reconnect')
-                self._reconnect()
+            log.debug('timeout, reconnect')
+            self._reconnect()
+            if retries:
                 self._socket.send_multipart(self._message)
                 retries -= 1
             else:
@@ -91,3 +132,10 @@ class SecureMajorDomoClient(zutil.SecureClient, MajorDomoClient):
     def __init__(self, server_key, client_key, *args, **kwargs):
         zutil.SecureClient.__init__(self, server_key, client_key)
         MajorDomoClient.__init__(self, *args, **kwargs)
+
+
+
+if __name__ == '__main__':
+    main()
+
+
