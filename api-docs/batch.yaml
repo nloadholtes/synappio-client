@@ -397,15 +397,20 @@ models:
       note: {type: string, defaultValue: "Whatever you want"}
       mapping: {$ref: ImportMapping}
 
+  ImportCollectionItems:
+    id: ImportCollectionItems
+    required: ['meta', 'paging', 'items']
+    meta: {$ref: MetaRef}
+    paging: {$ref: Paging}
+    items:
+      type: array
+      items: {$ref: ImportItem}
+
   ImportCollection:
     id: ImportCollection
-    required: ['meta', 'paging', 'items']
+    required: ['imports']
     properties:
-      meta: {$ref: MetaRef}
-      paging: {$ref: Paging}
-      items:
-        type: array
-        items: {$ref: ImportItem}
+      imports: {type: array, items: {$ref: ImportCollectionItems}}
 
   ImportResponse:
     id: ImportResponse
