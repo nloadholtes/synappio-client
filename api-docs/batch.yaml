@@ -414,7 +414,34 @@ models:
 
   ImportResponse:
     id: ImportResponse
+    type: array
+    properties:
+      items: {type: array, $ref: ImportResponseItems}
+
+  ImportResponseItems:
+    id: ImportResponse
     required: ['meta', 'slug', 'href', 'note', 'mapping', 'status', 'created']
+
+  ImportMapping:
+    id: ImportMapping
+    required: ['header_row', 'email_col', 'include_metadata']
+    properties:
+      header_row:
+        type: boolean
+        description: Does the CSV contain a header row?
+        defaultValue: true
+      email_col:
+        type: integer
+        description: Which column contains the email address?
+        defaultValue: 1
+      slug_col:
+        type: integer
+        description: Which column contains the member slug (-1 to use row number)
+        default_value: 0
+      include_metadata:
+        type: boolean
+        description: Should the non-key columns be imported as member metadata?
+        defaultValue: false
 
   NewMember:
     id: NewMember
