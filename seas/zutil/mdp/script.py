@@ -80,4 +80,5 @@ def _setup_logging(path):
     config_file = os.path.abspath(path)
     return logging.config.fileConfig(
         config_file,
-        dict(__file__=config_file, here=os.path.dirname(config_file)))
+        dict(__file__=config_file, here=os.path.dirname(config_file)),
+        disable_existing_loggers=False)
