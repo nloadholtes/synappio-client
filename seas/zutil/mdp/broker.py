@@ -66,7 +66,14 @@ class MajorDomoBroker(object):
 
     def serve_forever(self):
         for x in self.reactor():
-            pass
+            log.debug('Services:')
+            for name, svc in self._services.items():
+                log.debug('%s: %s', name, svc)
+            log.debug('Worers:')
+            for name, worker in self._workers.items():
+                log.debug('%s: %s', name, worker)
+            log.debug('---')
+
 
     def reactor(self):
         log.debug('In reactor')
@@ -81,7 +88,10 @@ class MajorDomoBroker(object):
             if self._socket in socks:
                 msg = self._socket.recv_multipart()
                 log_dump.debug('recv:\n%r', msg)
-                self._handle_message(list(reversed(msg)))
+                try:
+                    self._handle_message(list(reversed(msg)))
+                except Exception:
+                    log.exception('Error handling message:\n%r', msg)
 
             self._send_heartbeats()
             self._reap_workers()
