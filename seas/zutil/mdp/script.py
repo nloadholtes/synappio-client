@@ -7,11 +7,10 @@ from formencode import foreach as fef
 from formencode import variabledecode as fevd
 from ConfigParser import ConfigParser
 
-import zmq
 from docopt import docopt
 from zmq.auth.thread import ThreadAuthenticator
 
-from seas.zutil.mdp import SecureMajorDomoBroker
+from seas.zutil.mdp import MajorDomoBroker, SecureMajorDomoBroker
 from seas.zutil.zutil import Key
 
 
@@ -37,7 +36,8 @@ class SettingsSchema(fes.Schema):
     uri = fev.String()
     key = fes.Schema(
         broker=KeySchema(),
-        client=fef.ForEach(KeySchema(), convert_to_list=True))
+        client=KeySchema(),
+        if_missing=None)
 
 
 def run_mdp_broker():
@@ -61,14 +61,17 @@ def run_mdp_broker():
         for option in cp.options('mdp-broker'))
     s = SettingsSchema().to_python(raw)
 
-    log.info('Starting mdp-broker on %s', s['uri'])
+    if s['key']:
+        log.info('Starting secure mdp-broker on %s', s['uri'])
+        auth = ThreadAuthenticator()
+        auth.start()
+        auth.thread.authenticator.certs['*'] = {
+            s['key']['client'].public: 'OK'}
 
-    auth = ThreadAuthenticator()
-    auth.start()
-    auth.thread.authenticator.certs['*'] = dict(
-        (k.public, 'OK') for k in s['key']['client'])
-
-    broker = SecureMajorDomoBroker(s['key']['broker'], s['uri'])
+        broker = SecureMajorDomoBroker(s['key']['broker'], s['uri'])
+    else:
+        log.info('Starting mdp-broker on %s', s['uri'])
+        broker = MajorDomoBroker(s['uri'])
     try:
         broker.serve_forever()
     except:
