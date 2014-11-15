@@ -69,7 +69,7 @@ class MajorDomoBroker(object):
             log.debug('Services:')
             for name, svc in self._services.items():
                 log.debug('%s: %s', name, svc)
-            log.debug('Worers:')
+            log.debug('Workers:')
             for name, worker in self._workers.items():
                 log.debug('%s: %s', name, worker)
             log.debug('---')
@@ -237,7 +237,10 @@ class _Worker(object):
     def handle_reply(self, client_addr, rmsg):
         '''Handle a reply from a worker by sending to the client'''
         assert rmsg.pop() == ''
-        self._service.send_to_client(client_addr, list(reversed(rmsg)))
+        if self._service:
+            self._service.send_to_client(client_addr, list(reversed(rmsg)))
+        else:
+            self.delete(True)
 
 
 class _Service(object):
