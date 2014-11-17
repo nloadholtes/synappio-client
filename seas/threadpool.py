@@ -4,33 +4,40 @@ import threading
 from Queue import Queue, Empty
 
 
-class Result(object):
+class Request(object):
 
-    def __init__(self, success, value):
-        self._success = success
-        self._value = value
+    def __init__(self, func, *args, **kwargs):
+        self._func = func
+        self._args = args
+        self._kwargs = kwargs
+        self._event = threading.Event()
+        self._success = None
+        self._result = None
 
-    @classmethod
-    def success(cls, value):
-        return cls(True, value)
+    def run(self):
+        try:
+            self._result = self._func(*self._args, **self._kwargs)
+            self._success = True
+        except Exception:
+            self._result = sys.exc_info()
+            self._success = False
+        self._event.set()
 
-    @classmethod
-    def failure(cls, ex_type, ex_value, ex_traceback):
-        return cls(False, (ex_type, ex_value, ex_traceback))
+    def wait(self, *args, **kwargs):
+        self._event.wait(*args, **kwargs)
 
     def get(self):
+        self.wait()
         if self._success:
-            return self._value
+            return self._result
         else:
-            raise self._value[0], self._value[1], self._value[2]
-
+            raise self._result[0], self._result[1], self._result[2]
 
 class ThreadPool(object):
 
     def __init__(self, size):
         self.size = size
-        self.qi = Queue()
-        self.qo = Queue()
+        self.q = Queue()
         self.quitting = False
         self.threads = []
 
@@ -46,22 +53,16 @@ class ThreadPool(object):
         for t in self.threads:
             t.join()
 
-    def put_job(self, func, *args, **kwargs):
-        self.qi.put((func, args, kwargs))
-
-    def get_result(self, *args, **kwargs):
-        result = self.qo.get(*args, **kwargs)
-        return result.get()
+    def put(self, func, *args, **kwargs):
+        req = Request(func, *args, **kwargs)
+        self.q.put(req)
+        return req
 
     def worker(self):
         while not self.quitting:
             try:
-                (func, args, kwargs) = self.qi.get(True, 1)
-                try:
-                    result = func(*args, **kwargs)
-                    self.qo.put(Result.success(result))
-                except Exception:
-                    self.qo.put(Result.failure(*sys.exc_info()))
+                req = self.q.get(True, 1)
+                req.run()
             except Empty:
                 pass
 
@@ -74,11 +75,10 @@ def main():
         time.sleep(1)
         print 'Leave func(%s)' % i
         return i
-    for i in range(256):
-        pool.put_job(func, i)
+    results = [pool.put(func, i) for i in range(256)]
     pool.start()
-    for i in range(256):
-        print 'Result is %s' % pool.get_result()
+    for r in results:
+        print 'Result is %s' % r.get()
         sys.stdout.flush()
     pool.stop()
 
