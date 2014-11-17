@@ -40,6 +40,11 @@ class ThreadPool(object):
         self.q = Queue()
         self.quitting = False
         self.threads = []
+        self._local = threading.local()
+
+    def init_local(self):
+        '''Create thread-local variables here'''
+        pass
 
     def start(self):
         self.threads = [
@@ -53,12 +58,13 @@ class ThreadPool(object):
         for t in self.threads:
             t.join()
 
-    def put(self, func, *args, **kwargs):
+    def request(self, func, *args, **kwargs):
         req = Request(func, *args, **kwargs)
         self.q.put(req)
         return req
 
     def worker(self):
+        self.init_local()
         while not self.quitting:
             try:
                 req = self.q.get(True, 1)
