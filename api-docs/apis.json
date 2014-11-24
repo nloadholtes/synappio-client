@@ -1,0 +1,55 @@
+{
+  "name": "Real Time Email Validation",
+  "description": "DataValidation's API offers a simple way to check the deliverability of an email address. Quickly find out if a single email address is deliverable in realtime, or check the deliverability of a list of email addresses using the batch API. Email service providers can utilize the batch API to simplify and automate the onboarding, monitoring, and remediation of users.",
+  "url": "https://developer.datavalidation.com/apis.json",
+  "specificationVersion": "0.14",
+  "apis": [
+    {
+      "name": "Real Time Email Validation",
+      "description": "DataValidation's API offers a simple way to check the deliverability of an email address. Quickly find out if a single email address is deliverable in realtime, or check the deliverability of a list of email addresses using the batch API. Email service providers can utilize the batch API to simplify and automate the onboarding, monitoring, and remediation of users.",
+      "image": "https://avatars3.githubusercontent.com/u/9884381?v=3&s=200",
+      "baseURL": "https://api.datavalidation.com/1.0/rt/",
+      "humanURL": "https://developer.datavalidation.com/",
+      "tags": [
+        "email",
+        "validation",
+        "verification"
+      ],
+      "properties": [
+        {
+          "type": "Pricing",
+          "url": "https://developer.datavalidation.com/"
+        }
+      ],
+      "contact": [
+        {
+          "FN": "Datavalidation",
+          "email": "support@datavalidation.com",
+          "organizationName": "Data Validation",
+          "adr": "Suite 221, 75 5th St NW,  Atlanta, GA 30308",
+          "X-twitter": "https://twitter.com/datavalidation",
+          "X-github": "https://github.com/synappio",
+          "photo": "http://www.datavalidation.com/assets/images/cd568e69.logo-alt3.png",
+          "url": "http://www.datavalidation.com/"
+        }
+      ]
+    }
+  ],
+  "maintainers": [
+    {
+      "FN": "Data Validation",
+      "email": "support@datavalidation.com",
+      "X-twitter": "https://twitter.com/datavalidation",
+      "X-github": "https://github.com/synappio",
+      "photo": "http://www.datavalidation.com/assets/images/cd568e69.logo-alt3.png"
+    }
+  ],
+  "tags": [
+    "email validation",
+    "email",
+    "validation"
+  ],
+  "include": [],
+  "created": "2014-11-24",
+  "modified": "2014-11-24"
+}
