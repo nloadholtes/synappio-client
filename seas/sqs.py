@@ -6,8 +6,10 @@ log = logging.getLogger(__name__)
 
 class Listener(object):
 
-    def __init__(self, queue):
+    def __init__(self, queue, handle=None):
         self.queue = queue
+        if handle is not None:
+            self.handle = handle
 
     def handle(self, message):
         raise NotImplementedError()
