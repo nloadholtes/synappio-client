@@ -14,6 +14,10 @@ apis:
         summary: Validate (quickly) a single email address
         type: EmailResponse
         parameters:
+          - name: Authorization
+            description: API Key
+            type: string
+            paramType: header
           - name: email
             description: Email address to validate
             type: string
