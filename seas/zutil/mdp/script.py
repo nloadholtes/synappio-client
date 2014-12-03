@@ -46,6 +46,7 @@ def run_mdp_broker():
 
     Options:
         -h --help                 show this help message and exit
+        -s --secure               generate (and print) client & broker keys for a secure server
     """)
     global log
     _setup_logging(args['<config>'])
@@ -60,6 +61,18 @@ def run_mdp_broker():
         (option, cp.get('mdp-broker', option))
         for option in cp.options('mdp-broker'))
     s = SettingsSchema().to_python(raw)
+
+    if args['--secure']:
+        broker_key = Key.generate()
+        client_key = Key.generate()
+        s['key'] = dict(
+            broker=broker_key,
+            client=client_key)
+        log.info('Auto-generated keys: %s_%s_%s',
+            broker_key.public, client_key.public, client_key.secret)
+        log.info(' broker.public: %s', broker_key.public)
+        log.info(' client.public: %s', client_key.public)
+        log.info(' client.secret: %s', client_key.secret)
 
     if s['key']:
         log.info('Starting secure mdp-broker on %s', s['uri'])
