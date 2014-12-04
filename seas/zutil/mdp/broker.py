@@ -216,6 +216,8 @@ class _Worker(object):
             self._service = service
 
     def ready(self):
+        if not self._service:
+            self.delete(True)
         self._service.worker_ready(self)
         self._service.dispatch()
 
