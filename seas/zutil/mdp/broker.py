@@ -118,7 +118,7 @@ class MajorDomoBroker(object):
         return self._socket
 
     def forget_worker(self, worker_addr):
-        self._workers.pop(worker_addr)
+        self._workers.pop(worker_addr, None)
 
     def _make_socket(self, socktype):
         socket = self._context.socket(socktype)
