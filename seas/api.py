@@ -1,5 +1,6 @@
 import json
 from urlparse import urljoin
+from urllib import quote
 
 import funcsigs
 
@@ -277,7 +278,7 @@ class RPCOp(object):
         body = self.collect('body', arguments)
         request_kwargs.update(
             method=self.method,
-            path=self.path.format(**path_args),
+            path=quote(self.path.format(**path_args)),
             params=query_args,
             headers=header_args)
         if body is not None:
