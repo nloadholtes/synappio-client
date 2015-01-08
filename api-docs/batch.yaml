@@ -17,17 +17,19 @@ apis:
           You can use this to retrieve summary or detailed data about all the lists
           in your account, or just a few using filters.
         parameters:
-          - name: paging.skip
+          - &paging_skip
+            name: paging_skip
             description: Paging offset
             type: integer
             paramType: query
             defaultValue: 0
-          - name: paging.limit
+          - &paging_limit
+            name: paging_limit
             description: Paging limit
             type: integer
             paramType: query
             defaultValue: 50
-            maximum: 500
+            maximum: &paging_limit_max 500
           - &_expand
             name: _expand
             description: Expand the list of items?
@@ -168,19 +170,8 @@ apis:
           - *list_slug
           - *pretty
           - *_expand
-          - &paging_skip
-            name: paging.skip
-            description: Paging offset
-            type: integer
-            paramType: query
-            defaultValue: 0
-          - &paging_limit
-            name: paging.limit
-            description: Paging limit
-            type: integer
-            paramType: query
-            defaultValue: 50
-            maximum: &paging_limit_max 500
+          - *paging_skip
+          - *paging_limit
 
       - method: POST
         nickname: createImport
@@ -231,17 +222,8 @@ apis:
           Use this to retrieve / filter the members of your list
         parameters:
           - *list_slug
-          - name: paging.skip
-            description: Paging offset
-            type: integer
-            paramType: query
-            defaultValue: 0
-          - name: paging.limit
-            description: Paging limit
-            type: integer
-            paramType: query
-            defaultValue: 50
-            maximum: 500
+          - *paging_skip
+          - *paging_limit
           - *_expand
           - *pretty
           - name: changed
@@ -331,17 +313,8 @@ apis:
         parameters:
           - *list_slug
           - *pretty
-          - name: paging.skip
-            description: Paging offset
-            type: integer
-            paramType: query
-            defaultValue: 0
-          - name: paging.limit
-            description: Paging limit
-            type: integer
-            paramType: query
-            defaultValue: 50
-            maximum: 500
+          - *paging_skip
+          - *paging_limit
           - *_expand
       - method: POST
         nickname: createJob
