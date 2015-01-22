@@ -223,15 +223,14 @@ class Resource(object):
     def href(self):
         return self._state.meta.href
 
-    def link(self, rel):
+    def link(self, rel, **params):
         for link in self.links:
             if link.rel == rel:
                 if link.href.startswith('/'):
                     key = link.href
                 else:
                     key = urljoin(self.href, link.href)
-                resource = Meta.get(self).api.resources.lookup(key)
-                return resource
+                return key.format(params)
 
     def __repr__(self):
         return '{}: {}'.format(self.__class__, self._state)

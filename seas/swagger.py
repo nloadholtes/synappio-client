@@ -73,7 +73,7 @@ class SwaggerSpec(object):
             'additionalProperties': False}
         if required:
             model['required'] = required
-        if paramType == 'header':
+        if paramType in ('header', 'query'):
             model['additionalProperties'] = True
         return model
 
