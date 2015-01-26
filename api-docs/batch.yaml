@@ -158,6 +158,19 @@ apis:
         parameters:
           - *list_slug
 
+  - path: /list/{list_slug}/unsubscribe/
+    operations:
+      - method: POST
+        nickname: unsubscribeUrl
+        summary: Unsubscribe a CSV located at the given URL from a list
+        notes: |
+          Use this to asynchronously unsubscribe members on the CSV from a list 
+        parameters:
+          - *list_slug
+          - name: body
+            type: UnsubscribeUrl
+            paramType: body
+
   - path: /list/{list_slug}/import/
     operations:
       - method: GET
@@ -369,6 +382,24 @@ models:
       href: {type: string, format: uri, defaultValue: "http://example.com"}
       note: {type: string, defaultValue: "Whatever you want"}
       mapping: {$ref: ImportMapping}
+
+  UnsubscribeUrl:
+    id: UnsubscribeUrl 
+    required: ['href', 'slug_col', 'header_row']
+    properties:
+      header_row:
+        type: boolean
+        description: Does the CSV contain a header row?
+        defaultValue: true
+      slug_col:
+        type: integer
+        description: Which column contains the member slugs to unsubscribe
+        default_value: 0
+      href:
+        type: string
+        format: uri
+        defaultValue: "http://example.com"
+        description: "Publicly accessible URL of the CSV that contains the slugs of Members to unsubscribe"
 
   ImportCollectionItems:
     id: ImportCollectionItems
