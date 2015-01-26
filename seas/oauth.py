@@ -21,33 +21,33 @@ class OAuth2(object):
             self._session = requests.Session()
         else:
             self._session = session
-        self._authorize_uri = authorize_uri
-        self._access_token_uri = access_token_uri
-        self._client_id = client_id
-        self._client_secret = client_secret
-        self._redirect_uri = redirect_uri
+        self.authorize_uri = authorize_uri
+        self.access_token_uri = access_token_uri
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.redirect_uri = redirect_uri
 
     def authorize_url(self):
-        return self._authorize_uri + '?' + urlencode(dict(
+        return self.authorize_uri + '?' + urlencode(dict(
             response_type='code',
-            client_id=self._client_id,
-            redirect_uri=self._redirect_uri))
+            client_id=self.client_id,
+            redirect_uri=self.redirect_uri))
 
     def get_access_token(self, code=None, refresh_token=None):
         '''Exchange a code or refresh_token for an access_token'''
         data = dict(
-            client_id=self._client_id,
-            client_secret=self._client_secret)
+            client_id=self.client_id,
+            client_secret=self.client_secret)
         if code:
             data.update(
                 grant_type='authorization_code',
                 code=code,
-                redirect_uri=self._redirect_uri)
+                redirect_uri=self.redirect_uri)
         else:
             data.update(
                 grant_type='refresh_token',
                 refresh_token=refresh_token)
-        resp = self._session.post(self._access_token_uri, data=data)
+        resp = self._session.post(self.access_token_uri, data=data)
         resp.raise_for_status()
         return resp.json()
 
