@@ -1,7 +1,6 @@
 import re
 import os
 import sys
-import csv
 import base64
 import logging.config
 import urlparse
@@ -22,6 +21,15 @@ TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 re_wildcard = re.compile(r'(\{[a-zA-Z][^\}]*\})')
 re_newline = re.compile('(\r(?=[^\n]))|\r\n')
 manager = pkg_resources.ResourceManager()
+
+
+def constant_time_compare(val1, val2):
+    if len(val1) != len(val2):
+        return False
+    bits = 0
+    for v1, v2 in zip(val1, val2):
+        bits |= ord(v1) ^ ord(v2)
+    return bits == 0
 
 
 def setup_logging(config_file):
