@@ -66,6 +66,7 @@ class MajorDomoBroker(object):
 
     def serve_forever(self):
         for x in self.reactor():
+            continue
             log.debug('Services:')
             for name, svc in self._services.items():
                 log.debug('%s: %s', name, svc)
