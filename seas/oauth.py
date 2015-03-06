@@ -27,11 +27,14 @@ class OAuth2(object):
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
 
-    def authorize_url(self):
-        return self.authorize_uri + '?' + urlencode(dict(
-            response_type='code',
+    def authorize_url(self, response_type='code', scope=None):
+        params = dict(
+            response_type=response_type,
             client_id=self.client_id,
-            redirect_uri=self.redirect_uri))
+            redirect_uri=self.redirect_uri)
+        if scope is not None:
+            params['scope'] = scope
+        return self.authorize_uri + '?' + urlencode(params)
 
     def get_access_token(self, code=None, refresh_token=None):
         '''Exchange a code or refresh_token for an access_token'''
