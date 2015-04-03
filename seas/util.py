@@ -1,6 +1,7 @@
 import re
 import os
 import sys
+import string
 import base64
 import logging.config
 import urlparse
@@ -42,6 +43,15 @@ def setup_logging(config_file):
     return logging.config.fileConfig(
         full_path, dict(__file__=full_path, here=here),
         disable_existing_loggers=False)
+
+
+def update_settings_from_environ(settings):
+    for k, v in settings.items():
+        if not isinstance(v, basestring):
+            continue
+        t = string.Template(v)
+        v1 = t.safe_substitute(os.environ)
+        settings[k] = v1
 
 
 def strptime(s):
