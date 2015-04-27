@@ -1,6 +1,257 @@
 Email Assurance for ESPs
 =======================
 
+### Recommended Getting Started Steps
+
+The easiest and most efficient way to upload large lists is by first creating a list then importing the CSV via URL. 
+
+Endpoint - /list/
+
+Create a list with POST
+
+Command:
+
+~~~~
+    $ curl -X POST
+    -H "Content-Type: text/csv"
+    -H "Authorization: bearer {api_key}"
+    "https://api.datavalidation.com/1.0/list/?header=true&email=0&metadata=true&slug_col=2"
+~~~~
+
+You will get something like this in return. 
+    
+~~~~
+{
+    "list": [
+        {
+            "size": 0, 
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/1S2QdPn-ahFyNwlQ/", 
+                "links": [
+                    {
+                        "href": "import/", 
+                        "rel": "imports"
+                    }, 
+                    {
+                        "href": "job/", 
+                        "rel": "jobs"
+                    }, 
+                    {
+                        "href": "member/", 
+                        "rel": "members"
+                    }
+                ]
+            }, 
+            "slug": "1S2QdPn-ahFyNwlQ", 
+            "tags": []
+        }
+    ]
+}
+~~~~
+
+You can always check the size of the list 
+
+Endpoint - /list/{list_slug}/
+
+~~~~
+{
+    "list": [
+        {
+            "size": 0, 
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/1S2QdPn-ahFyNwlQ/", 
+                "links": [
+                    {
+                        "href": "import/", 
+                        "rel": "imports"
+                    }, 
+                    {
+                        "href": "job/", 
+                        "rel": "jobs"
+                    }, 
+                    {
+                        "href": "member/", 
+                        "rel": "members"
+                    }
+                ]
+            }, 
+            "slug": "1S2QdPn-ahFyNwlQ", 
+            "tags": []
+        }
+    ]
+}
+~~~~
+
+Now that the list is created, use the import via URL to import the list members. 
+
+Now that I have imported a list of subscribers, I check the status and size of the list to ensure all were imported properly.
+
+Endpoint - GET /list/{list_slug}/
+
+~~~~
+{
+    "list": [
+        {
+            "size": 150, 
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/1S2QdPn-ahFyNwlQ/", 
+                "links": [
+                    {
+                        "href": "import/", 
+                        "rel": "imports"
+                    }, 
+                    {
+                        "href": "job/", 
+                        "rel": "jobs"
+                    }, 
+                    {
+                        "href": "member/", 
+                        "rel": "members"
+                    }
+                ]
+            }, 
+            "slug": "1S2QdPn-ahFyNwlQ", 
+            "tags": []
+        }
+    ]
+}
+~~~~
+
+I can see there are now 150 members in my list. Now I will start a validation job on the list. 
+
+POST /list/{list slug}/job/
+
+~~~~
+{
+    "job": [
+        {
+            "stats_only": false, 
+            "status": "New", 
+            "stats": {}, 
+            "created": "2015-04-27T18:16:12.739000Z", 
+            "skip_dha": false, 
+            "priority": {
+                "mu": 1, 
+                "sigma": 1
+            }, 
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/1S2QdPn-ahFyNwlQ/job/-eUnxcxR/"
+            }, 
+            "analyze_only": false, 
+            "pct_complete": 0, 
+            "slug": "-eUnxcxR"
+        }
+    ]
+}
+~~~~
+
+You need the job slug to track progress on the validation of the list. To check the status of a validation job
+
+GET /list/{list slug}/job/{job slug}/
+
+
+
+~~~~
+[
+    {
+        "items": [
+            {
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/1S2QdPn-ahFyNwlQ/"
+                }
+            }, 
+            {
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/2XONtvTsS83VtgZX/"
+                }
+            }
+        ], 
+        "paging": {
+            "skip": 0, 
+            "total": 2, 
+            "limit": 2
+        }, 
+        "meta": {
+            "href": "https://api.datavalidation.com/1.0/list/", 
+            "links": [
+                {
+                    "href": "{slug}/", 
+                    "rel": "item"
+                }
+            ]
+        }
+    }
+]
+~~~~
+
+
+
+
+
+
+### Frequently Used Command Lines
+
+#### See all of the lists you have created
+
+GET https://api.datavalidation.com/1.0/list/
+
+~~~~
+    curl -X GET
+    -H "Authorization: bearer {api_key}"
+    -H "Content-Type: application/json"
+    "https://api/datavalidation.com/1.0/list/"
+~~~~
+
+If you see this, it means you have not uploaded any lists to your account. 
+
+~~~~
+    [
+    {
+        "items": [], 
+        "paging": {
+            "skip": 0, 
+            "total": 0, 
+            "limit": 0
+        }, 
+        "meta": {
+            "href": "https://api.datavalidation.com/1.0/list/", 
+            "links": [
+                {
+                    "href": "{slug}/", 
+                    "rel": "item"
+                }
+            ]
+        }
+    }
+    ]
+~~~~
+
+Once there are lists in your account, you will see something similar to this.
+
+~~~~
+    [
+    {
+        "items": [], 
+        "paging": {
+            "skip": 0, 
+            "total": 0, 
+            "limit": 0
+        }, 
+        "meta": {
+            "href": "https://api.datavalidation.com/1.0/list/", 
+            "links": [
+                {
+                    "href": "{slug}/", 
+                    "rel": "item"
+                }
+            ]
+        }
+    }
+    ]
+~~~~
+
+
+
 This cookbook will discuss use cases and implementation of Email Assurance (Ongoing Monitoring and Remediation) using the DataValidation Batch API. Email Assurance for ESPs is only available at the subscription level. If you are on a pay-as-you-go plan, you will need to upgrade to a subscription prior to beginning this integration. The cost of a subscription is based on the total number of subscribers in your database and includes unlimited API calls and token usage. 
 
 An email service provider can use these instructions to onboard new users, monitor existing users, and remediate lists daily/weekly. 
