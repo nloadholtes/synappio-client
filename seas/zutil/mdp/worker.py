@@ -19,7 +19,6 @@ from . import constants as MDP
 
 log = logging.getLogger(__name__)
 log_dump = logging.getLogger('seas.zutil.dump')
-log_heartbeat = logging.getLogger(__name__ + '.heartbeat')
 
 
 def main():
@@ -96,7 +95,6 @@ class MajorDomoWorker(object):
             else:
                 self._handle_timeout()
             if time.time() > self._next_heartbeat:
-                log_heartbeat.debug('send heartbeat')
                 self._send(MDP.W_HEARTBEAT)
                 self._next_heartbeat = time.time() + self._heartbeat_interval
         log.info('Terminating reactor')
@@ -140,7 +138,6 @@ class MajorDomoWorker(object):
         assert MDP.W_WORKER == rmsg.pop()
         command = rmsg.pop()
         if command == MDP.W_HEARTBEAT:
-            log_heartbeat.debug('recv heartbeat')
             return
         elif command == MDP.W_DISCONNECT:
             self._reconnect()
