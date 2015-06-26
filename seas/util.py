@@ -16,12 +16,35 @@ import pkg_resources
 from datetime import datetime
 from cStringIO import StringIO
 from bag import csv2
+import requests
 
 
 TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 re_wildcard = re.compile(r'(\{[a-zA-Z][^\}]*\})')
 re_newline = re.compile('(\r(?=[^\n]))|\r\n')
 manager = pkg_resources.ResourceManager()
+
+
+def restart_download(resp, offset):
+    accept_ranges = resp.headers.get('accept-ranges', '').split(',')
+    is_resumable = 'bytes' in accept_ranges
+    new_req = resp.request.copy()
+    sess = requests.Session()
+    if is_resumable:
+        new_req.headers['range'] = 'bytes={}-'.format(offset)
+        new_resp = sess.send(new_req, stream=True)
+        new_resp.raise_for_status()
+        sess.close()
+        return new_resp
+    # Have to read/discard a bunch of data
+    new_resp = sess.send(new_req, stream=True)
+    new_resp.raise_for_status()
+    bytes_discarded = 0
+    while bytes_discarded < offset:
+        to_read = min(8192, offset - bytes_discarded)
+        chunk = new_resp.raw.read(to_read)
+        bytes_discarded += len(chunk)
+    return new_resp
 
 
 def constant_time_compare(val1, val2):
