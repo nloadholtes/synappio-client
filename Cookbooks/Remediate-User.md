@@ -358,7 +358,7 @@ DataValidation will validate any new data coming into the system on a daily basi
 
 API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens. If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
 
-For instruction on Remediating a list please see the ESP Cookbook entitled Remediation.
+For instruction on monitoring list quality please see the ESP Cookbook entitled Monitoring.
 
 >Important!
     
