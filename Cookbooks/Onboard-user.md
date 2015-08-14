@@ -2,29 +2,36 @@ Onboarding a User
 ====================
 
 
-#### Uploading a List 
+#### Uploading an Email List
 
 As an ESP, it may be useful to know the quality of a potential user's list(s) before accepting them as a customer. This set of instructions will provide a means of doing so.
 
-Before upload a list, a few questions must first be answered about the list being uploaded:
+To vet whether a new user is a good sender or not, send their email lists through DataValidation’s API at onboarding. Retrieve an overview of a user’s list quality to recommend list remediation, or get the full validation results to clean on behalf of the user.
 
-1.   Does the csv have include a header on the first row?
-If yes, the query parameter 'header' should be set to 'true', otherwise 'false'.
+Before you upload a list to the API, a few questions must be answered about the list being uploaded:
 
-2.   What column is the email address in?
-If the email address is in the first column, the query parameter 'email' should be set to '0'. If the email address is in the second column, it should be set to '1' etc.
+1.   Does the csv have include a header on the first row? If yes, the query parameter 'header' should be set to 'true', otherwise 'false'.
 
-3.   Is there data in each row (other than the email address) that you would like to store?
-You might want to store additional data such as first name, last name, unqiue ID etc. If so, the query parameter 'metadata' should be set to 'true', otherwise 'false'.
+2.   What column is the email address in? If the email address is in the first column, the query parameter 'email' should be set to '0'. If the email address is in the second column, it should be set to '1', etc.
 
+3.   Is there data in each row (other than the email address) that you would like to store? You might want to store additional data such as first name, last name, unique ID etc. If so, the query parameter 'metadata' should be set to 'true', otherwise 'false'.
 
-After adding a list, individual member grades will be available via this endpoint: /list/{list_slug}/member/{member_slug}/
+4.   Do you have a unique identifier for each email address? 'member_slug' is a unique ID specific to members in a list. If you prefer to specify 'member_slug', set the 'slug_col' query parameter to the column containing your provided identifier in your csv (column 1 = 0). If this parameter is not provided, member slugs will be generated automatically.
+
+Note: Validation results can be retrieved on the member level or the list level. If you intend on accessing individual member grades and not ALL member grades, be sure to include member slugs in your csv. Otherwise, you will have to make a call to '/list/{list_slug}/member/' to retrieve the member_slugs we provide and you will be charged a remediation token for each member in the list.
 
 'member_slug' is a unique ID specific to members in a list. If you prefer to specify 'member_slug', set the 'slug_col' query parameter to the column containing your provided identifier in your csv(column 1 = 0). If this parameter is not provided, member slugs will be generated automatically.
 
-Note: If you intend on accessing individual member grades and not ALL member grades, be sure to include member slugs in your csv. Otherwise, you will have to make a call to '/list/{list_slug}/member/' to retrieve the member_slugs we provide and you will be charged a remediation token for each member in the list.
 
-Sample command:
+#### Create a List
+
+Lists can be created in the API via a .CSV file or via URL. *We recommend that for larger lists, or larger databases, you upload through URL. 
+
+For lists imported via .csv file, you'll create the list and import to it in the same command line and you must include all mapping data in the command line. Please note that if you use curl to upload a .csv, you must make sure that the data you're uploading contains newline (\n) characters. Otherwise, the API will interpret your upload as a single (very long!) row.
+
+To create a list using a .csv file, use the endpoint: POST /list
+
+Sample Command:
 
     $ curl -X POST
     -H "Content-Type: text/csv"
@@ -35,7 +42,7 @@ Sample command:
         bar@example.com,bar,002,
         baz@example.com,baz,003,"
 
-Sample output:
+Sample Output:
 
     {
         "list": [
@@ -62,20 +69,56 @@ Sample output:
 
 **Be sure to store the slug, as this will be needed to access the list in the future.**
 
+If you upload a list via URL, you will need to create an empty list and then import using the URL. Note: You must provide mapping data in the URL parameters. 
 
-#### Running a Validation Job 
+To create an empty list using a URL, use the endpoint: POST /list
 
-To begin processing a list, a job must be created to start validating members within a list.
+Sample Command:
 
-Note: An Onboarding Token will be charged for each member in the list when a job is created.
+$ curl -X POST
+    -H "Authorization: bearer {api_key}"
+    "https://api.datavalidation.com/1.0/list/?email=0&header=false&metadata=false" 
 
-Command:
+Sample Output:
+
+    {"list": [{"size": 0, "meta": {"href": "https://api.datavalidation.com/1.0/list/fwHpJX3E8dTIl6tE/", "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"}, {"href": "member/", "rel": "members"}]}, "slug": "fwHpJX3E8dTIl6tE", "tags": []}]}Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
+
+When importing via URL, be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create (and automatically start) an import from a URL. 
+
+Sample Command: 
+
+curl -X POST -H "Authorization: bearer {api_key}" 
+"https://api.datavalidation.com/1.0/list/{list_slug}/import/" -d 
+'{
+  "href": "{list_url}",
+  "note": "{notes}",
+  "mapping": {
+    "header_row": true,
+    "email_col": 0,
+    "include_metadata": false
+  }
+}'
+
+Sample Output:
+
+    [{"status": "New", "tags": [], "created": "2015-08-14T15:42:59.009000Z", "mapping": {"header_row": true, "email_col": 0, "include_metadata": false}, "note": "Test List", "href": "https://www.dropbox.com/s/39z6q9kgjjss242/TestList_540.csv?dl=0", "meta": {"href": "https://api.datavalidation.com/1.0/list/fwHpJX3E8dTIl6tE/import/jaRdKHI5/"}, "total_imported": 0, "slug": "jaRdKHI5"}]Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
+
+**Please Note: The output above shows "total_imported": 0. List imports must be 100% complete before creating the job that kicks off validation of a list.**
+
+
+#### Run a Validation Job 
+
+After your import is complete, the next step is to create a validation job for the imported list. Note: A Vetting Token will be charged for each member in the list when a job is created. Creating a validation job kicks off the validation process. When the job has finished, the Vetting Tokens consumed will provide you with an overview report of the list's quality.  
+
+To start a validation job, use the endpoint: GET /list/{list_slug}/job
+
+Sample Command:
 
     $ curl -X POST
     -H "Authorization: bearer {api_key}"
     "https://api.datavalidation.com/1.0/list/{list_slug}/job/"
 
-Sample output:
+Sample Output:
 
     {
         "job": [
@@ -144,12 +187,14 @@ If the job is not finished, you should see a response similar to:
         ]
     }
 
-Notice the 'pct_complete' field representing the current percent of completion.
+Notice the 'pct_complete' field representing the current percent of completion. If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list.
+
+To view the progress of a validation job, construct the following request using the job's slug from the above result.
 
 
-#### Viewing List Grades 
+#### Retrieve Overview Reporting
 
-This is an overview of an email list’s quality. It includes the total number of subscribers in each grade category, A+, A, B, D, and F, and an overall grade for the list. This report does not provide data on specific email addresses.
+Viewing a list’s quality will provide you (the ESP) with the necessary information to determine whether a list needs to be validated or not. Overview Reporting is an overview of an email list’s quality. Reporting includes the total number of subscribers in each Email Assurance Grade category: A+, A, B, D, and F, and the number of subscribers that have each Deliverability Code. Deliverability Codes represent the historical deliverability information on subscribers, and together determine a subscriber's Email Assurance Grade. 
 
 After a job is complete, repeating the GET request from above will yield a response similar to:
     
@@ -205,3 +250,14 @@ After a job is complete, repeating the GET request from above will yield a respo
             }
         ]
     } 
+
+ This report does not provide data on specific email addresses.
+
+For ESPs wanting to use the API at Onboarding, follow all of the steps listed above for lists coming into your platform. Starting a validation job will kick off validation and will provide you (the ESP), or your users, with reporting to decide whether or not a list needs to be cleaned.
+
+Performing any of the steps above will consume one Vetting Token per email address. Vetting Tokens are consumed when the validation job is started. If you decide that a user needs to have their list(s) remediated, proceed to exporting results of individual members or a list, or results of lists. By exporting, you will consume one Remediation Token for each member on a list. 
+
+API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Vetting Tokens you have consumed, insert -v into the curl command line calling the 'POST/list/{list_slug}/import' endpoint. This will provide you with the response header: x-synappio-tokens-consumed and provide the total number of Vetting Tokens consumed.
+
+For instruction on Remediating a list please see the ESP Cookbook entitled Remediation. 
+
