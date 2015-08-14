@@ -84,7 +84,7 @@ Sample Output:
     {"list": [{"size": 0, "meta": {"href": "https://api.datavalidation.com/1.0/list/fwHpJX3E8dTIl6tE/",
     "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"}, 
     {"href": "member/", "rel": "members"}]}, "slug": "fwHpJX3E8dTIl6tE", "tags": 
-    []}]}Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
+    []}]}
 
 When importing via URL, be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create (and automatically start) an import from a URL. 
 
@@ -114,7 +114,7 @@ Sample Output:
     {"href": "https://api.datavalidation.com/1.0/list/
     fwHpJX3E8dTIl6tE/import/jaRdKHI5/"}, "total_imported": 0, 
     "slug": "jaRdKHI5"}
-    ]Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
+    ]
 
 **Please Note: The output above shows "total_imported": 0. List imports must be 100% complete before creating the job that kicks off validation of a list.**
 
@@ -270,7 +270,7 @@ For ESPs wanting to use the API at Onboarding, follow all of the steps listed ab
 
 Performing any of the steps above will consume one Vetting Token per email address. Vetting Tokens are consumed when the validation job is started. If you decide that a user needs to have their list(s) remediated, proceed to exporting results of individual members or a list, or results of lists. By exporting, you will consume one Remediation Token for each member on a list. 
 
-API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Vetting Tokens you have consumed, insert -v into the curl command line calling the 'POST/list/{list_slug}/import' endpoint. This will provide you with the response header: x-synappio-tokens-consumed and provide the total number of Vetting Tokens consumed.
+API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Vetting Tokens you have consumed, insert -v into the curl command line calling the 'POST/list/{list_slug}/job' endpoint. If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header
 
 For instruction on Remediating a list please see the ESP Cookbook entitled Remediation. 
 
