@@ -81,7 +81,10 @@ Sample Command:
 
 Sample Output:
 
-    {"list": [{"size": 0, "meta": {"href": "https://api.datavalidation.com/1.0/list/fwHpJX3E8dTIl6tE/", "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"}, {"href": "member/", "rel": "members"}]}, "slug": "fwHpJX3E8dTIl6tE", "tags": []}]}Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
+    {"list": [{"size": 0, "meta": {"href": "https://api.datavalidation.com/1.0/list/fwHpJX3E8dTIl6tE/",
+    "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"}, 
+    {"href": "member/", "rel": "members"}]}, "slug": "fwHpJX3E8dTIl6tE", "tags": 
+    []}]}Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
 
 When importing via URL, be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create (and automatically start) an import from a URL. 
 
@@ -101,10 +104,17 @@ Sample Command:
 
 Sample Output:
 
-    [{"status": "New", "tags": [], "created": "2015-08-14T15:42:59.009000Z", "mapping": {"header_row": true, 
-    "email_col": 0, "include_metadata": false}, "note": "Test List", "href": "https://www.dropbox.com/s/
-    39z6q9kgjjss242/TestList_540.csv?dl=0", "meta": {"href": "https://api.datavalidation.com/1.0/list/
-    fwHpJX3E8dTIl6tE/import/jaRdKHI5/"}, "total_imported": 0, "slug": "jaRdKHI5"}]Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
+    [{"status": "New", "tags": [], "created": "2015-08-14T15:42:59.009000Z", "mapping": 
+    {"header_row": true, 
+    "email_col": 0, 
+    "include_metadata": false}, 
+    "note": "Test List",
+    "href": "https://www.dropbox.com/s/39z6q9kgjjss242/TestList_540.csv?dl=0", 
+    "meta": 
+    {"href": "https://api.datavalidation.com/1.0/list/
+    fwHpJX3E8dTIl6tE/import/jaRdKHI5/"}, "total_imported": 0, 
+    "slug": "jaRdKHI5"}
+    ]Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
 
 **Please Note: The output above shows "total_imported": 0. List imports must be 100% complete before creating the job that kicks off validation of a list.**
 
