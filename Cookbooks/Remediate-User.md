@@ -3,11 +3,15 @@ Remediate a List
 
 #### Running a Validation Job 
 
-To begin processing a list, a job must be created to start validating members within a list.
+By using the DataValidation API, Email Service Providers have the ability to vet the quality of email lists coming into their platform. ESPs can automate the process of checking List Quality prior to ever letting an email marketer send through their platform. View the Onboarding Cookbook for instructions on how this is done. 
 
-Note: An Onboarding Token will be charged for each member in the list when a job is created.
+To remediate an email list, an ESP must first follow the steps listed in the Onboarding Cookbook. To receive reporting on List Quality, and to kick off validation of an email list, a job must be created. One Vetting Token will be consumed per email address when the job is created. Note: List imports must be 100% complete before creating the job that kicks off validation of a list.
 
-Command:
+#### Create a Validation Job
+
+To start a validation job, use the endpoint: GET /list/{list_slug}/job
+
+Sample Command:
 
 ~~~~
 $ curl -X POST
@@ -15,7 +19,7 @@ $ curl -X POST
 "https://api.datavalidation.com/1.0/list/{list_slug}/job/"
 ~~~~
 
-Sample output:
+Sample Output:
 
     {
         "job": [
@@ -46,9 +50,12 @@ Sample output:
 
 If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list. 
 
+
+#### View the Progress of a Job
+
 To view the progress of a validation job, construct the following request using the job's slug from the above result:
 
-Command:
+Sample Command:
 
     $ curl -X GET
     -H "Authorization: bearer {api_key}"
@@ -83,12 +90,12 @@ If the job is not finished, you should see a response similar to:
         ]
     }
 
-Notice the 'pct_complete' field representing the current percent of completion.
+If the job is not finished, you should see a response similar to the one below. Notice the 'pct_complete' field representing the current percent of completion.
 
 
-#### Viewing List Grades 
+#### Retrieve Overview Reporting
 
-After a job is complete, repeating the GET request from above will yield a response similar to:
+Viewing a list’s quality will provide you (the ESP) with the necessary information to determine whether a list needs to be validated or not. After a job is complete, repeating the GET request from above will yield a response similar to:
 
     {
         "job": [
@@ -143,36 +150,39 @@ After a job is complete, repeating the GET request from above will yield a respo
         ]
     } 
 
-### Retrieve validation results 
+This is an overview of an email list’s quality. It includes the total number of subscribers in each Email Assurance Grade category (A+, A, B, D, and F) and the number of addresses that have each Deliverability Code. 
 
-After reviewing the overall grades of a list, it may or may not be necessary to remediate the list. The DataValidation Batch API provides multiple methods for viewing validation grades for individual members of a list.
+
+### Retrieve Validation Results 
+
+After reviewing a list’s quality, it may or may not be necessary to remediate the list. The API provides multiple methods for viewing validation grades for individual members of a list. Note: Retrieving validation results will consume one Remediation Token for each address within a list. 
+
+ESPs can choose to create one list and post separate jobs to this list, or they can create numerous lists with jobs for each. Validation results can be retrieved for all members of a single list, from specific jobs, or for single members of a list.
 
 #### To retrieve individual member grades for ALL members of a list:
 
-Using the '/export.csv' endpoint will provide csv formatted output including only the member slugs, email addresses, and grades.
+This will provide a .csv formatted output including only the member slugs, email addresses, and Email Assurance grades.
+To retrieve validation results for all members, use the endpoint: GET /list/{list_slug}/export.csv:
 
-/list/{list_slug}/export.csv:
-
-Command:
+Sample Command:
 
     curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv"
 
-Sample output:
+Sample Output:
 
     BPopxToE,foo@example.com,D,K0,R0,H4,O4,W3,T4,D4
     FVCExahe,baz@example.com,D,K0,R0,H4,O4,W4,T1,D4
     MPM-h7D1,bar@example.com,D,K0,R0,H4,O4,W4,T4,D4
 
+Using the '/member/' endpoint will provide json formatted output including member slugs, member email addresses, update timestamps as well as any metadata that may have been included in the list. 
 
-/list/{list_slug}/member/:
-        
-Using the '/member/' endpoint will provide json formatted output including member slugs, member email addresses, update timestamps as well as any metadata that may have been included in the list.
+To retrieve / filter the members of your list use endpoint: /list/{list_slug}/member/. Using the '/member/' endpoint will provide json formatted output including member slugs, member email addresses, update timestamps as well as any metadata that may have been included in the list.
 
-Command:
+Sample Command:
 
     curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
 
-Sample output:
+Sample Output:
 
     {
         "members": [
@@ -259,14 +269,13 @@ Sample output:
 
 A Remediation Token will be charged for EACH member in a list when using the '/export.csv' or '/member/' endpoints to retrieve member grades.
 
-
 #### To retrieve individual member grades from a specific job:
 
-Using the '/{job_slug}/export.csv' endpoint will provide a url linking to the results of a previous run job. After a job is completed we generate a csv of the result data. Accessing this url will generate a link to an S3 bucket where the csv file is located. The provided url will be valid for 300 seconds (5 minutes). After this time expires, a new call to this endpoint will generate a new valid link to the csv results. This csv will contain a header row, and will include the member slug, address, and analysis fields.
+Using the '/{job_slug}/export.csv' endpoint will provide a URL linking to the results of a previous run job. After a job is completed a .csv will be created containing the result data. Accessing this URL will generate a link to an S3 bucket where the .csv file is located. The provided url will be valid for 300 seconds (5 minutes). After this time expires, a new call to this endpoint will generate a new valid link to the csv results. This .csv will contain a header row, and will include the member slug, address, and analysis fields.
 
-/list/{list_slug}/job/{job_slug}/export.csv:
+To export results from a specific job use the endpoint: /list/{list_slug}/job/{job_slug}/export.csv
 
-Command:
+Sample Command:
 
 ~~~~
 curl -X GET
@@ -274,7 +283,7 @@ curl -X GET
 "https://api.datavalidation.com/1.0/list/{list_slug}/job/{job_slug}/export.csv"
 ~~~~
 
-Sample output:
+Sample Output:
 
 ~~~~
 {
@@ -282,7 +291,9 @@ Sample output:
 }
 ~~~~
 
-Link output:
+Link Output:
+
+A Remediation Token will be charged for EACH member in a list when using the '/{job_slug}/export.csv' endpoint to retrieve member grades.
 
 ~~~~
 slug,address,grade,click,open,hard,optout,complain,trap,deceased
@@ -293,18 +304,17 @@ fZS_PEs-,foo@example.com,D,K0,R0,H4,O4,W3,T4,D4
 
 A Remediation Token will be charged for EACH member in a list when usling the '/{job_slug}/export.csv' endpoint to retrieve member grades.
 
-
 #### To retrieve individual grades for a single member of a list:
 
-Using the '/member/{member_slug}/' endpoint will provide output similar to the '/member/' endpoint above but for just a single member.
-    
-/list/{list_slug}/member/{member_slug}/:
+Retrieving individual grades for a single member of a list will provide validation results for a single address within a list. Using the '/member/{member_slug}/' endpoint will provide output similar to the '/member/' endpoint above but for just a single member.
 
-Command:
+To retrieve individual member grades, use the endpoint: /list/{list_slug}/member/{member_slug}/
+
+Sameple Command:
 
     curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/{member_slug}"
 
-Sample output:
+Sample Output:
 
     {
         "members": [
@@ -340,8 +350,15 @@ Sample output:
 
 A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
+#### Remediate an Existing List 
 
-#### Remediating an Existing List 
+Once lists have been onboarded to the ESP platform, you may want to re-validate lists overtime. Whether you want to re-validate lists on a monthly or weekly basis, list maintenance can be achieved by remediating existing lists. 
+
+DataValidation will validate any new data coming into the system on a daily basis, and any existing data on a weekly basis. ESPs have the ability to retrieve updated deliverability information on any lists or individual members through the API. 
+
+API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens. If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
+
+For instruction on Remediating a list please see the ESP Cookbook entitled Remediation.
 
 >Important!
     
