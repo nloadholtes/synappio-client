@@ -75,7 +75,7 @@ To create an empty list using a URL, use the endpoint: POST /list
 
 Sample Command:
 
-$ curl -X POST
+    $ curl -X POST
     -H "Authorization: bearer {api_key}"
     "https://api.datavalidation.com/1.0/list/?email=0&header=false&metadata=false" 
 
@@ -87,21 +87,24 @@ When importing via URL, be sure to include mapping data for URL, header row, ema
 
 Sample Command: 
 
-curl -X POST -H "Authorization: bearer {api_key}" 
-"https://api.datavalidation.com/1.0/list/{list_slug}/import/" -d 
-'{
-  "href": "{list_url}",
-  "note": "{notes}",
-  "mapping": {
-    "header_row": true,
-    "email_col": 0,
-    "include_metadata": false
-  }
-}'
+    curl -X POST -H "Authorization: bearer {api_key}" 
+        "https://api.datavalidation.com/1.0/list/{list_slug}/import/" -d 
+            '{
+                "href": "{list_url}",
+                "note": "{notes}",
+                "mapping": {
+                    "header_row": true,
+                    "email_col": 0,
+                    "include_metadata": false
+            }
+         }'
 
 Sample Output:
 
-    [{"status": "New", "tags": [], "created": "2015-08-14T15:42:59.009000Z", "mapping": {"header_row": true, "email_col": 0, "include_metadata": false}, "note": "Test List", "href": "https://www.dropbox.com/s/39z6q9kgjjss242/TestList_540.csv?dl=0", "meta": {"href": "https://api.datavalidation.com/1.0/list/fwHpJX3E8dTIl6tE/import/jaRdKHI5/"}, "total_imported": 0, "slug": "jaRdKHI5"}]Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
+    [{"status": "New", "tags": [], "created": "2015-08-14T15:42:59.009000Z", "mapping": {"header_row": true, 
+    "email_col": 0, "include_metadata": false}, "note": "Test List", "href": "https://www.dropbox.com/s/
+    39z6q9kgjjss242/TestList_540.csv?dl=0", "meta": {"href": "https://api.datavalidation.com/1.0/list/
+    fwHpJX3E8dTIl6tE/import/jaRdKHI5/"}, "total_imported": 0, "slug": "jaRdKHI5"}]Ashleys-MacBook-Pro-2:~ ashleyhinds$ 
 
 **Please Note: The output above shows "total_imported": 0. List imports must be 100% complete before creating the job that kicks off validation of a list.**
 
