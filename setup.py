@@ -26,6 +26,7 @@ setup(
     test_suite="synappio-client",
     entry_points="""\
     [paste.app_factory]
+    doc = score.doc:DocServer.factory
 
     [paste.filter_factory]
 
