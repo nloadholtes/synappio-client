@@ -350,11 +350,23 @@ Sample Output:
 
 A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
-#### Remediate an Existing List 
+#### Remediate an Existing List for List Maintenance
 
-Once lists have been onboarded to the ESP platform, you may want to re-validate lists overtime. Whether you want to re-validate lists on a monthly or weekly basis, list maintenance can be achieved by remediating existing lists. 
+List maintenance is the key to upholding great deliverability. Using the DataValidation’s API, Email Service Providers can monitor the quality of email lists in their system, as well as provide a way for their users to do the same. Whether you want to re-validate lists on a monthly or weekly basis, or always provide the most recent deliverability information for users, list maintenance can be achieved by continuous remediation existing lists. 
 
-DataValidation will validate any new data coming into the system on a daily basis, and any existing data on a weekly basis. ESPs have the ability to retrieve updated deliverability information on any lists or individual members through the API. 
+DataValidation will validate any new data coming into the system on a daily basis, and any existing data on a weekly basis. ESPs have the ability to retrieve updated deliverability information on any email lists or individual members through the API. 
+
+
+
+
+
+
+
+
+
+
+
+
 
 API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens. If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
 
