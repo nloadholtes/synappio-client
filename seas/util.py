@@ -77,6 +77,21 @@ def update_settings_from_environ(settings):
         settings[k] = v1
 
 
+def extend_dict(dst, src):
+    '''Perform a "deep" update of a dst dict with src.
+
+    This means that when a particular value is already present in
+    the dst dict, it will be deep_updated with the corresponding
+    value in src.
+    '''
+    for src_k, src_v in src.items():
+        dst_v = dst.get(src_k, None)
+        if isinstance(dst_v, dict):
+            extend_dict(dst_v, src_v)
+        else:
+            dst[src_k] = src_v
+
+
 def strptime(s):
     'Return a datetime object from an iso formatted string'
     if '.' in s:
