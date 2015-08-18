@@ -350,7 +350,7 @@ Sample Output:
 
 A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
-#### Remediate an Existing List 
+### Remediate an Existing List 
 
 List maintenance is the key to upholding great deliverability. Using the DataValidation’s API, Email Service Providers can monitor the quality of email lists in their system, as well as provide a way for their users to do the same. Whether you want to re-validate lists on a monthly or weekly basis, or always provide the most recent deliverability information for users, list maintenance can be achieved by continuous remediation existing lists. 
 
