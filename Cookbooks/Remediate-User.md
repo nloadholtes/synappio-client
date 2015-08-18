@@ -5,7 +5,7 @@ Remediate a List
 
 By using the DataValidation API, Email Service Providers have the ability to vet the quality of email lists coming into their platform. ESPs can automate the process of checking List Quality prior to ever letting an email marketer send through their platform. View the Onboarding Cookbook for instructions on how this is done. 
 
-To remediate an email list, an ESP must first follow the steps listed in the Onboarding Cookbook. To receive reporting on List Quality, and to kick off validation of an email list, a job must be created. One Vetting Token will be consumed per email address when the job is created. Note: List imports must be 100% complete before creating the job that kicks off validation of a list.
+To remediate an email list, an ESP must first follow the steps listed in the <a href="https://github.com/synappio/synappio-client/blob/master/Cookbooks/Onboard-user.md" target="_blank">Onboarding Cookbook.</a> To receive reporting on List Quality, and to kick off validation of an email list, a job must be created. One Vetting Token will be consumed per email address when the job is created. Note: List imports must be 100% complete before creating the job that kicks off validation of a list.
 
 #### Create a Validation Job
 
@@ -350,28 +350,95 @@ Sample Output:
 
 A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
-#### Remediate an Existing List for List Maintenance
+#### Remediate an Existing List 
 
 List maintenance is the key to upholding great deliverability. Using the DataValidation’s API, Email Service Providers can monitor the quality of email lists in their system, as well as provide a way for their users to do the same. Whether you want to re-validate lists on a monthly or weekly basis, or always provide the most recent deliverability information for users, list maintenance can be achieved by continuous remediation existing lists. 
 
-DataValidation will validate any new data coming into the system on a daily basis, and any existing data on a weekly basis. ESPs have the ability to retrieve updated deliverability information on any email lists or individual members through the API. 
+Email Assurance is DataValidaton's list maintenance solution. We re-validate any existing addressess in our system on a weekly basis, and any new addresses on a daily basis. ESPs have access to the most recent deliverability information on any address within our system. 
 
-
-
-
-
-
-
-
-
-
-
-
-
-API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens. If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
-
-For instruction on monitoring list quality please see the ESP Cookbook entitled Monitoring.
+To kick off validation for an existing list within your API account, create a new validation job using an existing list slug. 
 
 >Important!
     
 >30 days after a list has been uploaded, list members that have not been updated will be removed from our system, potentially resulting in the absence of some or all list members. If you require remediation of a list that is more than 30 days old, it is important to re-upload the list. If your list is less than 30 days old, the remediation process is the same as above.
+
+###Remove Subscribers from a List
+
+After a list has been validated you'll want to remove any undeliverable addresses from the email list. Undeliverable email addresses will have an Email Assurance Grade of F. Some ESPs may recommend that users do not send to any email addresses other than those with Email Assurance Grades of A+ and A (those known to be deliverable). These addresses can be removed as well. 
+
+DataValidation API provides two methods for unsubscribing members from a list.
+
+#### Unsubscribe a Single Member from a List
+
+This command will allow you to remove individual subscribers from email lists by using an address's member slug. To unsubscribe a single member from a list, send a DELETE request to the endpoint: /list/{list_slug}/member/{member_slug}/
+
+Sample Command: 
+
+    curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list/{list_slug}/member/{member_slug}"
+
+Sample Response:
+
+    204: No Content
+
+The command's response will show that the member is longer part of the list.
+
+#### To unsubscribe multiple members from a list:
+
+This command will allow you to remove multiple members from a list at once by POSTing a .csv of addresses that you'd like to unsubscribe. After validating a list, specify multiple members to be unsubscribed by passing a .csv list of members to: /{list_slug}/unsubscribe.csv 
+
+
+Parameters:
+
+              - name: header
+                paramType: query
+                description: Is there a header row present in the CSV data
+                required: true
+                type: boolean
+            
+              - name: slug_col
+                required: true
+                paramType: query
+                type: integer
+                description: The column in the csv containing the slug for each member.
+
+Command:
+
+                curl -X POST
+                -H "Content-Type: text/csv"
+                -H "Authorization: bearer {api_key}"
+                   "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2"
+                -d "email_address,first_name,ID,
+                    oof@example.com,oof,005,
+                   rab@example.com,rab,006,
+                   zab@example.com,zab,007"
+
+Sample output:
+
+    {
+    "list": [
+        {
+            "status": "new",
+            "size": 3,
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/",
+                "links": {
+                    "jobs": "job/",
+                    "batch_subscribe": "subscribe.csv",
+                    "member": "member/{member_slug}/",
+                    "job": "job/{job_slug}/",
+                    "batch_unsubscribe": "unsubscribe.csv",
+                    "export": "export.csv",
+                    "members": "member/"
+                }
+            },
+            "slug": "E5RIlS2B",
+            "metadata": {}
+        }
+    ]
+    }
+
+
+API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens. If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header. 
+
+To find out more about list maintenance and Email Assurance for ESPs, read the <a href="https://github.com/synappio/synappio-client/blob/master/Cookbooks/Email-Assurance-Cookbook.md" target="_blank">Email Assurance Cookbook.</a>
+
