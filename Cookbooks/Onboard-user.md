@@ -118,8 +118,156 @@ Sample Output:
 
 **Please Note: The output above shows "total_imported": 0. List imports must be 100% complete before creating the job that kicks off validation of a list.**
 
+#### To add a single member to an existing list
 
-#### Run a Validation Job 
+An ESP may want to add individual subscribers to lists as they get added to user lists within their platform. You can subscribe a single member to s specified existing list (list_slug) by sending a POST request to the appropriate list slug, using the endpoint: /{list_slug}/member/
+
+Sample Command:
+
+    curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
+    -d "biz@example.com"
+
+Sample Output:
+
+    [
+        {
+            "updated": "2014-10-15 21:16:56.054000",
+            "list_slug": "E5RIlS2B",
+            "analysis": {
+                "optout": "O4",
+                "grade": "D",
+                "hard": "H4",
+                "click": "K0",
+                "trap": "T4",
+                "open": "R0",
+                "complain": "W4",
+                "deceased": "D4"
+            },
+            "meta": {
+                "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/8UKN-s-H/"
+            },
+            "f_upload": true,
+            "address": "biz@example.com",
+            "slug": "8UKN-s-H",
+            "metadata": {}
+        }
+    ]
+
+#### To add a multiple members to an existing list
+
+ESPs may want to add newly created lists by heir users directly to the API, to an existing list within their API account. Adding multiple members to an existing list can be done by POSTing a .csv file to the list or by providing us with a download link (URL) to a .csv file containing the members you want to subscribe. 
+
+To add members by POSTing a .csv, send a POST request to the appropriate list slug, using the endpoint: /list/{list_slug}/subscribe.csv
+
+*Please Note: The required parameters are the same as the '/list/' endpoint when using a POST request to create new list. Use the following Parameters:
+
+Parameters:
+
+              - name: header
+                paramType: query
+                description: Is there a header row present in the CSV data
+                required: true
+                type: boolean
+
+              - name: email_col
+                paramType: query
+                description: Which column is the email address in? (0 = first column)
+                required: true
+                type: integer
+
+              - name: metadata
+                paramType: query
+                required: true
+                type: string
+                format: other
+                description: Should the metadata (non-email) in the CSV be stored? (true or false)
+
+              - name: slug_col
+                required: false
+                paramType: query
+                type: integer
+                description: The column in the csv containing a slug for each member. If this is omitted, a slug will be generated automatically.
+
+Sample Command:
+
+    curl -X POST
+    -H "Content-Type: text/csv"
+    -H "Authorization: bearer {api_key}"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?header=true&email=0&metadata=true&member_slug=2"
+    -d "email_address,first_name,ID,
+    oof@example.com,oof,005,
+    rab@example.com,rab,006,
+    baz@example.com,baz,007,"
+
+Sample Output:
+
+    {
+        "list": [
+            {
+                "status": "new",
+                "size": 6,
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/",
+                    "links": {
+                        "jobs": "job/",
+                        "batch_subscribe": "subscribe.csv",
+                        "member": "member/{member_slug}/",
+                        "job": "job/{job_slug}/",
+                        "batch_unsubscribe": "unsubscribe.csv",
+                        "export": "export.csv",
+                        "members": "member/"
+                    }
+                },
+                "slug": "E5RIlS2B",
+                "metadata": {}
+            }
+        ]
+    }
+
+To add members via download URL, send a POST request to the appropriate list slug, using the endpoint: /{list_slug}/import/. You can subscribe multiple members to an existing list by providing us with a download link to a csv file containing the members you want to subscribe.
+
+Command:
+
+~~~~
+curl -X POST
+-H "Authorization: bearer {api_key}"
+-H "Content-Type: application/json"
+"https://api.datavalidation.com/1.0/list/{list_slug}/"
+-d '{
+        "href": {csv_download_url_in_quotes},
+        "mapping":
+        {
+            "email_col":0,
+            "slug_col":2,
+            "header_row":true,
+            "include_metadata":false,
+        }
+    }'
+~~~~
+
+Sample output:
+
+~~~~
+[
+    {
+        "status": "New",
+        "created": "2014-10-24T21:52:31.225000Z",
+        "mapping": {
+            "header_row": true,
+            "email_col": 0,
+            "include_metadata": false,
+            "slug_col": 2
+        },
+        "note": "",
+        "href": {csv_download_url_in_quotes},
+        "meta": {
+            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+        },
+        "slug": "vYG7J_XT"
+    }
+]
+
+### Run a Validation Job 
 
 After your import is complete, the next step is to create a validation job for the imported list. Note: A Vetting Token will be charged for each member in the list when a job is created. Creating a validation job kicks off the validation process. When the job has finished, the Vetting Tokens consumed will provide you with an overview report of the list's quality.  
 
@@ -205,7 +353,7 @@ Notice the 'pct_complete' field representing the current percent of completion. 
 To view the progress of a validation job, construct the following request using the job's slug from the above result.
 
 
-#### Retrieve Overview Reporting
+### Retrieve Overview Reporting
 
 Viewing a list’s quality will provide you (the ESP) with the necessary information to determine whether a list needs to be validated or not. Overview Reporting is an overview of an email list’s quality. Reporting includes the total number of subscribers in each Email Assurance Grade category: A+, A, B, D, and F, and the number of subscribers that have each Deliverability Code. Deliverability Codes represent the historical deliverability information on subscribers, and together determine a subscriber's Email Assurance Grade. 
 
