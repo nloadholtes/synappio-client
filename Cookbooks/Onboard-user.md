@@ -266,6 +266,7 @@ Sample output:
         "slug": "vYG7J_XT"
     }
 ]
+~~~~
 
 ### Run a Validation Job 
 
@@ -420,5 +421,5 @@ Performing any of the steps above will consume one Vetting Token per email addre
 
 API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Vetting Tokens you have consumed, insert -v into the curl command line calling the 'POST/list/{list_slug}/job' endpoint. If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header
 
-For instruction on Remediating a list please see the ESP Cookbook entitled Remediation. 
+For instruction on Remediating a list read the <a href="https://github.com/synappio/synappio-client/blob/master/Cookbooks/Email-Assurance-Cookbook.md" target="_blank">Email Assurance Cookbook.</a> 
 
