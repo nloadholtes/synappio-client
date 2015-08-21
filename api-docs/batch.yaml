@@ -164,7 +164,7 @@ apis:
         nickname: unsubscribeUrl
         summary: Unsubscribe a CSV located at the given URL from a list
         notes: |
-          Use this to asynchronously unsubscribe members on the CSV from a list 
+          Use this to asynchronously unsubscribe members on the CSV from a list
         parameters:
           - *list_slug
           - name: body
@@ -382,9 +382,14 @@ models:
       href: {type: string, format: uri, defaultValue: "http://example.com"}
       note: {type: string, defaultValue: "Whatever you want"}
       mapping: {$ref: ImportMapping}
+      validate:
+        &validate-description
+        type: boolean
+        defaultValue: false
+        description: "Should a validation job be automatically created once the import is complete?"
 
   UnsubscribeUrl:
-    id: UnsubscribeUrl 
+    id: UnsubscribeUrl
     required: ['href', 'slug_col', 'header_row']
     properties:
       header_row:
@@ -531,7 +536,7 @@ models:
     required: [rel, href]
     properties:
       rel: {type: string, defaultValue: relation}
-      href: {type: string, format: uri, defaultValue: 'http://example.com'}
+      href: {type: string, defaultValue: 'http://example.com'}
 
   Tag:
     id: Tag
