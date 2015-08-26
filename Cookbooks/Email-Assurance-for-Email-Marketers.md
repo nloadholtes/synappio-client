@@ -21,12 +21,15 @@ Note: Validation results can be retrieved on the member level or the list level.
 
 ###Create a List
 
-Lists can be created in the API via a .CSV file or via URL. *We recommend that for larger lists, or larger databases, you upload through URL.
+Lists can be created in the API by importing a .csv file directly or via download URL to the .csv file. **We recommend that for larger lists, or larger databases, you upload through URL.**
 
-For lists imported via .csv file, you'll create the list and import to it in the same command line and you must include all mapping data in the command line. Please note that if you use curl to upload a .csv, you must make sure that the data you're uploading contains newline (\n) characters. Otherwise, the API will interpret your upload as a single (very long!) row.
+**Import via .csv file**
+
+Create the list and import in the same command line. You must include all mapping data in the command line. Please note that if you use curl to upload a .csv, you must make sure that the data you're uploading contains newline (\n) characters. Otherwise, the API will interpret your upload as a single (very long!) row.
+
 To create a list using a .csv file, use the endpoint: POST /list
 
-Sample command:
+Sample Command:
 
     $ curl -X POST
     -H "Content-Type: text/csv
@@ -37,7 +40,7 @@ Sample command:
         bar@example.com,bar,002,
         baz@example.com,baz,003,"
 
-Sample output:
+Sample Output:
 
     {
         "list": [
@@ -62,13 +65,13 @@ Sample output:
         ]
     }
 
-**Be sure to store the slug, as this will be needed to access the list in the future.**
+Note: Be sure to store the slug, as this will be needed to access the list in the future.
 
-If you upload a list via URL, you will need to create an empty list and then import using the URL. Note: You must provide mapping data in the URL parameters.
+**Import via download URL**
 
-DataValidation’s automated list maintenance solution, Email Assurance, runs once a day. We will analyze any new email data in the system on a daily basis, and any existing data in the system on a weekly basis. If you create/import a new list of addresses, you can run a validation job OR wait for Email Assurance to run and validate your email list automatically.
+If you import a list via URL, you will need to create an empty list and then import using the download URL. Note: You must provide mapping data in the URL parameters for the email list.
 
-To create an empty list using a URL, use the endpoint: POST /list
+To create an empty list, use the endpoint: POST /list
 
 Sample Command:
 
@@ -98,7 +101,7 @@ Sample Output:
     "slug": "jaRdKHI5"}
     ]
 
-When importing via URL, be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create (and automatically start) an import from a URL.
+When importing to the empty list (via URL), be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create an import from a URL.
 
 Sample Command:
 
@@ -133,7 +136,7 @@ Sample Output:
 
 **Please Note: The output above shows "total_imported": 0. List imports must be 100% complete before creating the job that kicks off validation of a list.**
 
-###See all of the lists you have created
+### See all of the lists you have created
 
 You can easily retrieve summary or detailed information about all of the lists you’ve created within your API account by calling the endpoint: /list/
 
@@ -194,7 +197,7 @@ Once there are lists in your account, you will see something similar to response
 
 #### To add a single member to an existing list
 
-As an email marketer, you most likely have a way for people to sign up for your mailing list. The addresses collected will be subscribed one-by-one and you may wish to add these to an existing list within the API. You can subscribe a single member to a specified existing list (list_slug) by sending a POST request to the appropriate list slug, using the endpoint: /{list_slug}/member/
+As an email marketer, you most likely have a way for people to sign up for your mailing list. The addresses collected will be subscribed one-by-one and you may wish to add these to an existing list within the API. You can subscribe a single member to a specified existing list by sending a POST request to the appropriate list slug, using the endpoint: /{list_slug}/member/
 
 Sample Command:
 
@@ -231,7 +234,9 @@ Sample Output:
 
 Email marketers may want to add newly created lists directly to the API, to an existing list within their API account. Adding multiple members to an existing list can be done by POSTing a .csv file to the list or by providing us with a download link (URL) to a .csv file containing the members you want to subscribe.
 
-To add members by POSTing a .csv, send a POST request to the appropriate list slug, using the endpoint: /list/{list_slug}/subscribe.csv
+**To add members by POSTing a .csv**
+
+Send a POST request to the appropriate list slug, using the endpoint: /list/{list_slug}/subscribe.csv
 *Please Note: The required parameters are the same as the '/list/' endpoint when using a POST request to create new list.
 
 Use the following Parameters:
@@ -300,9 +305,11 @@ Sample Output:
         ]
     }
 
-To add members via download URL, send a POST request to the appropriate list slug, using the endpoint: /{list_slug}/import/. You can subscribe multiple members to an existing list by providing us with a download link to a csv file containing the members you want to subscribe.
+**To add members via download URL**
 
-**Please Note: To add members to an existing list via URL link, you MUST provide a **slug_col** within the specified parameters of the list import.
+Send a POST request to the appropriate list slug, using the endpoint: /{list_slug}/import/. You can subscribe multiple members to an existing list by providing us with a download link to a .csv file containing the members you want to subscribe.
+
+Please Note: To add members to an existing list via URL link, you MUST provide a **slug_col** within the specified parameters of the list import.
 
 Sample Command:
 
@@ -346,38 +353,48 @@ Sample Output:
 ]
 ~~~~
 
-Email Assurance, DataValidation's list maintenance solution, runs once a day. We will analyze any new email data in the system on a daily basis, and any existing data in the system on a weekly basis. After creating/importing a new list of addresses, you can 1. Automatically start a validation job when the import is created. 2. Run a validation job after a list import is complete or 3. Wait for the daily Email Assurance run to pull in any new email and validate your email list.
+Email Assurance, DataValidation's list maintenance solution, runs once a day. We will analyze any new email data in the system on a daily basis, and any existing data in the system on a weekly basis. After importing a new list of addresses, you can 1. Automatically start a validation job when the import is created 2. Run a validation job after a list import is complete or 3. Wait for the daily Email Assurance run to pull in any new email and validate your email list.
 
-To automatically start a validation job when an import is created, add the parameter "validate=true" when creating the import.
+To automatically start a validation job at import, API users should include the additional parameter (listed below) in the curl command for importing via URL. To run a validation job after a list import, **the import must be 100% complete.** To wait for Email Assurance to pick up any new email addresses, or any new email lists, simply create the import for the email data and we'll do the rest!
+
+To automatically start a validation job when an import is created, add the parameter **"validate":true** in the curl command for creating an import via URL.
 
 Sample Command:
 
-    $ curl -X POST
-    -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/?email=0&header=false&metadata=false"
+    curl -X POST -H "Authorization: bearer {api_key}"
+        "https://api.datavalidation.com/1.0/list/{list_slug}/import/" -d
+            '{
+                "href": "{list_url}",
+                "note": "{notes}",
+                "validate": true,
+                "mapping": {
+                    "header_row": true,
+                    "email_col": 0,
+                    "include_metadata": false
+            }
+         }'
 
 Sample Output:
 
-    {"list": [{"size": 0, "meta": {"href": "https://api.datavalidation.com/1.0/list/fwHpJX3E8dTIl6tE/",
-    "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"},
-    {"href": "member/", "rel": "members"}]}, "slug": "fwHpJX3E8dTIl6tE", "tags":
-    []}]}
+[{"status": "New", "tags": [], "created": "2015-08-26T14:12:23.572000Z", "mapping": {"header_row": true, "email_col": 0, "include_metadata": false, "slug_col": 0}, "note": "Click2Sell Onboarding", "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=0", "meta": {"href": "http://core-list/list/1.0/list/GKGu8YEKU6IQGzvT/import/yffkMW9l/"}, "validate": true, "total_imported": 0, "slug": "yffkMW9l"}]
 
 A Vetting Token will be charged for each member in the list when the job is automatically created.
 
 ### Run a Validation Job
 
-After an import is complete, the next step is to create a validation job for the imported list. Note: A Vetting Token will be charged for each member in the list when a job is created. Creating a validation job kicks off the validation process. When the job has finished, the Vetting Tokens consumed will provide you with an overview report of the list's quality.
+For lists that have been imported (no automatic job created), the next step is to create a validation job for the imported list. Note: A Vetting Token will be charged for each member in the list when a job is created. Creating a validation job kicks off the validation process. When the job has finished, the Vetting Tokens consumed will provide you with an overview report of the list's quality.
 
 To start a validation job, use the endpoint: GET /list/{list_slug}/job
 
-Command:
+Sample Command:
 
-    $ curl -X POST
-    -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/job"
+~~~~
+$ curl -X POST
+-H "Authorization: bearer {api_key}"
+"https://api.datavalidation.com/1.0/list/{list_slug}/job/"
+~~~~
 
-Sample output:
+Sample Output:
 
     {
         "job": [
@@ -446,9 +463,9 @@ If the job is not finished, you should see a response similar to:
         ]
     }
 
-Viewing a list’s quality will provide you with the necessary information to determine whether a list needs to be validated or not. Overview Reporting is an overview of an email list’s quality. Reporting includes the total number of subscribers in each Email Assurance Grade category: A+, A, B, D, and F, and the number of subscribers that have each Deliverability Code.
+Viewing a list’s quality will provide you with the necessary information to determine whether a list needs to be validated or not. Overview Reporting is an overview of an email list’s quality. Reporting includes the total number of subscribers in each Email Assurance Grade category: A+, A, B, D, and F, and the number of subscribers that have each Deliverability Code. Deliverability Codes represent the historical deliverability information on subscribers, and together determine a subscriber's Email Assurance Grade.
 
-Deliverability Codes represent the historical deliverability information on subscribers, and together determine a subscriber's Email Assurance Grade. See our <a href="http://www.datavalidation.com/kb/12105-What-do-the-codes-in-my-Email-Assurance-Report-mean.html" target="_blank">KnowledgeBase</a> for more information on Email Assurance Grades.
+Visit our <a href="http://www.datavalidation.com/kb/12105-What-do-the-codes-in-my-Email-Assurance-Report-mean.html" target="_blank">Knowledge Base</a> for more information on Email Assurance Grades.
 
 After a job is complete, repeating the GET request from above will yield a response similar to:
 
@@ -520,8 +537,8 @@ This will provide a .csv formatted output including only the member slugs, email
 
 Sample Command:
 
-
-            curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv"
+    curl -X GET -H "Authorization: bearer {api_key}"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv"
 
 Sample Output:
 
@@ -536,7 +553,8 @@ To retrieve / filter the members of your list use endpoint: /list/{list_slug}/me
 
 Sample Command:
 
-            curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
+    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/
+    {list_slug}/member/"
 
 Sample Output:
 
@@ -647,9 +665,9 @@ Sample Output:
 }
 ~~~~
 
-Link Output:
+**Link Output:**
 
-A Remediation Token will be charged for EACH member in a list when using the '/{job_slug}/export.csv' endpoint to retrieve member grades.
+The link provided for export will provide you with a downloadable .csv file. The file will contain member_slug, email address, Email Assurance Grade, and Deliverability Codes including: clicks, opens, hard bounces, outouts, complaints, spam traps, and deceased individuals. A Remediation Token will be charged for EACH member in a list when using the '/{job_slug}/export.csv' endpoint to retrieve member grades.
 
 ~~~~
 slug,address,grade,click,open,hard,optout,complain,trap,deceased
@@ -666,11 +684,12 @@ A Remediation Token will be charged for EACH member in a list when usling the '/
 Retrieving individual grades for a single member of a list will provide validation results for a single address within a list. Using the '/member/{member_slug}/' endpoint will provide output similar to the '/member/' endpoint above but for just a single member.
 To retrieve individual member grades, use the endpoint: /list/{list_slug}/member/{member_slug}/
 
-Command:
+Sample Command:
 
-            curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
+            curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/
+            {list_slug}/member/"
 
-Sample output:
+Sample Output:
 
     {
         "members": [
@@ -707,7 +726,7 @@ Sample output:
 A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
 
-#### Remediating an Existing List
+#### Remediating Existing Lists
 
 List maintenance is the key to upholding great deliverability. Using DataValidation’s API, email marketers can monitor the quality of their email lists and always know where they stand prior to sending. List maintenance can be achieved by continuous remediation existing lists.
 
@@ -727,17 +746,18 @@ After a list has been validated you'll want to remove any undeliverable addresse
 
 DataValidation API provides two methods for unsubscribing members from a list.
 
-#### Unsubscribe a Single Member from a List
+#### Unsubscribing a Single Member from a List
 
 This command will allow you to remove individual subscribers from email lists by using an address's member slug. To unsubscribe a single member from a list, send a DELETE request to the endpoint: /list/{list_slug}/member/{member_slug}/
 
 Command:
 
-                curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list/{list_slug}/member/{member_slug}"
+    curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list
+    /{list_slug}/member/{member_slug}"
 
 Sample output:
 
-             Status code: 204 No Content
+    Status code: 204 No Content
 
 
 #### Unsubscribe Multiple Members from a List:
@@ -772,18 +792,18 @@ Parameters:
                 type: integer
                 description: The column in the csv containing a slug for each member. If this is omitted, a slug will be generated automatically.
 
-Command:
+Sample Command:
 
-                curl -X POST
-                -H "Content-Type: text/csv
-                    Authorization: bearer {api_key}"
-                   "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2"
-                -d "email_address,first_name,ID,
-                    oof@example.com,oof,005,
-                   rab@example.com,rab,006,
-                   zab@example.com,zab,007"
+    curl -X POST
+    -H "Content-Type: text/csv
+        Authorization: bearer {api_key}"
+        "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2"
+    -d "email_address,first_name,ID,
+        oof@example.com,oof,005,
+        rab@example.com,rab,006,
+        zab@example.com,zab,007"
 
-Sample output:
+Sample Output:
 
     {
     "list": [
@@ -806,6 +826,8 @@ Sample output:
             "metadata": {}
         }
     ]
+
+#### API Token Consumption
 
 API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens (ie. when running a validation job or exporting validated results). If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
 
@@ -848,7 +870,7 @@ In addition to the Email Assurance grade you are provided deliverability data fo
 
 Deliverability codes are provided on a scale of 1-4, with 1 being the least deliverable and 4 being the most. You may see a 0 associated with Historical Opens (R) and Historical Clicks (K), meaning that we do not have any engagement data on that particular member.
 
-### Setting Up Email Assurance
+#### Setting Up Email Assurance
 
 The following process should be repeated in order to monitor your list(s) and keep them up to date with respect to new subscribers, unsubscribes, and grade changes. This process should be used if you are setting up daily or weekly monitoring and remediation. Please use this endpoint in place of the list/list_slug/{csv_link}/import endpoint if you are monitoring lists daily or weekly.
 Resetting the 'changed' Flag
