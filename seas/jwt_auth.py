@@ -17,6 +17,8 @@ class JWTAuthenticationPolicy(CallbackAuthenticationPolicy):
     def unauthenticated_userid(self, request):
         header = request.headers.get('Authorization', None)
         request.claims = dict(sub='', grp='')
+        if header is None:
+            return None
         try:
             bearer, data = header.split(' ')
             if bearer.lower() != 'bearer':
