@@ -661,7 +661,9 @@ Sample Output:
 
 ~~~~
 {
-    "href": "https://dv-prod.s3.amazonaws.com/db/20141023/fGilGyUrDnw0bGhfnsnvLfAZhuenLVM9vhFM5d3LZDVWG6udAvRK6o6GVx3vkXNZ/M2V8TPTA-_qZc.csv?Signature=Sdu3I4jq08wvImEsXzfE8TDTUWc%3D&Expires=1414099679&AWSAccessKeyId=AKIAJ6DQJUDEB7L7MRZA"
+    "href": "https://dv-prod.s3.amazonaws.com/db/20141023/
+    fGilGyUrDnw0bGhfnsnvLfAZhuenLVM9vhFM5d3LZDVWG6udAvRK6o6GVx3vkXNZ/M2V8TPTA-_qZc.csv?
+    Signature=Sdu3I4jq08wvImEsXzfE8TDTUWc%3D&Expires=1414099679&AWSAccessKeyId=AKIAJ6DQJUDEB7L7MRZA"
 }
 ~~~~
 
@@ -787,17 +789,19 @@ Parameters:
                 description: Should the metadata (non-email) in the CSV be stored? (true or false)
 
               - name: slug_col
-                required: false
                 paramType: query
+                required: false
                 type: integer
-                description: The column in the csv containing a slug for each member. If this is omitted, a slug will be generated automatically.
+                description: The column in the csv containing a slug for each member.
+                If this is omitted, a slug will be generated automatically.
 
 Sample Command:
 
     curl -X POST
     -H "Content-Type: text/csv
         Authorization: bearer {api_key}"
-        "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2"
+        "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv
+        ?header=true&slug_col=2"
     -d "email_address,first_name,ID,
         oof@example.com,oof,005,
         rab@example.com,rab,006,
@@ -992,7 +996,8 @@ Parameters:
 
     name: slug_col
     paramType: query
-    description: The column in the csv containing a slug for each member. If this is omitted, a slug will be generated automatically.
+    description: The column in the csv containing a slug for each member.
+    If this is omitted, a slug will be generated automatically.
     required: false
     type: integer
 ~~~~
@@ -1003,7 +1008,8 @@ Sample Command:
     curl -X POST
     -H "Content-Type: text/csv"
     -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?header=true&email=0&metadata=true&member_slug=2"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv
+    ?header=true&email=0&metadata=true&member_slug=2"
     -d "email_address,first_name,ID,
         oof@example.com,oof,005,
         rab@example.com,rab,006,
@@ -1074,7 +1080,8 @@ Sample Output:
         "note": "",
         "href": {csv_download_url_in_quotes},
         "meta": {
-            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-
+            gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
         },
         "slug": "vYG7J_XT"
     }
