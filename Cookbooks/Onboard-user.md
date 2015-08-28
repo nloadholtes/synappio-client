@@ -242,7 +242,8 @@ Sample Output:
         "note": "",
         "href": {csv_download_url_in_quotes},
         "meta": {
-            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-\
+            gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
         },
         "slug": "vYG7J_XT"
     }

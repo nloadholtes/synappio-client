@@ -7,7 +7,7 @@ By using the DataValidation API, Email Service Providers have the ability to vet
 
 To remediate an email list, an ESP must first follow the steps listed in the <a href="https://github.com/synappio/synappio-client/blob/master/Cookbooks/Onboard-user.md" target="_blank">Onboarding Cookbook.</a> To receive reporting on List Quality, and to kick off validation of an email list, a job must be created. One Vetting Token will be consumed per email address when the job is created. Note: List imports must be 100% complete before creating the job that kicks off validation of a list.
 
-#### Create a Validation Job
+### Create a Validation Job
 
 To start a validation job, use the endpoint: GET /list/{list_slug}/job
 
@@ -51,7 +51,7 @@ Sample Output:
 If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list.
 
 
-#### View the Progress of a Job
+### View the Progress of a Job
 
 To view the progress of a validation job, construct the following request using the job's slug from the above result:
 
@@ -93,7 +93,7 @@ If the job is not finished, you should see a response similar to:
 If the job is not finished, you should see a response similar to the one below. Notice the 'pct_complete' field representing the current percent of completion.
 
 
-#### Retrieve Overview Reporting
+### Retrieve Overview Reporting
 
 Viewing a list’s quality will provide you (the ESP) with the necessary information to determine whether a list needs to be validated or not. After a job is complete, repeating the GET request from above will yield a response similar to:
 
@@ -180,7 +180,8 @@ To retrieve / filter the members of your list use endpoint: /list/{list_slug}/me
 
 Sample Command:
 
-    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
+    curl -X GET -H "Authorization: bearer {api_key}"\
+    "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
 
 Sample Output:
 
@@ -312,7 +313,9 @@ To retrieve individual member grades, use the endpoint: /list/{list_slug}/member
 
 Sample Command:
 
-    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/{member_slug}"
+    curl -X GET -H "Authorization: bearer {api_key}"\
+    "https://api.datavalidation.com/1.0/list/{list_slug}/\
+    member/{member_slug}"
 
 Sample Output:
 
@@ -362,7 +365,7 @@ To kick off validation for an existing list within your API account, create a ne
 
 >30 days after a list has been uploaded, list members that have not been updated will be removed from our system, potentially resulting in the absence of some or all list members. If you require remediation of a list that is more than 30 days old, it is important to re-upload the list. If your list is less than 30 days old, the remediation process is the same as above.
 
-###Remove Subscribers from a List
+### Remove Subscribers from a List
 
 After a list has been validated you'll want to remove any undeliverable addresses from the email list. Undeliverable email addresses will have an Email Assurance Grade of F. Some ESPs may recommend that users do not send to any email addresses other than those with Email Assurance Grades of A+ and A (those known to be deliverable). These addresses can be removed as well.
 
@@ -374,7 +377,9 @@ This command will allow you to remove individual subscribers from email lists by
 
 Sample Command:
 
-    curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list/{list_slug}/member/{member_slug}"
+    curl -X DELETE -H "Authorization: bearer {api_key}"\
+    "https://api.datavaliadtion.com/1.0/list/{list_slug}/\
+    member/{member_slug}"
 
 Sample Response:
 
@@ -389,24 +394,26 @@ This command will allow you to remove multiple members from a list at once by PO
 
 Parameters:
 
-              - name: header
-                paramType: query
-                description: Is there a header row present in the CSV data
-                required: true
-                type: boolean
+**header**
+* paramType: query
+* required: true
+* type: boolean
+* description: Specifies if there is a header row present in the .csv file
 
-              - name: slug_col
-                required: true
-                paramType: query
-                type: integer
-                description: The column in the csv containing the slug for each member.
+**slug_col**
+* paramType: query
+* required: false
+* type: integer
+* description: Specifies if a unique identifier is available for the address.
+If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 
                 curl -X POST
                 -H "Content-Type: text/csv"
                 -H "Authorization: bearer {api_key}"
-                   "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2"
+                   "https://api.datavalidation.com/1.0/list/{list_slug}/\
+                   unsubscribe.csv?header=true&slug_col=2"\
                 -d "email_address,first_name,ID,
                     oof@example.com,oof,005,
                    rab@example.com,rab,006,
