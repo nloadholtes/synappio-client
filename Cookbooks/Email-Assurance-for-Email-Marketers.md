@@ -1,6 +1,35 @@
 Email Assurance for Email Marketers
 ====================
 
+### Email Assurance for Email Marketers
+
+This API allows email marketers to retrieve list level data and quickly view the data quality on an email list. Every email address is scanned on a list and you are provided an Email Assurance Report. This report is an overview of an email list’s quality. It includes the total number of subscribers in each grade category: A+, A, B, D, and F, and the count of addresses with each Deliverability Code.
+
+Email marketers can use this reporting to assess the quality of an email list, and to decide whether it needs to be cleaned or not. If a list needs remediation, marketers can easily download the results. We highly recommend that email marketers follow the best practices and compliance standards of their specific email service provider.
+
+We also recommend creating a "Safe" segment for A+ and A grades. This should not be a static segment, as every time you update the list members you will want the new A+ and A grades to auto-populate in the segment. This segment allows your users to quickly deploy mail to the deliverable email addresses. You may also want to create segments for B and D grades. An address with a result of B can be upgraded to an A+ if our system detects positive engagement, or downgraded to an F if it detects negative engagement. The same holds true with the D results.
+
+Continuous monitoring and remediation of email lists (in combination with email best practices, such as double opt-in) is the best way to maintain high list quality and great deliverability as an email sender. Each time someone subscribes to your mailing list, they can automatically be added to an existing list in your API account. If you acquire new mailing lists, you can create and validate these new lists with the API - we’ll monitor the list’s quality and keep each address updated with the most recent deliverability information.
+
+#### Email Assurance Grades
+
+This grade — A+, A, B, D, or F— indicates an emails likelihood to be deliverable. Additional deliverability data is provided with the grade.
+&nbsp;&nbsp;&nbsp;&nbsp;A+ indicates Deliverable + Engagement History
+&nbsp;&nbsp;&nbsp;&nbsp;A indicates Deliverable
+&nbsp;&nbsp;&nbsp;&nbsp;B indicates Accepts-All
+&nbsp;&nbsp;&nbsp;&nbsp;D indicates Indeterminate
+&nbsp;&nbsp;&nbsp;&nbsp;F indicates Undeliverable
+
+**Uses of the grades:**
+
+Determine what grades a user can deploy email to - A+ and A results are deliverable based on our most recent data. If a user is a trusted sender, perhaps B results can be allowed. D results should not be deployed email. F results should be unsubscribed.
+Emails graded with B or D cannot be confirmed deliverable or undeliverable unless mail is deployed to these codes. You may consider allowing these grades to remain on a user's list with the understanding that they cannot be mailed to unless the grade changes to an A+ or A.
+
+#### Deliverability Codes
+
+In addition to the Email Assurance grade you are provided deliverability data for each email address. This data may influence the Email Assurance grade given to a particular address, and is intended to provide more insight into the deliverability history of the email address.
+
+Deliverability codes are provided on a scale of 1-4, with 1 being the least deliverable and 4 being the most. You may see a 0 associated with Historical Opens (R) and Historical Clicks (K), meaning that we do not have any engagement data on that particular member.
 
 ### Uploading a List
 
@@ -19,7 +48,7 @@ Before you upload a list to the API, a few questions must be answered about the 
 Note: Validation results can be retrieved on the member level or the list level. If you intend on accessing individual member grades and not ALL member grades, be sure to include member slugs in your csv. Otherwise, you will have to make a call to '/list/{list_slug}/member/' to retrieve the member_slugs we provide and you will be charged a remediation token for each member in the list.
 'member_slug' is a unique ID specific to members in a list. If you prefer to specify 'member_slug', set the 'slug_col' query parameter to the column containing your provided identifier in your csv(column 1 = 0). If this parameter is not provided, member slugs will be generated automatically.
 
-###Create a List
+### Create and Import a List
 
 Lists can be created in the API by importing a .csv file directly or via download URL to the .csv file. **We recommend that for larger lists, or larger databases, you upload through URL.**
 
@@ -239,36 +268,34 @@ Email marketers may want to add newly created lists directly to the API, to an e
 Send a POST request to the appropriate list slug, using the endpoint: /list/{list_slug}/subscribe.csv
 *Please Note: The required parameters are the same as the '/list/' endpoint when using a POST request to create new list.
 
-Use the following Parameters:
+##### Parameters:
 
+**header**
+*paramType: query
+*required: true
+*type: boolean
+*description: Specifies if there is a header row present in the .csv file
 
-              - name: header
-                paramType: query
-                description: Is there a header row present in the CSV data
-                required: true
-                type: boolean
+**email_col**
+*paramType: query
+*required: true
+*type: integer
+*description: Specifies which column the email address is found in? (0 = first column)
 
-              - name: email_col
-                paramType: query
-                description: Which column is the email address in? (0 = first column)
-                required: true
-                type: integer
+**metadata**
+*paramType: query
+*required: true
+*type: string
+*description: Specifies if metadata (non-email) is present in the .csv file (true or false)
 
-              - name: metadata
-                paramType: query
-                required: true
-                type: string
-                format: other
-                description: Should the metadata (non-email) in the CSV be stored? (true or false)
-
-              - name: slug_col
-                required: false
-                paramType: query
-                type: integer
-                description: The column in the csv containing a slug for each member. If this is omitted, a slug will be generated automatically.
+**slug_col**
+*paramType: query
+*required: false
+*type: integer
+*description: Specifies if a unique identifier is available for the address.
+If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
-
 
     curl -X POST
     -H "Content-Type: text/csv"
@@ -353,11 +380,15 @@ Sample Output:
 ]
 ~~~~
 
-Email Assurance, DataValidation's list maintenance solution, runs once a day. We will analyze any new email data in the system on a daily basis, and any existing data in the system on a weekly basis. After importing a new list of addresses, you can 1. Automatically start a validation job when the import is created 2. Run a validation job after a list import is complete or 3. Wait for the daily Email Assurance run to pull in any new email and validate your email list.
+Email Assurance, DataValidation's list maintenance solution, runs once a day. We will analyze any new email data in the system on a daily basis, and any existing data in the system on a weekly basis. After creating and importing a new list of addresses, you can:
+
+1. Automatically start a validation job when the import is created
+2. Run a validation job after a list import is complete
+3. Wait for the daily Assurance run to pull in and validate any new email data
 
 To automatically start a validation job at import, API users should include the additional parameter (listed below) in the curl command for importing via URL. To run a validation job after a list import, **the import must be 100% complete.** To wait for Email Assurance to pick up any new email addresses, or any new email lists, simply create the import for the email data and we'll do the rest!
 
-To automatically start a validation job when an import is created, add the parameter **"validate":true** in the curl command for creating an import via URL.
+To **automatically start a validation job when an import is created**, add the parameter **"validate":true** in the curl command for creating an import via URL.
 
 Sample Command:
 
@@ -376,7 +407,7 @@ Sample Command:
 
 Sample Output:
 
-[{"status": "New", "tags": [], "created": "2015-08-26T14:12:23.572000Z", "mapping": {"header_row": true, "email_col": 0, "include_metadata": false, "slug_col": 0}, "note": "Click2Sell Onboarding", "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=0", "meta": {"href": "http://core-list/list/1.0/list/GKGu8YEKU6IQGzvT/import/yffkMW9l/"}, "validate": true, "total_imported": 0, "slug": "yffkMW9l"}]
+    [{"status": "New", "tags": [], "created": "2015-08-26T14:12:23.572000Z", "mapping": {"header_row": true, "email_col": 0, "include_metadata": false, "slug_col": 0}, "note": "Click2Sell Onboarding", "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=0", "meta": {"href": "http://core-list/list/1.0/list/GKGu8YEKU6IQGzvT/import/yffkMW9l/"}, "validate": true, "total_imported": 0, "slug": "yffkMW9l"}]
 
 A Vetting Token will be charged for each member in the list when the job is automatically created.
 
@@ -425,7 +456,7 @@ Sample Output:
 
 If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list.
 
-#### View the Progress of a Job
+### View the Progress of a Job
 
 To view the progress of a validation job, construct the following request using the job's slug from the above result:
 
@@ -728,7 +759,7 @@ Sample Output:
 A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
 
-#### Remediating Existing Lists
+### Remediating and Managing Existing Lists
 
 List maintenance is the key to upholding great deliverability. Using DataValidation’s API, email marketers can monitor the quality of their email lists and always know where they stand prior to sending. List maintenance can be achieved by continuous remediation existing lists.
 
@@ -736,11 +767,14 @@ Email Assurance is DataValidaton's list maintenance solution. We re-validate any
 
 If new addresses have been added to existing lists within the API, Email Assurance will pick them up that same day after 10pm EST, or you can kick off a validation job for an existing list within your API account. To revalidate an existing list, create a new validation job using the list’s existing list slug.
 
->Important!
+>This is important!
 
->30 days after a list has been uploaded, list members that have not been updated will be removed from our system, potentially resulting in the absence of some or all list members. If you require remediation of a list that is more than 30 days old, it is important to re-upload the list. If your list is less than 30 days old, the remediation process is the same as above.
+>For email addresses to be maintained with the most recent deliverability information, you must PUT member updates on all the members in your database (within lists) at least once every 30 days. When an email address or list has not been touched in 30 days, we remove it from our database. If this happens, the email list and all members will need to be created in the API again.
+This API does not currently support scheduling jobs. You should set up a periodic task in your code to create jobs in the API. These periodic tasks can be utilized to set up ongoing monitoring and ongoing remediation.
 
-### Manage List Members
+>Because the grades are being updated daily in our system, you can retrieve the member level grades for all lists daily or weekly. Export.csv does not PUT updates to the members on a list.
+
+>This API does not currently support filtering members by grade. After calling export.csv you may want to input this data into your users' accounts and set up a task in your code to automatically unsubscribe the F results.
 
 #### Removing subscribers from a List
 
@@ -767,33 +801,32 @@ Sample output:
 This will allow you to remove multiple members from a list at once by POSTing a .csv of addresses that you'd like to unsubscribe. After validating a list, specify multiple members to be unsubscribed by passing a .csv list of members to: /{list_slug}/unsubscribe.csv
 Parameters:
 
-Parameters:
+##### Parameters:
 
-              - name: header
-                paramType: query
-                description: Is there a header row present in the CSV data
-                required: true
-                type: boolean
+**header**
+*paramType: query
+*required: true
+*type: boolean
+*description: Specifies if there is a header row present in the .csv file
 
-              - name: email_col
-                paramType: query
-                description: Which column is the email address in? (0 = first column)
-                required: true
-                type: integer
+**email_col**
+*paramType: query
+*required: true
+*type: integer
+*description: Specifies which column the email address is found in? (0 = first column)
 
-              - name: metadata
-                paramType: query
-                required: true
-                type: string
-                format: other
-                description: Should the metadata (non-email) in the CSV be stored? (true or false)
+**metadata**
+*paramType: query
+*required: true
+*type: string
+*description: Specifies if metadata (non-email) is present in the .csv file (true or false)
 
-              - name: slug_col
-                paramType: query
-                required: false
-                type: integer
-                description: The column in the csv containing a slug for each member.
-                If this is omitted, a slug will be generated automatically.
+**slug_col**
+*paramType: query
+*required: false
+*type: integer
+*description: Specifies if a unique identifier is available for the address.
+If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 
@@ -831,57 +864,15 @@ Sample Output:
         }
     ]
 
-#### API Token Consumption
-
-API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens (ie. when running a validation job or exporting validated results). If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
-
-### Email Assurance for Email Marketers
-
-This API allows email marketers to retrieve list level data and quickly view the data quality on an email list. Every email address is scanned on a list and you are provided an Email Assurance Report. This report is an overview of an email list’s quality. It includes the total number of subscribers in each grade category: A+, A, B, D, and F, and the count of addresses with each Deliverability Code.
-
-Email marketers can use this reporting to assess the quality of an email list, and to decide whether it needs to be cleaned or not. If a list needs remediation, marketers can easily download the results. We highly recommend that email marketers follow the best practices and compliance standards of their specific email service provider.
-
-We also recommend creating a "Safe" segment for A+ and A grades. This should not be a static segment, as every time you update the list members you will want the new A+ and A grades to auto-populate in the segment. This segment allows your users to quickly deploy mail to the deliverable email addresses. You may also want to create segments for B and D grades. An address with a result of B can be upgraded to an A+ if our system detects positive engagement, or downgraded to an F if it detects negative engagement. The same holds true with the D results.
-
-Continuous monitoring and remediation of email lists (in combination with email best practices, such as double opt-in)  is the best way to maintain high list quality and great deliverability as an email sender. Each time someone subscribes to your mailing list, they can automatically be added to an existing list in your API account. If you acquire new mailing lists, you can create and validate these new lists with the API - we’ll monitor the list’s quality and keep each address updated with the most recent deliverability information.
-
-**This is important:**
-
-For email addresses to be maintained with the most recent deliverability information, you must PUT member updates on all the members in your database (within lists) at least once every 30 days. When an email address or list has not been touched in 30 days, we remove it from our database. If this happens, the email list and all members will need to be created in the API again.
-This API does not currently support scheduling jobs. You should set up a periodic task in your code to create jobs in the API. These periodic tasks can be utilized to set up ongoing monitoring and ongoing remediation.
-
-Because the grades are being updated daily in our system, you can retrieve the member level grades for all lists daily or weekly. Export.csv does not PUT updates to the members on a list.
-
-This API does not currently support filtering members by grade. After calling export.csv you may want to input this data into your users' accounts and set up a task in your code to automatically unsubscribe the F results.
-
-#### Email Assurance Grades
-
-This grade — A+, A, B, D, or F— indicates an emails likelihood to be deliverable. Additional deliverability data is provided with the grade.
-&nbsp;&nbsp;&nbsp;&nbsp;A+ indicates Deliverable + Engagement History
-&nbsp;&nbsp;&nbsp;&nbsp;A indicates Deliverable
-&nbsp;&nbsp;&nbsp;&nbsp;B indicates Accepts-All
-&nbsp;&nbsp;&nbsp;&nbsp;D indicates Indeterminate
-&nbsp;&nbsp;&nbsp;&nbsp;F indicates Undeliverable
-
-**Uses of the grades:**
-
-Determine what grades a user can deploy email to - A+ and A results are deliverable based on our most recent data. If a user is a trusted sender, perhaps B results can be allowed. D results should not be deployed email. F results should be unsubscribed.
-Emails graded with B or D cannot be confirmed deliverable or undeliverable unless mail is deployed to these codes. You may consider allowing these grades to remain on a user's list with the understanding that they cannot be mailed to unless the grade changes to an A+ or A.
-
-#### Deliverability Codes
-
-In addition to the Email Assurance grade you are provided deliverability data for each email address. This data may influence the Email Assurance grade given to a particular address, and is intended to provide more insight into the deliverability history of the email address.
-
-Deliverability codes are provided on a scale of 1-4, with 1 being the least deliverable and 4 being the most. You may see a 0 associated with Historical Opens (R) and Historical Clicks (K), meaning that we do not have any engagement data on that particular member.
 
 #### Setting Up Email Assurance
 
-The following process should be repeated in order to monitor your list(s) and keep them up to date with respect to new subscribers, unsubscribes, and grade changes. This process should be used if you are setting up daily or weekly monitoring and remediation. Please use this endpoint in place of the list/list_slug/{csv_link}/import endpoint if you are monitoring lists daily or weekly.
-Resetting the 'changed' Flag
+The following process should be repeated in order to monitor your list(s) and keep them up to date in respect to new subscribers, unsubscribes, and grade changes. This process should be used if you are setting up daily or weekly monitoring and remediation. Please use this endpoint in place of the list/list_slug/{csv_link}/import endpoint if you are monitoring lists daily or weekly.
 
 #### Resetting the Changed Flag
 
 First, you’ll want to reset the ‘changed’ flag on the members of a list. This indicates that the deliverability information on an address has not changed. The following command will set the ‘changed’ flag to ‘false’ for each member in a list.
+
 To reset the ‘changed’ flag, use the endpoint: /list/{list_slug}/member/
 
 Sample Command:
@@ -904,27 +895,27 @@ Sample Output:
     }
 ~~~~
 
-#### Removing Unsubscribes
+#### Removing Changed Unsubscribes
 
 After resetting the 'changed' flag for list members, you should remove members from a list that have unsubscribed from your mailing list OR have results in an Email Assurance grade of F (undeliverable). The following command will remove specified members from a list by supplying CSV input via POST to the unsubscribe.csv endpoint.
 
 To remove unsubscribes from your list, use the same endpoint as listed previously for unsubscribes: /list/{list_slug}/unsubscribe.csv
 
-Parameters:
+##### Parameters:
 
-~~~~
-    name: header
-    paramType: query
-    description: Is there a header row present in the CSV data
-    required: true
-    type: boolean
+**header**
+*paramType: query
+*required: true
+*type: boolean
+*description: Specifies if there is a header row present in the .csv file
 
-    name: slug_col
-    paramType: query
-    required: true
-    description: The column in the csv containing the slug for each member.
-    type: integer
-~~~~
+**slug_col**
+*paramType: query
+*required: false
+*type: integer
+*description: Specifies if a unique identifier is available for the address.
+If this is omitted, a slug will be generated automatically for each address.
+
 
 Sample Command:
 
@@ -968,171 +959,19 @@ Sample Output:
 
 #### Adding New Subscribers
 
-Once unsubscribed members have been removed, you will want to add any new subscribers to the existing list. New members can be added to an existing list by posting a .csv file OR by providing a URL link to the .csv file of new subscribers.
+Once unsubscribed members have been removed, you will want to add any new subscribers to the existing list. New members can be added to an existing list by posting a .csv file OR by providing a URL link to the .csv file of new subscribers. This will be done exactly as documented previously.
 
-The following command will add specified members to a list by supplying CSV input via POST to the subscribe.csv endpoint. To add new subscribers to an existing list via .csv file, use the same command mentioned previously: /list/{list_slug}/subscribe.csv
-
-Parameters:
-
-~~~~
-    name: header
-    paramType: query
-    description: Is there a header row present in the CSV data
-    required: true
-    type: boolean
-
-    name: email_col
-    paramType: query
-    description: Which column is the email address in? (0 = first column)
-    required: true
-    type: integer
-
-    name: metadata
-    paramType: query
-    description: Should the metadata (non-email) in the CSV be stored? (true or false)
-    required: true
-    type: string
-    format: other
-
-    name: slug_col
-    paramType: query
-    description: The column in the csv containing a slug for each member.
-    If this is omitted, a slug will be generated automatically.
-    required: false
-    type: integer
-~~~~
-
-Sample Command:
-
-~~~~
-    curl -X POST
-    -H "Content-Type: text/csv"
-    -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv
-    ?header=true&email=0&metadata=true&member_slug=2"
-    -d "email_address,first_name,ID,
-        oof@example.com,oof,005,
-        rab@example.com,rab,006,
-        baz@example.com,baz,007,"
-~~~~
-
-Sample Output:
-
-~~~~
-    {
-        "list": [
-            {
-                "status": "new",
-                "size": 6,
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/",
-                    "links": {
-                        "jobs": "job/",
-                        "batch_subscribe": "subscribe.csv",
-                        "member": "member/{member_slug}/",
-                        "job": "job/{job_slug}/",
-                        "batch_unsubscribe": "unsubscribe.csv",
-                        "export": "export.csv",
-                        "members": "member/"
-                    }
-                },
-                "slug": "E5RIlS2B",
-                "metadata": {}
-            }
-        ]
-    }
-~~~~
-
-The following command will add specified members to a list by providing a URL link to the .csv file. To add new subscribers to an existing list via URL, use the same command mentioned previously:
-
-Sample Command:
-
-~~~~
-curl -X POST
--H "Authorization: bearer {api_key}"
--H "Content-Type: application/json"
-"https://api.datavalidation.com/1.0/list/{list_slug}/"
--d '{
-        "href": {csv_download_url_in_quotes},
-        "mapping":
-        {
-            "email_col":0,
-            "slug_col":2,
-            "header_row":true,
-            "include_metadata":false,
-        }
-    }'
-~~~~
-
-Sample Output:
-
-~~~~
-[
-    {
-        "status": "New",
-        "created": "2014-10-24T21:52:31.225000Z",
-        "mapping": {
-            "header_row": true,
-            "email_col": 0,
-            "include_metadata": false,
-            "slug_col": 2
-        },
-        "note": "",
-        "href": {csv_download_url_in_quotes},
-        "meta": {
-            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-
-            gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
-        },
-        "slug": "vYG7J_XT"
-    }
-]
-~~~~
+Add specified members to a list by supplying CSV input via POST to the subscribe.csv endpoint. To add new subscribers to an existing list via .csv file, use the same command mentioned previously: /list/{list_slug}/subscribe.csv
 
 **Please Note: To add members to an existing list via URL link, you MUST provide a slug_col within the specified parameters of the list import.
 
-### Start a Validation Job
-
-Now that the list has been updated with new subscribers, the next step is to run a validation job. Imports MUST be 100% complete before starting a validation job. Run the validation job the same way specified in the instructions above.
+Once a list has been updated with new subscribers, the next step is to run the validation job. Imports MUST be 100% complete before starting a validation job (unless using the "validate": true parameter. Run the validation job the same way specified in the instructions mentioned previously.
 
 To run validation, send a POST request to the endpoint: /list/job/
 
-Sample Command:
-
-~~~~
-$ curl -X POST
--H "Authorization: bearer {api_key}"
-"https://api.datavalidation.com/1.0/list/{list_slug}/job/"
-~~~~
-
-Sample Output:
-
-    {
-        "job": [
-            {
-                "status": "New",
-                "list_slug": "JItNx3th",
-                "stats": {},
-                "created": "2014-10-15 14:36:21.749000",
-                "webhook": {
-                    "status": null,
-                    "complete": null
-                },
-                "priority": {
-                    "mu": 10,
-                    "sigma": 0
-                },
-                "original_chunks": null,
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/JItNx3th/job/XdH8rZQk/"
-                },
-                "current_chunks": null,
-                "pct_complete": 0,
-                "slug": "XdH8rZQk"
-            }
-        ]
-    }
-
 If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list. To monitor the progress of the job started above, send a GET request to the list/{list_slug}/job/{job_slug}/ endpoint and monitor the 'pct_complete' field. Once this has reached 100, proceed to the next step.
+
+### Retrieve Changed Validation Results
 
 At this point, you only want to retrieve data for members that have changed. This means that an address has a new Email Assurance Grade or newly appended Deliverability Codes since it’s last validation export by you.
 
@@ -1221,7 +1060,11 @@ Using the ‘Changed’ flag when monitoring and continuously remediating existi
 Exporting only the changed results will ensure that you do not consume more API Remediation Tokens than necessary, and will provide you (the email marketer) with the most recent deliverability information we have on the addresses within your lists.
 Email marketers should retrieve changed results as necessary for their business. Whether you want to retrieve them daily, weekly or monthly, DataValidation will maintain the deliverability status of the addresses in your emai lists as long as you keep them updated! (See information above on updating every 30 days)
 
-API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into the curl command when starting a validation job or when exporting validated results (these two endpoints consume API Tokens). If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
+#### API Token Consumption
+
+API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens (ie. when running a validation job or exporting validated results). If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
+
+
 
 
 
