@@ -176,9 +176,11 @@ Sample Command:
 
 Sample Output:
 
-   {"list": [{"size": 0, "meta": {"href": "http://core-list/list/1.0/list/skjdhfksjdhf/",\
+~~~~
+    {"list": [{"size": 0, "meta": {"href": "http://core-list/list/1.0/list/skjdhfksjdhf/",\
     "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"},\
      {"href": "member/", "rel": "members"}]}, "slug": "T4Vt8OvnQU5fkyo9", "tags": []}]
+~~~~
 
 When importing to the empty list (via URL), be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create an import from a URL.
 
