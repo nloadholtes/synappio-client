@@ -1,11 +1,16 @@
 '''Super-simple Pyramid App for converting .yml files to .json'''
+import json
 import os.path
+import logging
 
 import yaml
 import jinja2
 import pkg_resources
 from pyramid.config import Configurator
 import pyramid.httpexceptions as exc
+
+
+log = logging.getLogger(__name__)
 
 
 class DocServer(object):
@@ -74,29 +79,32 @@ class DocLoader(object):
             raise exc.HTTPNotFound()
 
     def load_filename(self, fn):
-        base, ext = os.path.splitext(fn)
-        exts = [ext]
-        if ext == '.json':
-            exts += ['.json.jinja', '.yaml.jinja', '.yaml']
-        for ext in exts:
-            full_fn = base + ext
-            if not os.path.exists(full_fn):
-                continue
-            if ext == '.json.jinja':
-                content_json = self.render_jinja(full_fn)
-                data = json.loads(content_json)
-                return data
-            elif ext == '.yaml.jinja':
-                content_yaml = self.render_jinja(full_fn)
-                data = yaml.load(content_yaml)
-                return data
-            with open(full_fn) as fp:
-                if ext == '.yaml':
-                    return yaml.load(fp)
-                elif ext == '.json':
-                    return json.load(fp)
-        log.error('Could not load filename %s in any of %s', fn, self.search_path)
-        raise exc.HTTPNotFound()
+        try:
+            base, ext = os.path.splitext(fn)
+            exts = [ext]
+            if ext == '.json':
+                exts += ['.json.jinja', '.yaml.jinja', '.yaml']
+            for ext in exts:
+                full_fn = base + ext
+                if not os.path.exists(full_fn):
+                    continue
+                if ext == '.json.jinja':
+                    content_json = self.render_jinja(full_fn)
+                    data = json.loads(content_json)
+                    return data
+                elif ext == '.yaml.jinja':
+                    content_yaml = self.render_jinja(full_fn)
+                    data = yaml.load(content_yaml)
+                    return data
+                with open(full_fn) as fp:
+                    if ext == '.yaml':
+                        return yaml.load(fp)
+                    elif ext == '.json':
+                        return json.load(fp)
+            raise exc.HTTPNotFound()
+        except Exception:
+            log.error('Could not load filename %s in any of %s', fn, self.search_path)
+            raise
 
     def render_jinja(self, fn):
         rel_fn = os.path.relpath(fn, self.root_resource_path)

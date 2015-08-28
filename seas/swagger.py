@@ -1,15 +1,17 @@
+import re
 import os
-import json
 import urlparse
 
-import yaml
 import jsonschema as S
 
 import formencode as fe
 from formencode import validators as fev
 
 from seas import doc
-from seas.util import load_content, pattern_for, extend_dict
+from seas.util import pattern_for, extend_dict
+
+
+re_path_loader = re.compile(r'^(.*)\[(.*)\]$')
 
 
 class SwaggerSpec(object):
@@ -23,28 +25,29 @@ class SwaggerSpec(object):
 
     def load(self, path):
         self._raw = {}
-        to_load = path.split(';')
+        parsed = urlparse.urlparse(path)
+        mo = re_path_loader.match(parsed.path)
+        if mo:
+            loader = doc.DocLoader(parsed.netloc, mo.group(1))
+            fn = loader.normalize_filename(mo.group(2))
+        else:
+            loader = doc.DocLoader(parsed.netloc, os.path.dirname(parsed.path))
+            fn = loader.normalize_filename(os.path.basename(parsed.path))
+        to_load = [fn]
         while to_load:
             p = to_load.pop(0)
-            parsed = urlparse.urlparse(p)
-            if parsed.scheme == 'egg':
-                loader = doc.DocLoader(parsed.netloc, os.path.dirname(parsed.path))
-                fn = loader.normalize_filename(os.path.basename(parsed.path))
-                content_data = loader.load_filename(fn)
-            else:
-                content = load_content(p)
-                # Deserialize
-                if p.endswith('.json'):
-                    content_data = json.loads(content)
-                elif p.endswith('.yaml'):
-                    content_data = yaml.load(content)
+            fn = loader.normalize_filename(p)
+            content_data = loader.load_filename(fn)
             if 'resourcePath' in content_data:
                 extend_dict(self._raw, content_data)
             else:
                 # Must be a swagger.yaml file
                 for api in content_data['apis']:
-                    dname = os.path.dirname(p)
-                    new_path = dname + api['path']
+                    new_path = api['path']
+                    if new_path.startswith('/'):
+                        new_path = '.' + new_path
+                    new_path = os.path.join(os.path.dirname(fn), new_path)
+                    new_path = os.path.normpath(new_path)
                     to_load.append(new_path)
         # Build resolver
         self.resolver = ModelRefResolver(path, self._raw)
