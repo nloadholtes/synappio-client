@@ -1,7 +1,7 @@
 Email Assurance for Email Marketers
 ====================
 
-### Email Assurance for Email Marketers
+### Email Assurance
 
 This API allows email marketers to retrieve list level data and quickly view the data quality on an email list. Every email address is scanned on a list and you are provided an Email Assurance Report. This report is an overview of an email list’s quality. It includes the total number of subscribers in each grade category: A+, A, B, D, and F, and the count of addresses with each Deliverability Code.
 
