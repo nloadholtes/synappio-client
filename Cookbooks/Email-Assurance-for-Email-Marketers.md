@@ -260,7 +260,7 @@ Email marketers may want to add newly created lists directly to the API, to an e
 Send a POST request to the appropriate list slug, using the endpoint: /list/{list_slug}/subscribe.csv
 *Please Note: The required parameters are the same as the '/list/' endpoint when using a POST request to create new list.
 
-##### Parameters:
+Parameters:
 
 **header**
 * paramType: query
@@ -798,7 +798,7 @@ Sample output:
 This will allow you to remove multiple members from a list at once by POSTing a .csv of addresses that you'd like to unsubscribe. After validating a list, specify multiple members to be unsubscribed by passing a .csv list of members to: /{list_slug}/unsubscribe.csv
 Parameters:
 
-##### Parameters:
+Parameters:
 
 **header**
 * paramType: query
@@ -898,7 +898,7 @@ After resetting the 'changed' flag for list members, you should remove members f
 
 To remove unsubscribes from your list, use the same endpoint as listed previously for unsubscribes: /list/{list_slug}/unsubscribe.csv
 
-##### Parameters:
+Parameters:
 
 **header**
 * paramType: query
