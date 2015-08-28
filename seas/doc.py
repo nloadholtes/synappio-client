@@ -4,7 +4,6 @@ import os.path
 import yaml
 import jinja2
 import pkg_resources
-from pyramid.response import FileResponse
 from pyramid.config import Configurator
 import pyramid.httpexceptions as exc
 
@@ -24,12 +23,11 @@ class DocServer(object):
         return app
 
     def view(self, request):
-        if not request.matchdict['subpath']:
-            subpath = ('swagger.json',)
-        else:
-            subpath = request.matchdict['subpath']
+        subpath = request.matchdict['subpath']
         fn = '/'.join(subpath)
         norm_fn = self.loader.normalize_filename(fn)
+        if os.path.isdir(norm_fn):
+            norm_fn += '/swagger.json'
         return self.loader.load_filename(norm_fn)
 
     def load_yaml(self, source_fn):
@@ -63,14 +61,16 @@ class DocLoader(object):
         self.resource_name = resource_name
         self.root_resource_path = self.egg.get_resource_filename(
             self.manager, resource_name)
-        self.jinja_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(self.root_resource_path))
+        self.search_path = [self.root_resource_path]
+        self.jinja_loader = jinja2.FileSystemLoader(self.search_path)
+        self.jinja_env = jinja2.Environment(loader=self.jinja_loader)
 
     def normalize_filename(self, fn):
         result = os.path.normpath(os.path.join(self.root_resource_path, fn))
         if result.startswith(self.root_resource_path):
             return result
         else:
+            log.error('Could not load filename %s in any of %s', result, self.search_path)
             raise exc.HTTPNotFound()
 
     def load_filename(self, fn):
@@ -95,6 +95,7 @@ class DocLoader(object):
                     return yaml.load(fp)
                 elif ext == '.json':
                     return json.load(fp)
+        log.error('Could not load filename %s in any of %s', fn, self.search_path)
         raise exc.HTTPNotFound()
 
     def render_jinja(self, fn):

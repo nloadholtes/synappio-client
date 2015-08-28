@@ -9,6 +9,7 @@ from .model import Model, Meta, ModelMeta, Unset
 from .swagger import SwaggerSpec
 from .util import pattern_for, jsonify
 
+
 class API(object):
 
     def __init__(self, swagger_path, base_url=None, auth_header=None):

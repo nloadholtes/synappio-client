@@ -61,8 +61,13 @@ class SwaggerSpec(object):
 
     def model(self, id):
         model = self._raw['models'][id]
+        if 'id' not in model:
+            raise fev.Invalid(
+                'No id field for model {}'.format(id),
+                model, None)
         if model['id'] != id:
-            raise fev.Invalid('id mismatch: {} != {}'.format(id, model['id']),
+            raise fev.Invalid(
+                'id mismatch: {} != {}'.format(id, model['id']),
                 model, None)
         model.setdefault('type', 'object')
         model.setdefault('additionalProperties', False)
@@ -76,7 +81,7 @@ class SwaggerSpec(object):
         for p in operation['parameters']:
             if p['paramType'] != paramType:
                 continue
-            properties[p['name']] = dict(p)# {'type': p['type']}
+            properties[p['name']] = dict(p) # {'type': p['type']}
             if p.get('required'):
                 required.append(p['name'])
         if paramType == 'body':
