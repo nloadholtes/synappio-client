@@ -381,7 +381,7 @@ Email Assurance, DataValidation's list maintenance solution, runs once a day. We
 
 To automatically start a validation job at import, API users should include the additional parameter (listed below) in the curl command for importing via URL. To run a validation job after a list import, **the import must be 100% complete.** To wait for Email Assurance to pick up any new email addresses, or any new email lists, simply create the import for the email data and we'll do the rest!
 
-To **automatically start a validation job when an import is created**, add the parameter **"validate":true** in the curl command for creating an import via URL.
+To **automatically start a validation job when an import is created**, add the parameter **"validate": true** in the curl command for creating an import via URL.
 
 Sample Command:
 
@@ -714,6 +714,7 @@ A Remediation Token will be charged for EACH member in a list when usling the '/
 #### To retrieve individual grades for a single member of a list:
 
 Retrieving individual grades for a single member of a list will provide validation results for a single address within a list. Using the '/member/{member_slug}/' endpoint will provide output similar to the '/member/' endpoint above but for just a single member.
+
 To retrieve individual member grades, use the endpoint: /list/{list_slug}/member/{member_slug}/
 
 Sample Command:
@@ -1063,7 +1064,8 @@ Sample Output:
 Using the ‘Changed’ flag when monitoring and continuously remediating existing lists is how users of the API can simulate automated list maintenance. DataValidation will validate any new email data coming into the system on a daily basis (Email Assurance currently runs at 10pm EST) and any existing email data on a weekly basis.
 
 Exporting only the changed results will ensure that you do not consume more API Remediation Tokens than necessary, and will provide you (the email marketer) with the most recent deliverability information we have on the addresses within your lists.
-Email marketers should retrieve changed results as necessary for their business. Whether you want to retrieve them daily, weekly or monthly, DataValidation will maintain the deliverability status of the addresses in your emai lists as long as you keep them updated! (See information above on updating every 30 days)
+
+Email marketers should retrieve changed results as necessary for their business. Whether you want to retrieve results daily, weekly or monthly, DataValidation will maintain the deliverability status of the addresses in your emai lists as long as you keep them updated! (See information above on updating every 30 days)
 
 #### API Token Consumption
 

@@ -292,7 +292,7 @@ Sample Output:
 }
 ~~~~
 
-Link Output:
+**Link Output:**
 
 A Remediation Token will be charged for EACH member in a list when using the '/{job_slug}/export.csv' endpoint to retrieve member grades.
 
@@ -444,6 +444,8 @@ Sample Output:
     ]
     }
 
+
+### Token Consumption
 
 API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens. If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
 
