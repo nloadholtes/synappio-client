@@ -23,7 +23,7 @@ Note: Validation results can be retrieved on the member level or the list level.
 'member_slug' is a unique ID specific to members in a list. If you prefer to specify 'member_slug', set the 'slug_col' query parameter to the column containing your provided identifier in your csv(column 1 = 0). If this parameter is not provided, member slugs will be generated automatically.
 
 
-#### Create a List
+### Create and Import a List
 
 Lists can be created in the API via a .CSV file or via URL. *We recommend that for larger lists, or larger databases, you upload through URL.
 
@@ -36,7 +36,8 @@ Sample Command:
     $ curl -X POST
     -H "Content-Type: text/csv"
     -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/?header=true&email=0&metadata=true&slug_col=2"
+    "https://api.datavalidation.com/1.0/list/\
+    ?header=true&email=0&metadata=true&slug_col=2"\
     -d "email_address,first_name,ID,
         foo@example.com,foo,001,
         bar@example.com,bar,002,
@@ -89,17 +90,9 @@ Sample Command:
 
 Sample Output:
 
-    [{"status": "New", "tags": [], "created": "2015-08-14T15:42:59.009000Z", "mapping":
-    {"header_row": true,
-    "email_col": 0,
-    "include_metadata": false},
-    "note": "Test List",
-    "href": "https://www.dropbox.com/s/39z6q9kgjjss242/TestList_540.csv?dl=0",
-    "meta":
-    {"href": "https://api.datavalidation.com/1.0/list/
-    fwHpJX3E8dTIl6tE/import/jaRdKHI5/"}, "total_imported": 0,
-    "slug": "jaRdKHI5"}
-    ]
+    {"list": [{"size": 0, "meta": {"href": "http://core-list/list/1.0/list/skjdhfksjdhf/",\
+    "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"},\
+    {"href": "member/", "rel": "members"}]}, "slug": "T4Vt8OvnQU5fkyo9", "tags": []}]
 
 When importing via URL, be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create (and automatically start) an import from a URL.
 
@@ -111,8 +104,8 @@ An ESP may want to add individual subscribers to lists as they get added to user
 
 Sample Command:
 
-    curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
-    -d "biz@example.com"
+    curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/\
+    list/{list_slug}/member/" -d "biz@example.com"
 
 Sample Output:
 
@@ -150,37 +143,38 @@ To add members by POSTing a .csv, send a POST request to the appropriate list sl
 
 Parameters:
 
-              - name: header
-                paramType: query
-                description: Is there a header row present in the CSV data
-                required: true
-                type: boolean
+**header**
+* paramType: query
+* required: true
+* type: boolean
+* description: Specifies if there is a header row present in the .csv file
 
-              - name: email_col
-                paramType: query
-                description: Which column is the email address in? (0 = first column)
-                required: true
-                type: integer
+**email_col**
+* paramType: query
+* required: true
+* type: integer
+* description: Specifies which column the email address is found in? (0 = first column)
 
-              - name: metadata
-                paramType: query
-                required: true
-                type: string
-                format: other
-                description: Should the metadata (non-email) in the CSV be stored? (true or false)
+**metadata**
+* paramType: query
+* required: true
+* type: string
+* description: Specifies if metadata (non-email) is present in the .csv file (true or false)
 
-              - name: slug_col
-                required: false
-                paramType: query
-                type: integer
-                description: The column in the csv containing a slug for each member. If this is omitted, a slug will be generated automatically.
+**slug_col**
+* paramType: query
+* required: false
+* type: integer
+* description: Specifies if a unique identifier is available for the address.
+If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 
     curl -X POST
     -H "Content-Type: text/csv"
     -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?header=true&email=0&metadata=true&member_slug=2"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/\
+    subscribe.csv?header=true&email=0&metadata=true&member_slug=2"\
     -d "email_address,first_name,ID,
     oof@example.com,oof,005,
     rab@example.com,rab,006,
@@ -213,7 +207,7 @@ Sample Output:
 
 To add members via download URL, send a POST request to the appropriate list slug, using the endpoint: /{list_slug}/import/. You can subscribe multiple members to an existing list by providing us with a download link to a csv file containing the members you want to subscribe.
 
-Command:
+Sample Command:
 
 ~~~~
 curl -X POST
@@ -232,7 +226,7 @@ curl -X POST
     }'
 ~~~~
 
-Sample output:
+Sample Output:
 
 ~~~~
 [
@@ -267,9 +261,10 @@ Sample Command:
 
 Sample Output:
 
-    {"list": [{"size": 0, "meta": {"href": "https://api.datavalidation.com/1.0/list/fwHpJX3E8dTIl6tE/",
-    "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"},
-    {"href": "member/", "rel": "members"}]}, "slug": "fwHpJX3E8dTIl6tE", "tags":
+    {"list": [{"size": 0, "meta": {"href": "https://api.datavalidation.com/1.0/\
+    list/fwHpJX3E8dTIl6tE/","links": [{"href": "import/", "rel": "imports"},\
+    {"href": "job/", "rel": "jobs"}, {"href": "member/", "rel": "members"}]},\
+     "slug": "fwHpJX3E8dTIl6tE", "tags":
     []}]}
 
 A Vetting Token will be charged for each member in the list when a job is created.
@@ -318,6 +313,7 @@ Sample Output:
 
 If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list.
 
+### View the Progress of a Job
 
 To view the progress of a validation job, construct the following request using the job's slug from the above result:
 
@@ -359,7 +355,6 @@ If the job is not finished, you should see a response similar to:
 Notice the 'pct_complete' field representing the current percent of completion. If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list.
 
 To view the progress of a validation job, construct the following request using the job's slug from the above result.
-
 
 ### Retrieve Overview Reporting
 

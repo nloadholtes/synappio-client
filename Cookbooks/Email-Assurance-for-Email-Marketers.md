@@ -491,6 +491,8 @@ If the job is not finished, you should see a response similar to:
         ]
     }
 
+### Retrieve Overview Reporting
+
 Viewing a list’s quality will provide you with the necessary information to determine whether a list needs to be validated or not. Overview Reporting is an overview of an email list’s quality. Reporting includes the total number of subscribers in each Email Assurance Grade category: A+, A, B, D, and F, and the number of subscribers that have each Deliverability Code. Deliverability Codes represent the historical deliverability information on subscribers, and together determine a subscriber's Email Assurance Grade.
 
 Visit our <a href="http://www.datavalidation.com/kb/12105-What-do-the-codes-in-my-Email-Assurance-Report-mean.html" target="_blank">Knowledge Base</a> for more information on Email Assurance Grades.
