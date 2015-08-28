@@ -52,7 +52,7 @@ Note: Validation results can be retrieved on the member level or the list level.
 
 Lists can be created in the API by importing a .csv file directly or via download URL to the .csv file. **We recommend that for larger lists, or larger databases, you upload through URL.**
 
-**Import via .csv file**
+##### Import via .csv file
 
 Create the list and import in the same command line. You must include all mapping data in the command line. Please note that if you use curl to upload a .csv, you must make sure that the data you're uploading contains newline (\n) characters. Otherwise, the API will interpret your upload as a single (very long!) row.
 
@@ -63,7 +63,7 @@ Sample Command:
     $ curl -X POST
     -H "Content-Type: text/csv
         Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/?header=true&email=0&metadata=true&slug_col=2"
+    "https://api.datavalidation.com/1.0/list/?header=true&email=0&metadata=true&slug_col=2"\
     -d "email_address,first_name,ID,
         foo@example.com,foo,001,
         bar@example.com,bar,002,
@@ -96,7 +96,7 @@ Sample Output:
 
 Note: Be sure to store the slug, as this will be needed to access the list in the future.
 
-**Import via download URL**
+##### Import via download URL
 
 If you import a list via URL, you will need to create an empty list and then import using the download URL. Note: You must provide mapping data in the URL parameters for the email list.
 
@@ -118,17 +118,9 @@ Sample Command:
 
 Sample Output:
 
-    [{"status": "New", "tags": [], "created": "2015-08-14T15:42:59.009000Z", "mapping":
-    {"header_row": true,
-    "email_col": 0,
-    "include_metadata": false},
-    "note": "Test List",
-    "href": "https://www.dropbox.com/s/39z6q9kgjjss242/TestList_540.csv?dl=0",
-    "meta":
-    {"href": "https://api.datavalidation.com/1.0/list/
-    fwHpJX3E8dTIl6tE/import/jaRdKHI5/"}, "total_imported": 0,
-    "slug": "jaRdKHI5"}
-    ]
+   {"list": [{"size": 0, "meta": {"href": "http://core-list/list/1.0/list/skjdhfksjdhf/",\
+    "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"},\
+     {"href": "member/", "rel": "members"}]}, "slug": "T4Vt8OvnQU5fkyo9", "tags": []}]
 
 When importing to the empty list (via URL), be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create an import from a URL.
 
@@ -230,8 +222,8 @@ As an email marketer, you most likely have a way for people to sign up for your 
 
 Sample Command:
 
-    curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
-    -d "biz@example.com"
+    curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/\
+    {list_slug}/member/ -d "biz@example.com"
 
 Sample Output:
 
@@ -271,28 +263,28 @@ Send a POST request to the appropriate list slug, using the endpoint: /list/{lis
 ##### Parameters:
 
 **header**
-*paramType: query
-*required: true
-*type: boolean
-*description: Specifies if there is a header row present in the .csv file
+* paramType: query
+* required: true
+* type: boolean
+* description: Specifies if there is a header row present in the .csv file
 
 **email_col**
-*paramType: query
-*required: true
-*type: integer
-*description: Specifies which column the email address is found in? (0 = first column)
+* paramType: query
+* required: true
+* type: integer
+* description: Specifies which column the email address is found in? (0 = first column)
 
 **metadata**
-*paramType: query
-*required: true
-*type: string
-*description: Specifies if metadata (non-email) is present in the .csv file (true or false)
+* paramType: query
+* required: true
+* type: string
+* description: Specifies if metadata (non-email) is present in the .csv file (true or false)
 
 **slug_col**
-*paramType: query
-*required: false
-*type: integer
-*description: Specifies if a unique identifier is available for the address.
+* paramType: query
+* required: false
+* type: integer
+* description: Specifies if a unique identifier is available for the address.
 If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
@@ -300,8 +292,8 @@ Sample Command:
     curl -X POST
     -H "Content-Type: text/csv"
     -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?header=true&email=0&metadata=true&member_slug=2"
-    -d "email_address,first_name,ID,
+    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?\
+    header=true&email=0&metadata=true&member_slug=2" -d "email_address,first_name,ID,
     oof@example.com,oof,005,
     rab@example.com,rab,006,
     baz@example.com,baz,007,"
@@ -373,7 +365,8 @@ Sample Output:
         "note": "",
         "href": {csv_download_url_in_quotes},
         "meta": {
-            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZa-gFxG9aiAXbaHeKSk7OoddI9I0lw3LTy8jHwueoSLFvvGn5R4qH7Kzc/import/vYG7J_XT/"
+            "href": "https://api.datavalidation.com/1.0/list/CrT3YdNZagFxG9aiAXb/\
+            import/vYG7J_XT/"
         },
         "slug": "vYG7J_XT"
     }
@@ -407,7 +400,11 @@ Sample Command:
 
 Sample Output:
 
-    [{"status": "New", "tags": [], "created": "2015-08-26T14:12:23.572000Z", "mapping": {"header_row": true, "email_col": 0, "include_metadata": false, "slug_col": 0}, "note": "Click2Sell Onboarding", "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=0", "meta": {"href": "http://core-list/list/1.0/list/GKGu8YEKU6IQGzvT/import/yffkMW9l/"}, "validate": true, "total_imported": 0, "slug": "yffkMW9l"}]
+    [{"status": "New", "tags": [], "created": "2015-08-26T14:12:23.572000Z", "mapping":\
+    {"header_row": true, "email_col": 0, "include_metadata": false, "slug_col": 0},\
+    "note": "Sample Onboarding", "href": "https://www.dropbox.com/s/vqas77p/202.csv?dl=0",\
+    "meta": {"href": "http://core-list/list/1.0/list/GKGu8YEKU6IQGzvT/import/yffkMW9l/"},\
+    "validate": true, "total_imported": 0, "slug": "yffkMW9l"}]
 
 A Vetting Token will be charged for each member in the list when the job is automatically created.
 
@@ -719,8 +716,8 @@ To retrieve individual member grades, use the endpoint: /list/{list_slug}/member
 
 Sample Command:
 
-            curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/
-            {list_slug}/member/"
+    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/\
+    1.0/list/{list_slug}/member/"
 
 Sample Output:
 
@@ -804,28 +801,28 @@ Parameters:
 ##### Parameters:
 
 **header**
-*paramType: query
-*required: true
-*type: boolean
-*description: Specifies if there is a header row present in the .csv file
+* paramType: query
+* required: true
+* type: boolean
+* description: Specifies if there is a header row present in the .csv file
 
 **email_col**
-*paramType: query
-*required: true
-*type: integer
-*description: Specifies which column the email address is found in? (0 = first column)
+* paramType: query
+* required: true
+* type: integer
+* description: Specifies which column the email address is found in? (0 = first column)
 
 **metadata**
-*paramType: query
-*required: true
-*type: string
-*description: Specifies if metadata (non-email) is present in the .csv file (true or false)
+* paramType: query
+* required: true
+* type: string
+* description: Specifies if metadata (non-email) is present in the .csv file (true or false)
 
 **slug_col**
-*paramType: query
-*required: false
-*type: integer
-*description: Specifies if a unique identifier is available for the address.
+* paramType: query
+* required: false
+* type: integer
+* description: Specifies if a unique identifier is available for the address.
 If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
@@ -904,16 +901,16 @@ To remove unsubscribes from your list, use the same endpoint as listed previousl
 ##### Parameters:
 
 **header**
-*paramType: query
-*required: true
-*type: boolean
-*description: Specifies if there is a header row present in the .csv file
+* paramType: query
+* required: true
+* type: boolean
+* description: Specifies if there is a header row present in the .csv file
 
 **slug_col**
-*paramType: query
-*required: false
-*type: integer
-*description: Specifies if a unique identifier is available for the address.
+* paramType: query
+* required: false
+* type: integer
+* description: Specifies if a unique identifier is available for the address.
 If this is omitted, a slug will be generated automatically for each address.
 
 
@@ -992,17 +989,20 @@ Sample Output:
         "members": [
             {
                 "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/ftL5TysJ/"
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
+                    member/ftL5TysJ/"
                 }
             },
             {
                 "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/wxM4337f/"
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
+                    member/wxM4337f/"
                 }
             },
             {
                 "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/HqghS1Cv/"
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
+                    member/HqghS1Cv/"
                 }
             }
         ]
@@ -1027,7 +1027,8 @@ Sample Output:
             {
                 "address": "oof@example.com",
                 "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/ftL5TysJ/"
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
+                    member/ftL5TysJ/"
                 },
                 "slug": "ftL5TysJ",
                 "tags": [],
@@ -1036,7 +1037,8 @@ Sample Output:
             {
                 "address": "rab@example.com",
                 "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/wxM4337f/"
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/\
+                    wxM4337f/"
                 },
                 "slug": "wxM4337f",
                 "tags": [],
@@ -1045,7 +1047,8 @@ Sample Output:
             {
                 "address": "bar@example.com",
                 "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/HqghS1Cv/"
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/\
+                    HqghS1Cv/"
                 },
                 "slug": "HqghS1Cv",
                 "tags": [],
