@@ -158,7 +158,21 @@ Note: Be sure to store the slug, as this will be needed to access the list in th
 
 If you import a list via URL, you will need to create an empty list and then import using the download URL. Note: You must provide mapping data in the URL parameters for the email list.
 
-To create an empty list, use the endpoint: POST /list
+To create an empty list:
+
+Sample Command:
+
+    curl -X POST -H 'authorization: bearer {list_slug}' "https://api.datavalidation.com/1.0/list/?email=0&header=false&metadata=false"
+
+Sample Output:
+
+~~~~
+    {"list": [{"size": 0, "meta": {"href": "http://core-list/list/1.0/list/skjdhfksjdhf/",\
+    "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"},\
+     {"href": "member/", "rel": "members"}]}, "slug": "T4Vt8OvnQU5fkyo9", "tags": []}]
+~~~~
+
+After creating an empty list, then import the the list via download URL.
 
 Sample Command:
 
@@ -177,45 +191,47 @@ Sample Command:
 Sample Output:
 
 ~~~~
-    {"list": [{"size": 0, "meta": {"href": "http://core-list/list/1.0/list/skjdhfksjdhf/",\
-    "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"},\
-     {"href": "member/", "rel": "members"}]}, "slug": "T4Vt8OvnQU5fkyo9", "tags": []}]
+    [{"status": "New", "tags": [], "created": "2015-09-02T18:51:10.654000Z", "mapping": {"header_row": false, "email_col":\
+    1, "include_metadata": false, "slug_col": 0}, "note": "List Example", "href": "https://www.dropbox.com/s/\
+    vqasnxgx77tu77p/email_key_new%202.csv?dl=1", "meta": {"href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/\
+    import/nsJUsuLn/"}, "validate": false, "total_imported": 0, "slug": "nsJUsuLn"}]
 ~~~~
 
 When importing to the empty list (via URL), be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create an import from a URL.
 
+#### Check the Status of an Import
+
+Imports must be 100% complete before starting a job! To check the status of an import, use the endpoint: GET /list/{list_slug}/import/{import_slug}/
+
 Sample Command:
 
-    curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/member/"
-    -d "biz@example.com"
+    curl -H 'authorization: bearer {api_key}' "https://api.datavalidation.com/1.0/list/{list_slug}/\
+    import/{import_slug}/?pretty=true"
+
 
 Sample Output:
 
-    [
-        {
-            "updated": "2014-10-15 21:16:56.054000",
-            "list_slug": "E5RIlS2B",
-            "analysis": {
-                "optout": "O4",
-                "grade": "D",
-                "hard": "H4",
-                "click": "K0",
-                "trap": "T4",
-                "open": "R0",
-                "complain": "W4",
-                "deceased": "D4"
-            },
-            "meta": {
-                "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/8UKN-s-H/"
-            },
-            "f_upload": true,
-            "address": "biz@example.com",
-            "slug": "8UKN-s-H",
-            "metadata": {}
-        }
-    ]
+    {
+        "status": "Complete",
+        "tags": [],
+        "created": "2015-09-02T18:51:10.654000Z",
+        "mapping": {
+            "header_row": false,
+            "email_col": 1,
+            "include_metadata": false,
+            "slug_col": 0
+        },
+        "note": "Example Import",
+        "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=1",
+        "meta": {
+            "href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"
+        },
+        "validate": false,
+        "total_imported": 349333,
+        "slug": "nsJUsuLn"
+    }
 
-**Please Note: The output above shows "total_imported": 0. List imports must be 100% complete before creating the job that kicks off validation of a list.**
+List imports must be 100% complete before creating the job that kicks off validation of a list.**
 
 ### See all of the lists you have created
 
