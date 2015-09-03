@@ -174,7 +174,7 @@ Sample Output:
         "value": {
          "tags": [
             {
-                "name": "Ashley",
+                "name": "Test Email",
                 "value": "Some value"
                 }
             ],
