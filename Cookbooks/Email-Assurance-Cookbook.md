@@ -162,7 +162,8 @@ To create an empty list:
 
 Sample Command:
 
-    curl -X POST -H 'authorization: bearer {list_slug}' "https://api.datavalidation.com/1.0/list/?email=0&header=false&metadata=false"
+    curl -X POST -H 'authorization: bearer {list_slug}' "https://api.datavalidation.com/\
+    1.0/list/?email=0&header=false&metadata=false"
 
 Sample Output:
 
@@ -191,10 +192,11 @@ Sample Command:
 Sample Output:
 
 ~~~~
-    [{"status": "New", "tags": [], "created": "2015-09-02T18:51:10.654000Z", "mapping": {"header_row": false, "email_col":\
-    1, "include_metadata": false, "slug_col": 0}, "note": "List Example", "href": "https://www.dropbox.com/s/\
-    vqasnxgx77tu77p/email_key_new%202.csv?dl=1", "meta": {"href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/\
-    import/nsJUsuLn/"}, "validate": false, "total_imported": 0, "slug": "nsJUsuLn"}]
+    [{"status": "New", "tags": [], "created": "2015-09-02T18:51:10.654000Z", "mapping": {"header_row":\
+     false, "email_col":\ 1, "include_metadata": false, "slug_col": 0}, "note": "List Example",\
+     "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=1", "meta":\
+     {"href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"},\
+     "validate": false, "total_imported": 0, "slug": "nsJUsuLn"}]
 ~~~~
 
 When importing to the empty list (via URL), be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create an import from a URL.
@@ -653,101 +655,6 @@ Sample Output:
     BPopxToE,foo@example.com,D,K0,R0,H4,O4,W3,T4,D4
     FVCExahe,baz@example.com,D,K0,R0,H4,O4,W4,T1,D4
     MPM-h7D1,bar@example.com,D,K0,R0,H4,O4,W4,T4,D4
-
-
-Using the '/member/' endpoint will provide json formatted output including member slugs, member email addresses, update timestamps as well as any metadata that may have been included in the list.
-
-To retrieve / filter the members of your list use endpoint: /list/{list_slug}/member/. Using the '/member/' endpoint will provide json formatted output including member slugs, member email addresses, update timestamps as well as any metadata that may have been included in the list.
-
-Sample Command:
-
-    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/
-    {list_slug}/member/"
-
-Sample Output:
-
-    {
-        "members": [
-            {
-                "updated": "2014-10-15 20:45:13.803000",
-                "list_slug": "E5RIlS2B",
-                "analysis": {
-                    "optout": "O4",
-                    "grade": "D",
-                    "hard": "H4",
-                    "click": "K0",
-                    "trap": "T4",
-                    "open": "R0",
-                    "complain": "W4",
-                    "deceased": "D4"
-                },
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/MPM-h7D1/"
-                },
-                "f_upload": false,
-                "address": "bar@example.com",
-                "slug": "MPM-h7D1",
-                "metadata": {
-                    "": "",
-                    "first_name": "bar",
-                    "email_address": "bar@example.com",
-                    "ID": "002"
-                }
-            },
-            {
-                "updated": "2014-10-15 20:45:13.802000",
-                "list_slug": "E5RIlS2B",
-                "analysis": {
-                    "optout": "O4",
-                    "grade": "D",
-                    "hard": "H4",
-                    "click": "K0",
-                    "trap": "T4",
-                    "open": "R0",
-                    "complain": "W3",
-                    "deceased": "D4"
-                },
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/BPopxToE/"
-                },
-                "f_upload": false,
-                "address": "foo@example.com",
-                "slug": "BPopxToE",
-                "metadata": {
-                    "": "",
-                    "first_name": "foo",
-                    "email_address": "foo@example.com",
-                    "ID": "001"
-                }
-            },
-            {
-                "updated": "2014-10-15 20:45:13.803000",
-                "list_slug": "E5RIlS2B",
-                "analysis": {
-                    "optout": "O4",
-                    "grade": "D",
-                    "hard": "H4",
-                    "click": "K0",
-                    "trap": "T1",
-                    "open": "R0",
-                    "complain": "W4",
-                    "deceased": "D4"
-                },
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/FVCExahe/"
-                },
-                "f_upload": false,
-                "address": "baz@example.com",
-                "slug": "FVCExahe",
-                "metadata": {
-                    "": "",
-                    "first_name": "baz",
-                    "email_address": "baz@example.com",
-                    "ID": "003"
-                }
-            }
-        ]
-    }
 
 A Remediation Token will be charged for EACH member in a list when using the '/export.csv' or '/member/' endpoints to retrieve member grades.
 
