@@ -157,6 +157,12 @@ apis:
           Use this method for bulk export of list subscribers.
         parameters:
           - *list_slug
+          - &changed
+            name: changed
+            description: Filter the members based on the changed flag
+            required: false
+            paramType: query
+            type: string
 
   - path: /list/{list_slug}/unsubscribe/
     operations:
@@ -239,11 +245,7 @@ apis:
           - *paging_limit
           - *_expand
           - *pretty
-          - name: changed
-            description: Filter the members based on the changed flag
-            required: false
-            paramType: query
-            type: string
+          - *changed
       - method: POST
         nickname: createListMember
         summary: Create a new list member
