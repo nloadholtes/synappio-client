@@ -242,34 +242,33 @@ As an email marketer, you most likely have a way for people to sign up for your 
 
 Sample Command:
 
-    curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/\
-    {list_slug}/member/ -d "biz@example.com"
+    curl -X POST -H "Authorization:bearer {api_key}" -H "Content-Type:application/json" "https://api.datavalidation.com/1.0/list/{list_slug}/member/" -d '{
+        "slug": "random-or-user-defined-slug",
+        "address": "test@synapp.io",
+        "tags": [
+            {
+                "name": "Test Email",
+                "value": "Some value"
+            }
+        ]
+     }'
 
 Sample Output:
 
-    [
-        {
-            "updated": "2014-10-15 21:16:56.054000",
-            "list_slug": "E5RIlS2B",
-            "analysis": {
-                "optout": "O4",
-                "grade": "D",
-                "hard": "H4",
-                "click": "K0",
-                "trap": "T4",
-                "open": "R0",
-                "complain": "W4",
-                "deceased": "D4"
-            },
-            "meta": {
-                "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/8UKN-s-H/"
-            },
-            "f_upload": true,
-            "address": "biz@example.com",
-            "slug": "8UKN-s-H",
-            "metadata": {}
-        }
-    ]
+    {
+        "status": 400,
+      "errors": "additionalProperties: Additional properties are not allowed (u'slug' was unexpected)",
+        "value": {
+         "tags": [
+            {
+                "name": "Ashley",
+                "value": "Some value"
+                }
+            ],
+            "slug": "random-or-user-defined-slug",
+            "address": "ashley@synapp.io"
+         }
+    }
 
 #### To add multiple members to an existing list
 

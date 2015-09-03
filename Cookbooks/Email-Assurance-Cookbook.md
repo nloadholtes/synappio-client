@@ -173,7 +173,7 @@ Sample Output:
      {"href": "member/", "rel": "members"}]}, "slug": "T4Vt8OvnQU5fkyo9", "tags": []}]
 ~~~~
 
-After creating an empty list, then import the the list via download URL.
+After creating an empty list, then import the list via download URL.
 
 Sample Command:
 
@@ -193,10 +193,10 @@ Sample Output:
 
 ~~~~
     [{"status": "New", "tags": [], "created": "2015-09-02T18:51:10.654000Z", "mapping": {"header_row":\
-     false, "email_col":\ 1, "include_metadata": false, "slug_col": 0}, "note": "List Example",\
-     "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=1", "meta":\
-     {"href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"},\
-     "validate": false, "total_imported": 0, "slug": "nsJUsuLn"}]
+    false, "email_col":\ 1, "include_metadata": false, "slug_col": 0}, "note": "List Example",\
+    "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=1", "meta":\
+    {"href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"},\
+    "validate": false, "total_imported": 0, "slug": "nsJUsuLn"}]
 ~~~~
 
 When importing to the empty list (via URL), be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create an import from a URL.
@@ -300,34 +300,33 @@ As an ESP, there will be subscribers signing up for numerous users' emails lists
 
 Sample Command:
 
-    curl -X POST -H "Authorizaiton: bearer {api_key}" "https://api.datavalidation.com/1.0/list/\
-    {list_slug}/member/ -d "biz@example.com"
+    curl -X POST -H "Authorization:bearer {api_key}" -H "Content-Type:application/json" "https://api.datavalidation.com/1.0/list/{list_slug}/member/" -d '{
+        "slug": "random-or-user-defined-slug",
+        "address": "test@synapp.io",
+        "tags": [
+            {
+                "name": "Test Email",
+                "value": "Some value"
+            }
+        ]
+     }'
 
 Sample Output:
 
-    [
-        {
-            "updated": "2014-10-15 21:16:56.054000",
-            "list_slug": "E5RIlS2B",
-            "analysis": {
-                "optout": "O4",
-                "grade": "D",
-                "hard": "H4",
-                "click": "K0",
-                "trap": "T4",
-                "open": "R0",
-                "complain": "W4",
-                "deceased": "D4"
-            },
-            "meta": {
-                "href": "https://api.datavalidation.com/1.0/list/E5RIlS2B/member/8UKN-s-H/"
-            },
-            "f_upload": true,
-            "address": "biz@example.com",
-            "slug": "8UKN-s-H",
-            "metadata": {}
-        }
-    ]
+    {
+        "status": 400,
+      "errors": "additionalProperties: Additional properties are not allowed (u'slug' was unexpected)",
+        "value": {
+         "tags": [
+            {
+                "name": "Ashley",
+                "value": "Some value"
+                }
+            ],
+            "slug": "random-or-user-defined-slug",
+            "address": "ashley@synapp.io"
+         }
+    }
 
 #### To add multiple members to an existing list
 
