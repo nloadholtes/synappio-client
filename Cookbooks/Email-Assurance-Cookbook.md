@@ -118,14 +118,14 @@ To create a list using a .csv file, use the endpoint: POST /list
 
 Sample Command:
 
-    $ curl -X POST
-    -H "Content-Type: text/csv
-        Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/?header=true&email=0&metadata=true&slug_col=2"\
-    -d "email_address,first_name,ID,
-        foo@example.com,foo,001,
-        bar@example.com,bar,002,
-        baz@example.com,baz,003,"
+    $ curl -X POST \
+    -H "Content-Type: text/csv \
+        Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/?header=true&email=0&metadata=true&slug_col=2" \
+    -d "email_address,first_name,ID, \
+        foo@example.com,foo,001, \
+        bar@example.com,bar,002, \
+        baz@example.com,baz,003," \
 
 Sample Output:
 
@@ -162,14 +162,14 @@ To create an empty list:
 
 Sample Command:
 
-    curl -X POST -H 'authorization: bearer {list_slug}' "https://api.datavalidation.com/\
+    curl -X POST -H 'authorization: bearer {list_slug}' "https://api.datavalidation.com/ \
     1.0/list/?email=0&header=false&metadata=false"
 
 Sample Output:
 
 ~~~~
-    {"list": [{"size": 0, "meta": {"href": "http://core-list/list/1.0/list/skjdhfksjdhf/",\
-    "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"},\
+    {"list": [{"size": 0, "meta": {"href": "http://core-list/list/1.0/list/skjdhfksjdhf/", \
+    "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"}, \
      {"href": "member/", "rel": "members"}]}, "slug": "T4Vt8OvnQU5fkyo9", "tags": []}]
 ~~~~
 
@@ -177,7 +177,7 @@ After creating an empty list, then import the list via download URL.
 
 Sample Command:
 
-    curl -X POST -H "Authorization: bearer {api_key}"
+    curl -X POST -H "Authorization: bearer {api_key}" \
         "https://api.datavalidation.com/1.0/list/{list_slug}/import/" -d
             '{
                 "href": "{list_url}",
@@ -192,10 +192,10 @@ Sample Command:
 Sample Output:
 
 ~~~~
-    [{"status": "New", "tags": [], "created": "2015-09-02T18:51:10.654000Z", "mapping": {"header_row":\
-    false, "email_col":\ 1, "include_metadata": false, "slug_col": 0}, "note": "List Example",\
-    "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=1", "meta":\
-    {"href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"},\
+    [{"status": "New", "tags": [], "created": "2015-09-02T18:51:10.654000Z", "mapping": {"header_row": \
+    false, "email_col":\ 1, "include_metadata": false, "slug_col": 0}, "note": "List Example", \
+    "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=1", "meta": \
+    {"href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"}, \
     "validate": false, "total_imported": 0, "slug": "nsJUsuLn"}]
 ~~~~
 
@@ -207,7 +207,7 @@ Imports must be 100% complete before starting a job! To check the status of an i
 
 Sample Command:
 
-    curl -H 'authorization: bearer {api_key}' "https://api.datavalidation.com/1.0/list/{list_slug}/\
+    curl -H 'authorization: bearer {api_key}' "https://api.datavalidation.com/1.0/list/{list_slug}/ \
     import/{import_slug}/?pretty=true"
 
 
@@ -240,9 +240,9 @@ List imports must be 100% complete before creating the job that kicks off valida
 You can easily retrieve summary or detailed information about all of the lists you’ve created within your API account by calling the endpoint: /list/
 
 ~~~~
-    curl -X GET
-    -H "Authorization: bearer {api_key}"
-    -H "Content-Type: application/json"
+    curl -X GET \
+    -H "Authorization: bearer {api_key}" \
+    -H "Content-Type: application/json" \
     "https://api/datavalidation.com/1.0/list/"
 ~~~~
 
@@ -300,7 +300,8 @@ As an ESP, there will be subscribers signing up for numerous users' emails lists
 
 Sample Command:
 
-    curl -X POST -H "Authorization:bearer {api_key}" -H "Content-Type:application/json" "https://api.datavalidation.com/1.0/list/{list_slug}/member/" -d '{
+    curl -X POST -H "Authorization:bearer {api_key}" -H "Content-Type:application/json" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/member/" -d '{
         "slug": "random-or-user-defined-slug",
         "address": "test@synapp.io",
         "tags": [
@@ -366,13 +367,13 @@ If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 
-    curl -X POST
-    -H "Content-Type: text/csv"
-    -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv?\
-    header=true&email=0&metadata=true&member_slug=2" -d "email_address,first_name,ID,
-    oof@example.com,oof,005,
-    rab@example.com,rab,006,
+    curl -X POST \
+    -H "Content-Type: text/csv" \
+    -H "Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/subscribe.csv? \
+    header=true&email=0&metadata=true&member_slug=2" -d "email_address,first_name,ID, \
+    oof@example.com,oof,005, \
+    rab@example.com,rab,006, \
     baz@example.com,baz,007,"
 
 Sample Output:
@@ -410,10 +411,10 @@ Please Note: To add members to an existing list via URL link, you MUST provide a
 Sample Command:
 
 ~~~~
-curl -X POST
--H "Authorization: bearer {api_key}"
--H "Content-Type: application/json"
-"https://api.datavalidation.com/1.0/list/{list_slug}/"
+curl -X POST \
+-H "Authorization: bearer {api_key}" \
+-H "Content-Type: application/json" \
+"https://api.datavalidation.com/1.0/list/{list_slug}/" \
 -d '{
         "href": {csv_download_url_in_quotes},
         "mapping":
@@ -462,7 +463,7 @@ To **automatically start a validation job when an import is created**, add the p
 
 Sample Command:
 
-    curl -X POST -H "Authorization: bearer {api_key}"
+    curl -X POST -H "Authorization: bearer {api_key}" \
         "https://api.datavalidation.com/1.0/list/{list_slug}/import/" -d
             '{
                 "href": "{list_url}",
@@ -494,8 +495,8 @@ To start a validation job, use the endpoint: GET /list/{list_slug}/job
 Sample Command:
 
 ~~~~
-$ curl -X POST
--H "Authorization: bearer {api_key}"
+$ curl -X POST \
+-H "Authorization: bearer {api_key}" \
 "https://api.datavalidation.com/1.0/list/{list_slug}/job/"
 ~~~~
 
@@ -536,8 +537,8 @@ To view the progress of a validation job, construct the following request using 
 
 Command:
 
-    $ curl -X GET
-    -H "Authorization: bearer {api_key}"
+    $ curl -X GET \
+    -H "Authorization: bearer {api_key}" \
     "https://api.datavalidation.com/1.0/list/{list_slug}/job/{job_slug}/"
 
 If the job is not finished, you should see a response similar to:
@@ -646,7 +647,7 @@ This will provide a .csv formatted output including only the member slugs, email
 
 Sample Command:
 
-    curl -X GET -H "Authorization: bearer {api_key}"
+    curl -X GET -H "Authorization: bearer {api_key}" \
     "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv"
 
 Sample Output:
@@ -666,8 +667,8 @@ To export results from a specific job use the endpoint: /list/{list_slug}/job/{j
 Sample Command:
 
 ~~~~
-curl -X GET
--H "Authorization: bearer {api_key}"
+curl -X GET \
+-H "Authorization: bearer {api_key}" \
 "https://api.datavalidation.com/1.0/list/{list_slug}/job/{job_slug}/export.csv"
 ~~~~
 
@@ -675,8 +676,8 @@ Sample Output:
 
 ~~~~
 {
-    "href": "https://dv-prod.s3.amazonaws.com/db/20141023/
-    fGilGyUrDnw0bGhfnsnvLfAZhuenLVM9vhFM5d3LZDVWG6udAvRK6o6GVx3vkXNZ/M2V8TPTA-_qZc.csv?
+    "href": "https://dv-prod.s3.amazonaws.com/db/20141023/ \
+    fGilGyUrDnw0bGhfnsnvLfAZhuenLVM9vhFM5d3LZDVWG6udAvRK6o6GVx3vkXNZ/M2V8TPTA-_qZc.csv? \
     Signature=Sdu3I4jq08wvImEsXzfE8TDTUWc%3D&Expires=1414099679&AWSAccessKeyId=AKIAJ6DQJUDEB7L7MRZA"
 }
 ~~~~
@@ -703,7 +704,7 @@ To retrieve individual member grades, use the endpoint: /list/{list_slug}/member
 
 Sample Command:
 
-    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/\
+    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/ \
     1.0/list/{list_slug}/member/"
 
 Sample Output:
@@ -772,7 +773,7 @@ This command will allow you to remove individual subscribers from email lists by
 
 Command:
 
-    curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list
+    curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list \
     /{list_slug}/member/{member_slug}"
 
 Sample output:
@@ -814,14 +815,14 @@ If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 
-    curl -X POST
-    -H "Content-Type: text/csv
-        Authorization: bearer {api_key}"
-        "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv
-        ?header=true&slug_col=2"
-    -d "email_address,first_name,ID,
-        oof@example.com,oof,005,
-        rab@example.com,rab,006,
+    curl -X POST \
+    -H "Content-Type: text/csv \
+        Authorization: bearer {api_key}" \
+        "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv \
+        ?header=true&slug_col=2" \
+    -d "email_address,first_name,ID, \
+        oof@example.com,oof,005, \
+        rab@example.com,rab,006, \
         zab@example.com,zab,007"
 
 Sample Output:
@@ -862,10 +863,10 @@ To reset the ‘changed’ flag, use the endpoint: /list/{list_slug}/member/
 Sample Command:
 
 ~~~~
-    curl -X PATCH
-    -H "Authorization: bearer {api_key}"
-    -H "Content-Type: application/json"
-    "https://api/datavalidation.com/1.0/list/{list_slug}/member/"
+    curl -X PATCH \
+    -H "Authorization: bearer {api_key}" \
+    -H "Content-Type: application/json" \
+    "https://api/datavalidation.com/1.0/list/{list_slug}/member/" \
     -d '{"changed":false}'
 ~~~~
 
@@ -873,9 +874,99 @@ Sample Output:
 
 ~~~~
     {
-        "updated": -1,
-        "unsubscribed": 0,
-        "subscribed": 0
+        "updated": -1, \
+        "unsubscribed": 0, \
+        "subscribed": 0 \
+    }
+~~~~
+
+### Retrieve Changed Validation Results
+
+At this point, you only want to retrieve data for members that have changed. This means that an address has a new Email Assurance Grade or newly appended Deliverability Codes since it’s last validation export by you.
+
+To retrieve a list of changed members, send a GET request to the list/{list_slug}/export.csv endpoint and use the changed query parameter. If no members have a changed status, you will not recieve a response.
+
+Sample Command:
+
+~~~~
+    curl -X GET \
+    -H "Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
+~~~~
+
+Sample Output:
+
+~~~~
+    {
+        "members": [
+            {
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
+                    member/ftL5TysJ/"
+                }
+            },
+            {
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
+                    member/wxM4337f/"
+                }
+            },
+            {
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
+                    member/HqghS1Cv/"
+                }
+            }
+        ]
+    }
+~~~~
+
+If you would like more detailed member output, add the '_expand' query parameter to your GET command.
+
+Sample Command:
+
+~~~~
+    curl -X GET \
+    -H "Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true&_expand=true"
+~~~~
+
+Sample Output:
+
+~~~~
+    {
+        "members": [
+            {
+                "address": "oof@example.com",
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
+                    member/ftL5TysJ/"
+                },
+                "slug": "ftL5TysJ",
+                "tags": [],
+                "changed": true
+            },
+            {
+                "address": "rab@example.com",
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/\
+                    wxM4337f/"
+                },
+                "slug": "wxM4337f",
+                "tags": [],
+                "changed": true
+            },
+            {
+                "address": "bar@example.com",
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/\
+                    HqghS1Cv/"
+                },
+                "slug": "HqghS1Cv",
+                "tags": [],
+                "changed": true
+            }
+        ]
     }
 ~~~~
 
@@ -904,13 +995,13 @@ If this is omitted, a slug will be generated automatically for each address.
 Sample Command:
 
 ~~~~
-    curl -X POST
-    -H "Content-Type: text/csv"
-    -H "Authorization: bearer {api_key}"
-       "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2"
-    -d "email_address,first_name,ID,
-        oof@example.com,oof,005,
-        rab@example.com,rab,006,
+    curl -X POST \
+    -H "Content-Type: text/csv" \
+    -H "Authorization: bearer {api_key}" \
+       "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2" \
+    -d "email_address,first_name,ID, \
+        oof@example.com,oof,005, \
+        rab@example.com,rab,006, \
         zab@example.com,zab,007"
 ~~~~
 
@@ -955,95 +1046,6 @@ To run validation, send a POST request to the endpoint: /list/job/
 
 If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list. To monitor the progress of the job started above, send a GET request to the list/{list_slug}/job/{job_slug}/ endpoint and monitor the 'pct_complete' field. Once this has reached 100, proceed to the next step.
 
-### Retrieve Changed Validation Results
-
-At this point, you only want to retrieve data for members that have changed. This means that an address has a new Email Assurance Grade or newly appended Deliverability Codes since it’s last validation export by you.
-
-To retrieve a list of changed members, send a GET request to the member/{member_slug}/ endpoint and use the changed query parameter.
-
-Sample Command:
-
-~~~~
-    curl -X GET
-    -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/member/?changed=true"
-~~~~
-
-Sample Output:
-
-~~~~
-    {
-        "members": [
-            {
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
-                    member/ftL5TysJ/"
-                }
-            },
-            {
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
-                    member/wxM4337f/"
-                }
-            },
-            {
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
-                    member/HqghS1Cv/"
-                }
-            }
-        ]
-    }
-~~~~
-
-If you would like more detailed member output, add the '_expand' query parameter to your GET command.
-
-Sample Command:
-
-~~~~
-    curl -X GET
-    -H "Authorization: bearer {api_key}"
-    "https://api.datavalidation.com/1.0/list/{list_slug}/member/?changed=true&_expand=true"
-~~~~
-
-Sample Output:
-
-~~~~
-    {
-        "members": [
-            {
-                "address": "oof@example.com",
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
-                    member/ftL5TysJ/"
-                },
-                "slug": "ftL5TysJ",
-                "tags": [],
-                "changed": true
-            },
-            {
-                "address": "rab@example.com",
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/\
-                    wxM4337f/"
-                },
-                "slug": "wxM4337f",
-                "tags": [],
-                "changed": true
-            },
-            {
-                "address": "bar@example.com",
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/\
-                    HqghS1Cv/"
-                },
-                "slug": "HqghS1Cv",
-                "tags": [],
-                "changed": true
-            }
-        ]
-    }
-~~~~
 
 Using the ‘Changed’ flag when monitoring and continuously remediating existing lists is how users of the API can simulate automated list maintenance. DataValidation will validate any new email data coming into the system on a daily basis (Email Assurance currently runs at 10pm EST) and any existing email data on a weekly basis.
 

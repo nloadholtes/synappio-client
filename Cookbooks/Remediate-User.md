@@ -14,9 +14,9 @@ To start a validation job, use the endpoint: GET /list/{list_slug}/job
 Sample Command:
 
 ~~~~
-$ curl -X POST
--H "Authorization: bearer {api_key}"
-"https://api.datavalidation.com/1.0/list/{list_slug}/job/"
+$ curl -X POST \
+-H "Authorization: bearer {api_key}" \
+"https://api.datavalidation.com/1.0/list/{list_slug}/job/" \
 ~~~~
 
 Sample Output:
@@ -57,8 +57,8 @@ To view the progress of a validation job, construct the following request using 
 
 Sample Command:
 
-    $ curl -X GET
-    -H "Authorization: bearer {api_key}"
+    $ curl -X GET \
+    -H "Authorization: bearer {api_key}" \
     "https://api.datavalidation.com/1.0/list/{list_slug}/job/{job_slug}/"
 
 
@@ -166,7 +166,8 @@ To retrieve validation results for all members, use the endpoint: GET /list/{lis
 
 Sample Command:
 
-    curl -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv"
+    curl -X GET -H "Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv"
 
 Sample Output:
 
@@ -185,8 +186,8 @@ To export results from a specific job use the endpoint: /list/{list_slug}/job/{j
 Sample Command:
 
 ~~~~
-curl -X GET
--H "Authorization: bearer {api_key}"
+curl -X GET \
+-H "Authorization: bearer {api_key}" \
 "https://api.datavalidation.com/1.0/list/{list_slug}/job/{job_slug}/export.csv"
 ~~~~
 
@@ -194,7 +195,7 @@ Sample Output:
 
 ~~~~
 {
-    "href": "https://dv-prod.s3.amazonaws.com/db/20141023/fGilGyUrDnw0bGhfnsnvLfAZhuenLVM9vhFM5d3LZDVWG6udAvRK6o6GVx3vkXNZ/M2V8TPTA-_qZc.csv?Signature=Sdu3I4jq08wvImEsXzfE8TDTUWc%3D&Expires=1414099679&AWSAccessKeyId=AKIAJ6DQJUDEB7L7MRZA"
+    "href": "https://dv-prod.s3.amazonaws. com/db/20141023/fGilGyUrDnw0bGhfnsnvLfAZhuenLVM9vhFM5d3LZDVWG6udAvRK6o6GVx3vkXNZ/M2V8TPTA-_qZc.csv?Signature=Sdu3I4jq08wvImEsXzfE8TDTUWc%3D&Expires=1414099679&AWSAccessKeyId=AKIAJ6DQJUDEB7L7MRZA"
 }
 ~~~~
 
@@ -219,8 +220,8 @@ To retrieve individual member grades, use the endpoint: /list/{list_slug}/member
 
 Sample Command:
 
-    curl -X GET -H "Authorization: bearer {api_key}"\
-    "https://api.datavalidation.com/1.0/list/{list_slug}/\
+    curl -X GET -H "Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/ \
     member/{member_slug}"
 
 Sample Output:
@@ -283,8 +284,8 @@ This command will allow you to remove individual subscribers from email lists by
 
 Sample Command:
 
-    curl -X DELETE -H "Authorization: bearer {api_key}"\
-    "https://api.datavaliadtion.com/1.0/list/{list_slug}/\
+    curl -X DELETE -H "Authorization: bearer {api_key}" \
+    "https://api.datavaliadtion.com/1.0/list/{list_slug}/ \
     member/{member_slug}"
 
 Sample Response:
@@ -315,15 +316,15 @@ If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 
-                curl -X POST
-                -H "Content-Type: text/csv"
-                -H "Authorization: bearer {api_key}"
-                   "https://api.datavalidation.com/1.0/list/{list_slug}/\
-                   unsubscribe.csv?header=true&slug_col=2"\
-                -d "email_address,first_name,ID,
-                    oof@example.com,oof,005,
-                   rab@example.com,rab,006,
-                   zab@example.com,zab,007"
+    curl -X POST \
+    -H "Content-Type: text/csv" \
+    -H "Authorization: bearer {api_key}" \
+        "https://api.datavalidation.com/1.0/list/{list_slug}/ \
+        unsubscribe.csv?header=true&slug_col=2" \
+    -d "email_address,first_name,ID, \
+        oof@example.com,oof,005, \
+        rab@example.com,rab,006, \
+        zab@example.com,zab,007" \
 
 Sample Output:
 
