@@ -1,5 +1,6 @@
 import re
 import os
+import logging
 import urlparse
 
 import jsonschema as S
@@ -11,6 +12,7 @@ from seas import doc
 from seas.util import pattern_for, extend_dict
 
 
+log = logging.getLogger(__name__)
 re_path_loader = re.compile(r'^(.*)\[(.*)\]$')
 
 
@@ -37,7 +39,11 @@ class SwaggerSpec(object):
         while to_load:
             p = to_load.pop(0)
             fn = loader.normalize_filename(p)
-            content_data = loader.load_filename(fn)
+            try:
+                content_data = loader.load_filename(fn)
+            except Exception as err:
+                log.error('Error loading resource at %s: %s', fn, err)
+                raise
             if 'resourcePath' in content_data:
                 extend_dict(self._raw, content_data)
             else:
