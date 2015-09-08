@@ -1,0 +1,317 @@
+swaggerVersion: 1.2
+apiVersion: 1
+basePath: https://api.datavalidation.com/1.0
+resourcePath: /campaign-event
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+apis:
+  - path: "/campaign-event/"
+    operations:
+      - method: "POST"
+        nickname: "createImport"
+        summary: "Create a new import-from-url job"
+        type: "ImportResponse"
+        notes: |
+          Please note that the only event types currently supported are as follows:
+            - `sent`: email was sent to this address
+            - `open`: email was opened by the recipient
+            - `click`: a link was clicked by the recipient
+            - `hard`: a hard bounce was recorded
+            - `abuse`: abuse was reported by this email address
+            - `unsubscribed`: this email address was unsubscribed by the recipient
+          All other event types will be ignored.
+        parameters:
+          - &api-key
+            name: Authorization
+            description: API Key
+            type: string
+            paramType: header
+            defaultValue: bearer YOUR-KEY-HERE
+          - name: "body"
+            paramType: "body"
+            type: "ImportRequest"
+      - method: "GET"
+        nickname: "listImports"
+        summary: "List imports for this account"
+        type: "ImportCollectionResponse"
+        parameters:
+          - *api-key
+          - name: "paging.skip"
+            paramType: "query"
+            type: "integer"
+            description: "Number of results to skip before returning first result"
+          - name: "paging.limit"
+            paramType: "query"
+            type: "integer"
+            description: "Total number of results to return"
+          - name: "status"
+            paramType: "query"
+            enum:
+              - "processing"
+              - "complete"
+              - "error"
+            type: "string"
+            defaultValue: "processing"
+  - path: "/campaign-event/{import_slug}/"
+    operations:
+      - method: "GET"
+        nickname: "getImport"
+        summary: "Return the import data"
+        type: "ImportResponse"
+        parameters:
+          - name: "import_slug"
+            paramType: "path"
+            type: "string"
+  - path: "/campaign-event/_/data.csv"
+    operations:
+      - method: "POST"
+        nickname: "importData"
+        summary: "Create a new import-from-POST body job"
+        type: "StatusResponse"
+        consumes: ["text/csv"]
+        parameters:
+          - *api-key
+          - name: "body"
+            paramType: "body"
+            type: "string"
+            description: "The actual CSV data of the import"
+            defaultValue: |
+              ts,email,type
+              1440528585,test@example.com,sent
+              1440528585,test@example.com,hard
+              1440528585,test@example.com,open
+              1440528585,test@example.com,click
+              1440528585,test@example.com,abuse
+              1440528585,test@example.com,unsubscribed
+          - name: "header_row"
+            paramType: "query"
+            type: "boolean"
+            defaultValue: true
+            description: "Does the CSV contain a header row?"
+          - name: "ts_col"
+            paramType: "query"
+            type: "integer"
+            defaultValue: 0
+            description: "Which column contains the timestamp (UTC seconds since the epoch)"
+          - name: "email_col"
+            paramType: "query"
+            type: "integer"
+            defaultValue: 1
+            description: "Which column contains the email address"
+          - name: "type_col"
+            paramType: "query"
+            type: "integer"
+            defaultValue: 2
+            description: "Which column contains event type"
+
+models:
+  Credentials:
+    id: "Credentials"
+    properties:
+      identifier:
+        type: "string"
+        description: "Unique identifier for the account (ESP token or email address)"
+        defaultValue: "nobody@example.com"
+      secret:
+        type: "string"
+        description: "Secret which authenticates access to the account"
+        defaultValue: "mypassword"
+  ImportResponse:
+    id: "ImportResponse"
+    properties:
+      status:
+        $ref: "StatusResponse"
+      data:
+        $ref: "Import"
+      meta:
+        $ref: "MetaRef"
+  ImportCollectionResponse:
+    id: "ImportCollectionResponse"
+    properties:
+      status:
+        $ref: "StatusResponse"
+      data:
+        $ref: "ImportCollection"
+      meta:
+        $ref: "MetaRef"
+  Paging:
+    required:
+      - "skip"
+      - "limit"
+      - "total"
+    id: "Paging"
+    properties:
+      skip:
+        type: "integer"
+        defaultValue: 0
+      limit:
+        type: "integer"
+        defaultValue: -1
+      total:
+        type: "integer"
+        defaultValue: 0
+  Import:
+    id: "Import"
+    properties:
+      rows_imported:
+        type: "integer"
+        description: "Percentage complete for the import"
+        defaultValue: 42
+      mapping:
+        $ref: "ImportMapping"
+      href:
+        format: "uri"
+        type: "string"
+        defaultValue: "http://example.com/campaign-event-data.csv"
+      status:
+        enum:
+          - "processing"
+          - "complete"
+          - "error"
+        type: "string"
+        description: "Status of the import"
+        defaultValue: "processing"
+      import_slug:
+        type: "string"
+        description: "Unique slug identifying the resource"
+        defaultValue: "some-random-slug"
+      status_detail:
+        type: "string"
+        description: "Detailed (free-form) status of the import"
+        defaultValue: "A-OK!"
+  ImportRequest:
+    required:
+      - "href"
+      - "mapping"
+    id: "ImportRequest"
+    properties:
+      mapping:
+        $ref: "ImportMapping"
+      href:
+        format: "uri"
+        type: "string"
+        defaultValue: "http://example.com/campaign-event-data.csv"
+  ImportCollection:
+    id: "ImportCollection"
+    properties:
+      paging:
+        $ref: "Paging"
+      items:
+        type: "array"
+        items:
+          $ref: "ImportItem"
+  ContactDetails:
+    id: "ContactDetails"
+    properties:
+      country:
+        type: "string"
+        description: "Country code for the account"
+        defaultValue: "US"
+      name:
+        type: "string"
+        description: "The official name of the account"
+        defaultValue: "My Company"
+      phone:
+        type: "string"
+        description: "Contact phone number for account"
+        defaultValue: "555-555-1212"
+      state:
+        type: "string"
+        description: "State or province of the account"
+        defaultValue: "Georgia"
+      city:
+        type: "string"
+        description: "City of the account"
+        defaultValue: "Atlanta"
+      postal_code:
+        type: "string"
+        description: "Postal code for the account (if any)"
+        defaultValue: "30303"
+      address1:
+        type: "string"
+        description: "Street address for account (line 1)"
+        defaultValue: "123 Main Street"
+      address 2:
+        type: "string"
+        description: "Street address for account (line 2)"
+        defaultValue: "Suite 200"
+  ImportMapping:
+    required:
+      - "header_row"
+      - "ts_col"
+      - "email_col"
+      - "type_col"
+    id: "ImportMapping"
+    properties:
+      type_col:
+        type: "integer"
+        description: "Which column contains the event type?"
+        defaultValue: 2
+      header_row:
+        type: "boolean"
+        description: "Does the CSV contain a header row?"
+        defaultValue: true
+      email_col:
+        type: "integer"
+        description: "Which column contains the email address?"
+        defaultValue: 1
+      ts_col:
+        type: "integer"
+        description: "Which column contains the timestamp (UTC seconds since the epoch)"
+        defaultValue: 0
+  BooleanValue:
+    id: "BooleanValue"
+    description: "single boolean value"
+    properties:
+      value:
+        type: "boolean"
+        defaultValue: true
+  StatusResponse:
+    id: "StatusResponse"
+    properties:
+      status:
+        type: "integer"
+        description: "Corresponding HTTP status code"
+        defaultValue: 200
+      moreInfo:
+        type: "string"
+        description: "A fully qualified URL that may be accessed to obtain more information about the error."
+        defaultValue: "https://www.example.com"
+      code:
+        type: "integer"
+        description: "Custom Synapp.io code"
+        defaultValue: 200
+      developerMessage:
+        type: "string"
+        description: "A simple, easy to understand message that you can show directly to your application end-user."
+        defaultValue: "There are no problems with this request."
+      message:
+        type: "string"
+        description: "A simple, easy to understand message that you can show directly to your application end-user."
+        defaultValue: "Everything's cool!"
+  Object:
+    id: "Object"
+    description: "Arbitrary JSON object"
+    additionalProperties: true
+    properties: {}
+  MetaRef:
+    id: "MetaRef"
+    properties:
+      etag:
+        type: "string"
+        description: "The entity tag for this resource (must be included when updating)"
+        defaultValue: "some-random-etag"
+      href:
+        format: "uri"
+        type: "string"
+        description: "The fully-qualified URL where this resource can be located"
+        defaultValue: "https://www.example.com"
+  ImportItem:
+    id: "ImportItem"
+    properties:
+      data:
+        $ref: "Import"
+      meta:
+        $ref: "MetaRef"

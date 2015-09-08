@@ -4,7 +4,9 @@ apis:
   - path: /batch.json
     description: Public batch API
   - path: /realtime.json
-    description: Public real-time API
+    description: Public realtime API
+  - path: /campaign-event.json
+    description: Campaign event API
 info:
   title: Synapp.io APIs
   description: Synapp.io APIs
