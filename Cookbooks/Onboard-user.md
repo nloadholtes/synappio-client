@@ -83,7 +83,7 @@ Sample Command:
 Sample Output:
 
 ~~~~
-    {"list": [{"size": 0, "meta": {"href": "http://core-list/list/1.0/list/skjdhfksjdhf/", \
+    {"list": [{"size": 0, "meta": {"href": "http://api.datavalidation.com/1.0/list/skjdhfksjdhf/", \
     "links": [{"href": "import/", "rel": "imports"}, {"href": "job/", "rel": "jobs"}, \
      {"href": "member/", "rel": "members"}]}, "slug": "T4Vt8OvnQU5fkyo9", "tags": []}]
 ~~~~
@@ -110,7 +110,7 @@ Sample Output:
     [{"status": "New", "tags": [], "created": "2015-09-02T18:51:10.654000Z", "mapping": {"header_row": \
      false, "email_col":\ 1, "include_metadata": false, "slug_col": 0}, "note": "List Example", \
      "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=1", "meta": \
-     {"href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"}, \
+     {"href": "http://api.datavalidation.com/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"}, \
      "validate": false, "total_imported": 0, "slug": "nsJUsuLn"}]
 ~~~~
 
@@ -142,7 +142,7 @@ Sample Output:
         "note": "Example Import",
         "href": "https://www.dropbox.com/s/vqasnxgx77tu77p/email_key_new%202.csv?dl=1",
         "meta": {
-            "href": "http://core-list/list/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"
+            "href": "http://api.datavalidation.com/1.0/list/6iT4uwzFNYbvj8w1/import/nsJUsuLn/"
         },
         "validate": false,
         "total_imported": 349333,
