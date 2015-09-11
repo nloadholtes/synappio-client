@@ -48,7 +48,11 @@ Before you upload a list to the API, a few questions must be answered about the 
 Note: Validation results can be retrieved on the member level or the list level. If you intend on accessing individual member grades and not ALL member grades, be sure to include member slugs in your csv. Otherwise, you will have to make a call to '/list/{list_slug}/member/' to retrieve the member_slugs we provide and you will be charged a remediation token for each member in the list.
 'member_slug' is a unique ID specific to members in a list. If you prefer to specify 'member_slug', set the 'slug_col' query parameter to the column containing your provided identifier in your csv(column 1 = 0). If this parameter is not provided, member slugs will be generated automatically.
 
-### Create and Import a List
+Below explains how to create and import new lists within your API Account, add subscribers to existing lists within the API, and how to retrieve changed results for automated list maintenance.
+
+### For Initial List Validation
+
+#### Create and Import a List
 
 Lists can be created in the API by importing a .csv file directly or via download URL to the .csv file. **We recommend that for larger lists, or larger databases, you upload through URL.**
 
@@ -235,6 +239,8 @@ Once there are lists in your account, you will see something similar to response
     }
     ]
 ~~~~
+
+### To Add Subscribers to Existing Lists
 
 #### To add a single member to an existing list
 
@@ -426,7 +432,7 @@ Sample Output:
     "meta": {"href": "http://api.datavalidation.com/1.0/list/GKGu8YEKU6IQGzvT/import/yffkMW9l/"},\
     "validate": true, "total_imported": 0, "slug": "yffkMW9l"}]
 
-A Vetting Token will be charged for each member in the list when the job is automatically created.
+**A Vetting Token will be charged for each member in the list when the job is automatically created.**
 
 ### Run a Validation Job
 
@@ -575,7 +581,7 @@ After a job is complete, repeating the GET request from above will yield a respo
 
 This report does not provide data on specific email addresses. This is an overview of an email list’s quality. It includes the total number of subscribers in each Email Assurance Grade category (A+, A, B, D, and F) and the number of addresses that have each Deliverability Code.
 
-### Retrieve Validaton Results
+### Retrieve Validaton Results for Intitial Validation
 
 After reviewing a list’s quality, it may or may not be necessary to remediate the list. The API provides multiple methods for viewing validation grades for individual members of a list. Note: Retrieving validation results will consume one Remediation Token for each address within a list.
 
@@ -687,7 +693,7 @@ Sample Output:
 A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
 
-### Remediating and Managing Existing Lists
+### Managing Existing Lists and Retrieving Changed Results
 
 List maintenance is the key to upholding great deliverability. Using DataValidation’s API, email marketers can monitor the quality of their email lists and always know where they stand prior to sending. List maintenance can be achieved by continuous remediation existing lists.
 
@@ -704,9 +710,115 @@ This API does not currently support scheduling jobs. You should set up a periodi
 
 >This API does not currently support filtering members by grade. After calling export.csv you may want to input this data into your users' accounts and set up a task in your code to automatically unsubscribe the F results.
 
-#### Removing subscribers from a List
+The following process should be repeated in order to monitor user list(s) and keep them up to date in respect to new subscribers, unsubscribes, and grade changes. This process should be used if you are setting up daily or weekly monitoring and remediation. Please use this endpoint in place of the list/list_slug/{csv_link}/import endpoint if you are monitoring lists daily or weekly.
 
-After a list has been validated you'll want to remove any undeliverable addresses from the email list. Undeliverable email addresses will have an Email Assurance Grade of F. Some ESPs may recommend that email marketers do not send to any email addresses other than those with Email Assurance Grades of A+ and A (those known to be deliverable). These addresses can be removed as well. When deploying mail to validated addresses, we highly recommend following the best practices and compliance rules stated by your specific ESP.
+#### Reset the Changed Flag
+
+First, you’ll want to reset the ‘changed’ flag on the members of your existing lists. This will need to be done before daily Email Assurance runs and your list is re-validated. 'Changed' indicates that the deliverability information on an address has not changed. The following command will set the ‘changed’ flag to ‘false’ for each member in a list. The output will provide the number of changed results.
+
+To reset the ‘changed’ flag, use the endpoint: /list/{list_slug}/member/
+
+Sample Command:
+
+~~~~
+    curl -X PATCH \
+    -H "Authorization: bearer {api_key}" \
+    -H "Content-Type: application/json" \
+    "https://api/datavalidation.com/1.0/list/{list_slug}/member/" \
+    -d '{"changed":false}'
+~~~~
+
+Sample Output:
+
+~~~~
+    {
+        "updated": -1, \
+        "unsubscribed": 0, \
+        "subscribed": 0 \
+    }
+~~~~
+
+After resetting the 'changed' flag, you'll need to wait for daily Assurance to run and re-analyze all subscribers within your existing list. Waiting for daily Assurance to run is equivilant to re-starting a validation job. Once Assurance has finished, you can download only the email addresses that have a changed status.
+
+#### Retrieve Changed Validation Results
+
+At this point, you only want to retrieve data for members that have changed. This means that an address has a new Email Assurance Grade or newly appended Deliverability Codes since it’s last validation export by you.
+
+To retrieve a list of changed members, send a GET request to the list/{list_slug}/export.csv endpoint and use the changed query parameter. If no members have a changed status, you will recieve a 200 ok in your response header.
+
+#### To get results in the output
+
+Sample Command:
+
+~~~~
+    curl -v -X GET \
+    -H "Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
+~~~~
+
+Sample Output:
+
+~~~~
+
+curl -v -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
+elipsis(...)
+> GET /1.0/list/{list_slug}/export.csv?changed=true HTTP/1.1
+> User-Agent: curl/7.30.0
+> Host: api.datavalidation.com
+> Accept: */*
+> Authorization: bearer {api_key}
+>
+< HTTP/1.1 200 Ok
+< Content-Type: text/csv; charset=UTF-8
+< Date: Fri, 11 Sep 2015 18:02:19 GMT
+* Server nginx/1.9.2 is not blacklisted
+< Server: nginx/1.9.2
+< Content-Length: 0
+< Connection: keep-alive
+<
+* Connection #0 to host api.datavalidation.com left intact
+
+~~~~
+
+If there are email addresses within your existing list that have changed deliverability information, you will see a response similar to the one below, including the slug_col, email address, Email Assurance Grade, and corresponding Deliverability Codes.
+
+Sample Output:
+
+~~~~
+1,example@synapp.io,A,K0,R0,H4,O4,W4,T4,D4
+10,johndoe@synapp.io,B,K0,R0,H4,O4,W4,T4,D4
+100,janedoe@synapp.io.com,B,K0,R0,H4,O4,W4,T4,D4
+10000,email@synapp.io,A,K0,R0,H4,O4,W4,T4,D4
+~~~~
+
+#### To get results in a download URL
+
+If you would like to get a link to a downloadable .csv file of your 'changed' results, you can use the command listed below. This will be most easiest when attempting to sort your file for addresses you wish to unsubscribe from lists within your API Account. Add this to the end of your command line to get a downloaded .csv file: > new-results.csv
+
+Sample Command:
+
+~~~~
+    curl -v -X GET \
+    -H "Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true" > new-results.csv
+~~~~
+
+Sample Output:
+
+~~~~
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+100  262k    0  262k    0     0   5345      0 --:--:--  0:00:50 --:--:--  6558
+~~~~
+
+Once this has completed, there will be a new file in your Downloads called 'new-results.csv'
+
+Once you have downloaded only the 'changed' results, you'll want to remove any undeliverable addresses from the email list. Undeliverable email addresses will have an Email Assurance Grade of F. Filter the undeliverable addresses within your file so that you can upload this file to your existing list and unsubscribe these addresses.
+
+#### Remove subscribers from a List
+
+Some ESPs may recommend that email marketers do not send to any email addresses unless they have an Email Assurance Grade of A+ and A (those known to be deliverable). These addresses can be removed as well. When instructing email marketers, we highly recommend following the best practices and compliance rules stated by your specific ESP. By using the DataValidation API, ESPs can set their own compliance standards and unsubscribe according to that.
 
 DataValidation API provides two methods for unsubscribing members from a list.
 
@@ -716,10 +828,8 @@ This command will allow you to remove individual subscribers from email lists by
 
 Command:
 
-    curl -X DELETE \
-    -H "Authorization: bearer {api_key}" \
-    "https://api.datavaliadtion.com/1.0/list/ \
-    {list_slug}/member/{member_slug}"
+    curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list \
+    /{list_slug}/member/{member_slug}"
 
 Sample output:
 
@@ -728,7 +838,7 @@ Sample output:
 
 #### Unsubscribe Multiple Members from a List:
 
-This will allow you to remove multiple members from a list at once by POSTing a .csv of addresses that you'd like to unsubscribe. After validating a list, specify multiple members to be unsubscribed by passing a .csv list of members to: /{list_slug}/unsubscribe.csv
+This will allow you to remove multiple members from a user's list at once by POSTing a .csv of addresses that you'd like to unsubscribe. After validating a list, specify multiple members to be unsubscribed by passing a .csv list of members to: /{list_slug}/unsubscribe.csv
 Parameters:
 
 Parameters:
@@ -794,212 +904,24 @@ Sample Output:
         }
     ]
 
-
-#### Setting Up Email Assurance
-
-The following process should be repeated in order to monitor your list(s) and keep them up to date in respect to new subscribers, unsubscribes, and grade changes. This process should be used if you are setting up daily or weekly monitoring and remediation. Please use this endpoint in place of the list/list_slug/{csv_link}/import endpoint if you are monitoring lists daily or weekly.
-
-#### Resetting the Changed Flag
-
-First, you’ll want to reset the ‘changed’ flag on the members of a list. This indicates that the deliverability information on an address has not changed. The following command will set the ‘changed’ flag to ‘false’ for each member in a list.
-
-To reset the ‘changed’ flag, use the endpoint: /list/{list_slug}/member/
-
-Sample Command:
-
-~~~~
-    curl -X PATCH \
-    -H "Authorization: bearer {api_key}" \
-    -H "Content-Type: application/json" \
-    "https://api/datavalidation.com/1.0/list/{list_slug}/member/" \
-    -d '{"changed":false}'
-~~~~
-
-Sample Output:
-
-~~~~
-    {
-        "updated": -1, \
-        "unsubscribed": 0, \
-        "subscribed": 0 \
-    }
-~~~~
-
-### Retrieve Changed Validation Results
-
-At this point, you only want to retrieve data for members that have changed. This means that an address has a new Email Assurance Grade or newly appended Deliverability Codes since it’s last validation export by you.
-
-To retrieve a list of changed members, send a GET request to the list/{list_slug}/export.csv endpoint and use the changed query parameter.
-
-Sample Command:
-
-~~~~
-    curl -X GET \
-    -H "Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
-~~~~
-
-Sample Output:
-
-~~~~
-    {
-        "members": [
-            {
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
-                    member/ftL5TysJ/"
-                }
-            },
-            {
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
-                    member/wxM4337f/"
-                }
-            },
-            {
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
-                    member/HqghS1Cv/"
-                }
-            }
-        ]
-    }
-~~~~
-
-If you would like more detailed member output, add the '_expand' query parameter to your GET command.
-
-Sample Command:
-
-~~~~
-    curl -X GET \
-    -H "Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true&_expand=true"
-~~~~
-
-Sample Output:
-
-~~~~
-    {
-        "members": [
-            {
-                "address": "oof@example.com",
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/\
-                    member/ftL5TysJ/"
-                },
-                "slug": "ftL5TysJ",
-                "tags": [],
-                "changed": true
-            },
-            {
-                "address": "rab@example.com",
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/\
-                    wxM4337f/"
-                },
-                "slug": "wxM4337f",
-                "tags": [],
-                "changed": true
-            },
-            {
-                "address": "bar@example.com",
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/NnKOdJUjjtdNhtQa/member/\
-                    HqghS1Cv/"
-                },
-                "slug": "HqghS1Cv",
-                "tags": [],
-                "changed": true
-            }
-        ]
-    }
-~~~~
-
-#### Removing Changed Unsubscribes
-
-After resetting the 'changed' flag for list members, you should remove members from a list that have unsubscribed from your mailing list OR have results in an Email Assurance grade of F (undeliverable). The following command will remove specified members from a list by supplying CSV input via POST to the unsubscribe.csv endpoint.
-
-To remove unsubscribes from your list, use the same endpoint as listed previously for unsubscribes: /list/{list_slug}/unsubscribe.csv
-
-Parameters:
-
-**header**
-* paramType: query
-* required: true
-* type: boolean
-* description: Specifies if there is a header row present in the .csv file
-
-**slug_col**
-* paramType: query
-* required: false
-* type: integer
-* description: Specifies if a unique identifier is available for the address.
-If this is omitted, a slug will be generated automatically for each address.
-
-
-Sample Command:
-
-~~~~
-    curl -X POST
-    -H "Content-Type: text/csv"
-    -H "Authorization: bearer {api_key}"
-       "https://api.datavalidation.com/1.0/list/{list_slug}/unsubscribe.csv?header=true&slug_col=2"
-    -d "email_address,first_name,ID,
-        oof@example.com,oof,005,
-        rab@example.com,rab,006,
-        zab@example.com,zab,007"
-~~~~
-
-Sample Output:
-
-~~~~
-    {
-        "list": [
-            {
-                "status": "new",
-                "size": 3,
-                "meta": {
-                    "href": "https://api.datavalidation.com/1.0/list/{list_slug}/",
-                    "links": {
-                        "jobs": "job/",
-                        "batch_subscribe": "subscribe.csv",
-                        "member": "member/{member_slug}/",
-                        "job": "job/{job_slug}/",
-                        "batch_unsubscribe": "unsubscribe.csv",
-                        "export": "export.csv",
-                        "members": "member/"
-                    }
-                },
-                "slug": "E5RIlS2B",
-                "metadata": {}
-            }
-        ]
-    }
-~~~~
-
-#### Adding New Subscribers
-
-Once unsubscribed members have been removed, you will want to add any new subscribers to the existing list. New members can be added to an existing list by posting a .csv file OR by providing a URL link to the .csv file of new subscribers. This will be done exactly as documented previously.
-
-Add specified members to a list by supplying CSV input via POST to the subscribe.csv endpoint. To add new subscribers to an existing list via .csv file, use the same command mentioned previously: /list/{list_slug}/subscribe.csv
+Once you've retrieved 'changed' results, and updated your email lists with any unsubscribes, you can continue to add any new subscribers to existing lists. New members can be added to an existing list by posting a .csv file OR by providing a URL link to the .csv file of new subscribers. This will be done exactly as documented in the Initial Validation section of this Cookbook.
 
 **Please Note: To add members to an existing list via URL link, you MUST provide a slug_col within the specified parameters of the list import.
 
-Once a list has been updated with new subscribers, the next step is to run the validation job. Imports MUST be 100% complete before starting a validation job (unless using the "validate": true parameter. Run the validation job the same way specified in the instructions mentioned previously.
+Once a list has been updated with new subscribers, the next step is to either 1. Run the validation job or 2. Wait for daily Assurance to run. Imports MUST be 100% complete before starting a validation job (unless using the "validate": true parameter. Run the validation job the same way specified in the instructions mentioned previously. **Waiting for Assurance to run is equivilant to running a validation job, and is the best option for automated list maintenance.**
 
-To run validation, send a POST request to the endpoint: /list/job/
-
-If the list is large or we currently have a large number of list members to validate in our queue, it may take some time to validate the members in your list. To monitor the progress of the job started above, send a GET request to the list/{list_slug}/job/{job_slug}/ endpoint and monitor the 'pct_complete' field. Once this has reached 100, proceed to the next step.
-
-Using the ‘Changed’ flag when monitoring and continuously remediating existing lists is how users of the API can simulate automated list maintenance. DataValidation will validate any new email data coming into the system on a daily basis (Email Assurance currently runs at 10pm EST) and any existing email data on a weekly basis.
+Using the ‘Changed’ flag when monitoring and continuously remediating existing lists is how users of the API can simulate automated list maintenance for their database. DataValidation will validate any new email data coming into the system on a daily basis (Email Assurance currently runs at 10pm EST) and any existing email data on a weekly basis.
 
 Exporting only the changed results will ensure that you do not consume more API Remediation Tokens than necessary, and will provide you (the email marketer) with the most recent deliverability information we have on the addresses within your lists.
 
-Email marketers should retrieve changed results as necessary for their business. Whether you want to retrieve results daily, weekly or monthly, DataValidation will maintain the deliverability status of the addresses in your emai lists as long as you keep them updated! (See information above on updating every 30 days)
+ESPs should retrieve changed results as necessary for their users and compliance standards. Whether you want to retrieve results daily, weekly or monthly, DataValidation will maintain the deliverability status of the addresses in your emai lists as long as you keep them updated! (See information above on updating every 30 days)
 
 #### API Token Consumption
 
-API Tokens can be pre-purchased or post-paid, depending on the ESP plan or subscription. To determine how many Remediation Tokens you have consumed, insert -v into a curl command that consumes tokens (ie. when running a validation job or exporting validated results). If any API call consumes tokens, the summary of tokens consumed will be in the x-synappio-tokens-consumed header.
+DataValidation partners with Email Service Providers to provide a database monitoring and maintenance solution, and to enable an ESPs users to maintain list quality on an ongoing basis. All ESPs vary in terms of their platform, users, and compliance standandard. DataValidation aims to work directly with ESPs who wish to use the API, to provide a custom plan that fits the ESPs specific needs.
+
+Please <a href="http://developer.datavalidation.com/">visit our API page</a> for more information and documentation.
+
 
 
 
