@@ -279,3 +279,16 @@ class BetterJoiningThread(threading.Thread):
         if self.exc_info is not None:
             raise self.exc_info[0], self.exc_info[1], self.exc_info[2]
         return self.result
+
+class CoreTranslator(object):
+
+    def __init__(self, mapping):
+        self.mapping = mapping
+
+    def translate(self, response):
+        import re
+        import json
+        j_str = json.dumps(response.__json__())
+        for bad_url in self.mapping.keys():
+            j_str = re.sub(bad_url, self.mapping[bad_url], j_str)
+        return json.loads(j_str)
