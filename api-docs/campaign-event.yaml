@@ -15,7 +15,7 @@ apis:
         type: "ImportResponse"
         notes: |
           Please note that the only event types currently supported are as follows:
-            - `sent`: email was sent to this address
+            - `sent`: email was sent and successfully delivered to this address
             - `open`: email was opened by the recipient
             - `click`: a link was clicked by the recipient
             - `hard`: a hard bounce was recorded
