@@ -286,9 +286,11 @@ class CoreTranslator(object):
         self.mapping = mapping
 
     def translate(self, response):
-        import re
-        import json
-        j_str = json.dumps(response.__json__())
-        for bad_url in self.mapping.keys():
-            j_str = re.sub(bad_url, self.mapping[bad_url], j_str)
-        return json.loads(j_str)
+        if isinstance(response, basestring):
+            for bad in self.mapping:
+                response = re.sub(bad, self.mapping[bad], response)
+        if isinstance(response, dict):
+            response = {k:self.translate(response[k]) for k in response}
+        if isinstance(response, list):
+            response = [self.translate(i) for i in response]
+        return response
