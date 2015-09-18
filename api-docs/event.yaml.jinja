@@ -57,9 +57,7 @@ models:
       subject:
         type: string
         description: Topic of the event
-      detail:
-        type: {$ref: Object}
-        description: Event details
+      detail: {$ref: Object}
       responses:
         type: array
         description: List of responses received for the webhook
@@ -82,9 +80,7 @@ models:
       response_status:
         type: integer
         description: HTTP response (if any) from the webhook
-      response_headers:
-        type: {$ref: Object}
-        description: Headers received from the webhook
+      response_headers: {$ref: Object}
       response_body:
         type: string
         description: Content of the response body sent by the webhook
