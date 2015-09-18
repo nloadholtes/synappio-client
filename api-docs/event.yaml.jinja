@@ -1,0 +1,93 @@
+{% from '/base-models.jinja' import base_models, paging_params %}
+{% from '/base-models.jinja' import model_update, model_item, model_collection %}
+{% from '/base-models.jinja' import model_response, model_collection_response %}
+swaggerVersion: 1.2
+apiVersion: 1.0
+basePath: https://localhost:8081/api/ext/1.0
+resourcePath: /event
+produces:
+  - application/json
+consumes:
+  - application/json
+apis:
+  - path: /event/
+    operations:
+      - method: GET
+        nickname: listEvents
+        summary: Retrieve recent events and their responses
+        type: EventCollectionResponse
+        parameters:
+          - &authorization
+            name: Authorization
+            description: 3scale user API key
+            paramType: header
+            type: string
+            defaultValue: 'bearer YOUR-API-KEY'
+  - path: /event/{event_slug}/
+    operations:
+      - method: GET
+        nickname: getEvent
+        summary: Retrieve a particular event and its response (if any)
+        type: EventResponse
+        parameters:
+          - *authorization
+          - name: event_slug
+            type: string
+            description: The slug of the event to retrieve
+            paramType: path
+            defaultValue: random-slug
+models:
+  {{base_models()}}
+  Event:
+    id: Event
+    properties:
+      slug:
+        type: string
+        description: The event slug
+      ts:
+        type: string
+        format: date-time
+        description: Timestamp of the event (UTC)
+      type:
+        type: string
+        description: Type of the event
+        enum:
+          - batch
+          - realtime
+      subject:
+        type: string
+        description: Topic of the event
+      detail:
+        type: {$ref: Object}
+        description: Event details
+      responses:
+        type: array
+        description: List of responses received for the webhook
+        items: {$ref: Response}
+  {{model_item('Event')}}
+  {{model_collection('Event')}}
+  {{model_response('Event')}}
+  {{model_collection_response('Event')}}
+  Response:
+    id: Response
+    properties:
+      ts:
+        type: string
+        format: date-time
+        description: Timestamp of the call to the webook (UTC)
+      hook_href:
+        type: string
+        format: uri
+        defaultValue: http://example.com/webhook.php
+      response_status:
+        type: integer
+        description: HTTP response (if any) from the webhook
+      response_headers:
+        type: {$ref: Object}
+        description: Headers received from the webhook
+      response_body:
+        type: string
+        description: Content of the response body sent by the webhook
+      error_detail:
+        type: string
+        description: Detailed error description (if available)

@@ -1,0 +1,84 @@
+{% from '/base-models.jinja' import base_models, paging_params %}
+{% from '/base-models.jinja' import model_update, model_item, model_collection %}
+{% from '/base-models.jinja' import model_response, model_collection_response %}
+swaggerVersion: 1.2
+apiVersion: 1.0
+basePath: https://localhost:8081/api/ext/1.0
+resourcePath: /hook
+produces:
+  - application/json
+consumes:
+  - application/json
+apis:
+  - path: /hook/
+    operations:
+      - method: GET
+        nickname: listHooks
+        summary: List the enabled webhooks for your account
+        type: HookCollectionResponse
+        notes: |
+          Use this to list the enabled webhooks for your account.
+        parameters:
+          - &authorization
+            name: Authorization
+            description: 3scale user API key
+            paramType: header
+            type: string
+            defaultValue: 'bearer YOUR-API-KEY'
+  - path: /hook/{hook_type}/
+    operations:
+      - method: GET
+        nickname: getHook
+        summary: Retrieve a webhook of a certain type
+        type: HookResponse
+        parameters:
+          - *authorization
+          - &hook-type
+            name: hook_type
+            paramType: path
+            type: string
+            enum:
+              - batch
+              - realtime
+      - method: PUT
+        nickname: putHook
+        summary: Create or update a webhook for your account
+        type: HookResponse
+        parameters:
+          - *authorization
+          - *hook-type
+          - name: body
+            paramType: body
+            type: HookRequest
+      - method: DELETE
+        nickname: deleteHook
+        summary: Delete an existing webhook
+        parameters:
+          - *authorization
+          - *hook-type
+models:
+  {{base_models()}}
+  HookRequest:
+    id: HookRequest
+    required: [href]
+    additionalProperties: true
+    properties:
+      href:
+        &href
+        type: string
+        format: uri
+        defaultValue: http://example.com/webhook.php
+  Hook:
+    id: Hook
+    properties:
+      href: *href
+      type: *hook-type
+      created:
+        type: string
+        format: date-time
+        description: Timestamp of the call to the webook (UTC)
+
+  {{model_item('Hook')}}
+  {{model_collection('Hook')}}
+  {{model_response('Hook')}}
+  {{model_collection_response('Hook')}}

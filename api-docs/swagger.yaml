@@ -5,6 +5,10 @@ apis:
     description: Public batch API
   - path: /realtime.json
     description: Public realtime API
+  - path: /hook.json
+    description: Webhooks
+  - path: /event.json
+    description: Recent Webhook-able Events
   - path: /campaign-event.json
     description: Campaign event API
 info:

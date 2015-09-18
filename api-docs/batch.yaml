@@ -1,6 +1,6 @@
 swaggerVersion: 1.2
 apiVersion: 1.0
-basePath: https://api.datavalidation.com/1.0
+basePath: https://localhost:8081/api/ext/1.0
 resourcePath: /batch
 produces:
   - application/json

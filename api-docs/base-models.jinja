@@ -1,0 +1,156 @@
+{% macro paging_params() %}
+          - name: paging.skip
+            paramType: query
+            type: integer
+            description: Number of results to skip before returning first result
+          - name: paging.limit
+            paramType: query
+            type: integer
+            description: Total number of results to return
+{% endmacro %}
+
+{% macro base_models() %}
+  StatusResponse:
+    id: StatusResponse
+    properties:
+      status:
+        description: Corresponding HTTP status code
+        type: integer
+        defaultValue: 200
+      code:
+        description: Custom Synapp.io code
+        type: integer
+        defaultValue: 200
+      message:
+        description: "A simple, easy to understand message that you can show directly to your application end-user."
+        type: string
+        defaultValue: "Everything's cool!"
+      developerMessage:
+        description: "A simple, easy to understand message that you can show directly to your application end-user."
+        type: string
+        defaultValue: "There are no problems with this request."
+      moreInfo:
+        description: "A fully qualified URL that may be accessed to obtain more information about the error."
+        type: string
+        defaultValue: "https://www.example.com"
+  MetaRef:
+    id: MetaRef
+    properties:
+      etag:
+        &etag-description
+        description: The entity tag for this resource (must be included when updating)
+        type: string
+        defaultValue: 'some-random-etag'
+      href:
+        description: The fully-qualified URL where this resource can be located
+        type: string
+        format: uri
+        defaultValue: 'https://www.example.com'
+  Paging:
+    id: Paging
+    required: [skip, limit, total]
+    properties:
+      skip: {type: integer, defaultValue: 0}
+      limit: {type: integer, defaultValue: -1}
+      total: {type: integer, defaultValue: 0}
+  Object:
+    id: Object
+    additionalProperties: true
+    description: Arbitrary JSON object
+    properties: {}
+  BooleanValue:
+    id: BooleanValue
+    description: single boolean value
+    properties:
+      value: {type: boolean, defaultValue: true}
+  Credentials:
+    id: Credentials
+    properties:
+      identifier:
+        description: 'Unique identifier for the account (ESP token or email address)'
+        type: string
+        defaultValue: 'nobody@example.com'
+      secret:
+        description: 'Secret which authenticates access to the account'
+        type: string
+        defaultValue: 'mypassword'
+  ContactDetails:
+    id: ContactDetails
+    properties:
+      phone:
+        description: Contact phone number for account
+        type: string
+        defaultValue: 555-555-1212
+      name:
+        description: The official name of the account
+        type: string
+        defaultValue: My Company
+      address1:
+        description: Street address for account (line 1)
+        type: string
+        defaultValue: 123 Main Street
+      address 2:
+        description: Street address for account (line 2)
+        type: string
+        defaultValue: Suite 200
+      city:
+        description: City of the account
+        type: string
+        defaultValue: Atlanta
+      state:
+        description: State or province of the account
+        type: string
+        defaultValue: Georgia
+      postal_code:
+        description: Postal code for the account (if any)
+        type: string
+        defaultValue: '30303'
+      country:
+        description: Country code for the account
+        type: string
+        defaultValue: US
+{% endmacro %}
+
+{% macro model_update(model) %}
+  {{model}}Update:
+    id: {{model}}Update
+    properties:
+      etag: *etag-description
+      data: {$ref: {{model}}}
+{% endmacro %}
+
+{% macro model_item(model) %}
+  {{model}}Item:
+    id: {{model}}Item
+    properties:
+      meta: {$ref: MetaRef}
+      data: {$ref: {{model}}}
+{% endmacro %}
+
+{% macro model_response(model) %}
+  {{model}}Response:
+    id: {{model}}Response
+    properties:
+      meta: {$ref: MetaRef}
+      status: {$ref: StatusResponse}
+      data: {$ref: {{model}}}
+{% endmacro %}
+
+{% macro model_collection(model) %}
+  {{model}}Collection:
+    id: {{model}}Collection
+    properties:
+      paging: {$ref: Paging}
+      items:
+        type: array
+        items: {$ref: {{model}}Item}
+{% endmacro %}
+
+{% macro model_collection_response(model) %}
+  {{model}}CollectionResponse:
+    id: {{model}}CollectionResponse
+    properties:
+      meta: {$ref: MetaRef}
+      status: {$ref: StatusResponse}
+      data: {$ref: {{model}}Collection}
+{% endmacro %}
