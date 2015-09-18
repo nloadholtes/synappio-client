@@ -219,25 +219,32 @@ If you see the response below, then you have not uploaded any lists to your acco
 Once there are lists in your account, you will see something similar to response below.
 
 ~~~~
-    [
+   [
     {
-        "items": [],
-        "paging": {
-            "skip": 0,
-            "total": 0,
-            "limit": 0
-        },
-        "meta": {
-            "href": "https://api.datavalidation.com/1.0/list/",
-            "links": [
-                {
-                    "href": "{slug}/",
-                    "rel": "item"
-                }
-            ]
-        }
-    }
-    ]
+        "items": [
+            {
+                "size": 1000000,
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/{api_key}/",
+                    "links": [
+                        {
+                            "href": "import/",
+                            "rel": "imports"
+                        },
+                        {
+                            "href": "job/",
+                            "rel": "jobs"
+                        },
+                        {
+                            "href": "member/",
+                            "rel": "members"
+                        }
+                    ]
+                },
+                "slug": "{slug}",
+                "tags": []
+            }
+
 ~~~~
 
 ### To Add Subscribers to Existing Lists
@@ -906,7 +913,7 @@ Sample Output:
 
 Once you've retrieved 'changed' results, and updated your email lists with any unsubscribes, you can continue to add any new subscribers to existing lists. New members can be added to an existing list by posting a .csv file OR by providing a URL link to the .csv file of new subscribers. This will be done exactly as documented in the Initial Validation section of this Cookbook.
 
-**Please Note: To add members to an existing list via URL link, you MUST provide a slug_col within the specified parameters of the list import.
+**Please Note: To add members to an existing list via URL link, you MUST provide a slug_col within the specified parameters of the list import. If you ​*don't*​ include member slugs then we'll generate slugs for each of the members you import, since we assume you want to ​*replace*​ the members of the list.
 
 Once a list has been updated with new subscribers, the next step is to either 1. Run the validation job or 2. Wait for daily Assurance to run. Imports MUST be 100% complete before starting a validation job (unless using the "validate": true parameter. Run the validation job the same way specified in the instructions mentioned previously. **Waiting for Assurance to run is equivilant to running a validation job, and is the best option for automated list maintenance.**
 

@@ -14,7 +14,7 @@ After viewing the Email Assurance Report, there are several possible scenarios:
 
 As the ESP, you decide which grades you are going to allow your users to deploy email to. During the onboarding process, you may think about having stricter compliance thresholds around what grades you will allow a user to email. For example, we always recommend unsubscribing the F grades but maybe at onboarding you require the user to remove D grades as well.
 
-Once a user has been onboarded, we recommend creating a "Safe to Send" segment for A+ and A grades. This should not be a static segment, as every time you update the list members you will want the new A+ and A grades to auto-populate in the segment. This segment allows your users to quickly deploy mail to the deliverable email addresses. You may also want to create segments for B and D grades. A B result can be upgraded to an A+ if our system detects positive engagement, or downgraded to an F if it detects negative engagement. The same holds true with the D results. This data is not reliant on *your* users deploying mail to B and D results.
+Once a user has been onboarded, we recommend creating a "Safe" segment for A+ and A grades. This should not be a static segment, as every time you update the list members you will want the new A+ and A grades to auto-populate in the segment. This segment allows your users to quickly deploy mail to the deliverable email addresses. You may also want to create segments for B and D grades. A B result can be upgraded to an A+ if our system detects positive engagement, or downgraded to an F if it detects negative engagement. The same holds true with the D results. This data is not reliant on *your* users deploying mail to B and D results.
 
 Ongoing monitoring allows you to retrieve an Email Assurance Report for a list at anytime. As the ESP you can keep this data internal, or maybe you want to build a widget in your user dashboard to display the Email Assurance Report data for users to see. If you choose to do this, we recommend displaying only the Email Assurance Grades rather than all of the deliverability data on the user dashboard.
 
@@ -285,25 +285,31 @@ If you see the response below, then you have not uploaded any lists to your acco
 Once there are lists in your account, you will see something similar to response below.
 
 ~~~~
-    [
+   [
     {
-        "items": [],
-        "paging": {
-            "skip": 0,
-            "total": 0,
-            "limit": 0
-        },
-        "meta": {
-            "href": "https://api.datavalidation.com/1.0/list/",
-            "links": [
-                {
-                    "href": "{slug}/",
-                    "rel": "item"
-                }
-            ]
-        }
-    }
-    ]
+        "items": [
+            {
+                "size": 1000000,
+                "meta": {
+                    "href": "https://api.datavalidation.com/1.0/list/{api_key}/",
+                    "links": [
+                        {
+                            "href": "import/",
+                            "rel": "imports"
+                        },
+                        {
+                            "href": "job/",
+                            "rel": "jobs"
+                        },
+                        {
+                            "href": "member/",
+                            "rel": "members"
+                        }
+                    ]
+                },
+                "slug": "{slug}",
+                "tags": []
+            }
 ~~~~
 
 ### To Add Subscribers to Existing Lists
@@ -354,30 +360,14 @@ Send a POST request to the appropriate list slug, using the endpoint: /list/{lis
 
 Parameters:
 
-**header**
-* paramType: query
-* required: true
-* type: boolean
-* description: Specifies if there is a header row present in the .csv file
+**header** (boolean): Specifies if there is a header row present in the .csv file
 
-**email_col**
-* paramType: query
-* required: true
-* type: integer
-* description: Specifies which column the email address is found in? (0 = first column)
+**email_col** (integer): Specifies which column the email address is found in? (0 = first column)
 
-**metadata**
-* paramType: query
-* required: true
-* type: string
-* description: Specifies if metadata (non-email) is present in the .csv file (true or false)
+**metadata** (string): Specifies if metadata (non-email) is present in the .csv file (true or false)
 
-**slug_col**
-* paramType: query
-* required: false
-* type: integer
-* description: Specifies if a unique identifier is available for the address.
-If this is omitted, a slug will be generated automatically for each address.
+**slug_col** (integer): Specifies if a unique identifier is available for the address. If this is omitted, a slug will be generated automatically for each address.
+
 
 Sample Command:
 
@@ -969,13 +959,13 @@ Sample Output:
 
 Once you've retrieved 'changed' results, and updated your email lists with any unsubscribes, you can continue to add any new subscribers to existing lists. New members can be added to an existing list by posting a .csv file OR by providing a URL link to the .csv file of new subscribers. This will be done exactly as documented in the Initial Validation section of this Cookbook.
 
-**Please Note: To add members to an existing list via URL link, you MUST provide a slug_col within the specified parameters of the list import.
+**Please Note: To add members to an existing list via URL link, you MUST provide a slug_col within the specified parameters of the list import. If you ​*don't*​ include member slugs then we'll generate slugs for each of the members you import, since we assume you want to ​*replace*​ the members of the list.
 
 Once a list has been updated with new subscribers, the next step is to either 1. Run the validation job or 2. Wait for daily Assurance to run. Imports MUST be 100% complete before starting a validation job (unless using the "validate": true parameter. Run the validation job the same way specified in the instructions mentioned previously. **Waiting for Assurance to run is equivilant to running a validation job, and is the best option for automated list maintenance.**
 
 Using the ‘Changed’ flag when monitoring and continuously remediating existing lists is how users of the API can simulate automated list maintenance for their database. DataValidation will validate any new email data coming into the system on a daily basis (Email Assurance currently runs at 10pm EST) and any existing email data on a weekly basis.
 
-Exporting only the changed results will ensure that you do not consume more API Remediation Tokens than necessary, and will provide you (the email marketer) with the most recent deliverability information we have on the addresses within your lists.
+Exporting only the changed results will ensure that you do not consume more API Remediation Tokens than necessary, and will provide you (the ESP) with the most recent deliverability information we have on the addresses within your lists.
 
 ESPs should retrieve changed results as necessary for their users and compliance standards. Whether you want to retrieve results daily, weekly or monthly, DataValidation will maintain the deliverability status of the addresses in your emai lists as long as you keep them updated! (See information above on updating every 30 days)
 
