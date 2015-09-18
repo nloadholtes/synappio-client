@@ -197,32 +197,15 @@ To add members by POSTing a .csv, send a POST request to the appropriate list sl
 
 *Please Note: The required parameters are the same as the '/list/' endpoint when using a POST request to create new list. Use the following Parameters:
 
-Parameters:
+**Parameters:**
 
-**header**
-* paramType: query
-* required: true
-* type: boolean
-* description: Specifies if there is a header row present in the .csv file
+header (boolean): Specifies if there is a header row present in the .csv file
 
-**email_col**
-* paramType: query
-* required: true
-* type: integer
-* description: Specifies which column the email address is found in? (0 = first column)
+email_col (integer): Specifies which column the email address is found in? (0 = first column)
 
-**metadata**
-* paramType: query
-* required: true
-* type: string
-* description: Specifies if metadata (non-email) is present in the .csv file (true or false)
+metadata (string): Specifies if metadata (non-email) is present in the .csv file (true or false)
 
-**slug_col**
-* paramType: query
-* required: false
-* type: integer
-* description: Specifies if a unique identifier is available for the address.
-If this is omitted, a slug will be generated automatically for each address.
+slug_col (integer): Specifies if a unique identifier is available for the address. If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 

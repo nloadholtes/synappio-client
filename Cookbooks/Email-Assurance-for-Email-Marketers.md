@@ -293,32 +293,15 @@ Email marketers may want to add newly created lists directly to the API, to an e
 Send a POST request to the appropriate list slug, using the endpoint: /list/{list_slug}/subscribe.csv
 *Please Note: The required parameters are the same as the '/list/' endpoint when using a POST request to create new list.
 
-Parameters:
+**Parameters:**
 
-**header**
-* paramType: query
-* required: true
-* type: boolean
-* description: Specifies if there is a header row present in the .csv file
+header (boolean): Specifies if there is a header row present in the .csv file
 
-**email_col**
-* paramType: query
-* required: true
-* type: integer
-* description: Specifies which column the email address is found in? (0 = first column)
+email_col (integer): Specifies which column the email address is found in? (0 = first column)
 
-**metadata**
-* paramType: query
-* required: true
-* type: string
-* description: Specifies if metadata (non-email) is present in the .csv file (true or false)
+metadata (string): Specifies if metadata (non-email) is present in the .csv file (true or false)
 
-**slug_col**
-* paramType: query
-* required: false
-* type: integer
-* description: Specifies if a unique identifier is available for the address.
-If this is omitted, a slug will be generated automatically for each address.
+slug_col (integer): Specifies if a unique identifier is available for the address. If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 
@@ -848,32 +831,15 @@ Sample output:
 This will allow you to remove multiple members from a user's list at once by POSTing a .csv of addresses that you'd like to unsubscribe. After validating a list, specify multiple members to be unsubscribed by passing a .csv list of members to: /{list_slug}/unsubscribe.csv
 Parameters:
 
-Parameters:
+**Parameters:**
 
-**header**
-* paramType: query
-* required: true
-* type: boolean
-* description: Specifies if there is a header row present in the .csv file
+header (boolean): Specifies if there is a header row present in the .csv file
 
-**email_col**
-* paramType: query
-* required: true
-* type: integer
-* description: Specifies which column the email address is found in? (0 = first column)
+email_col (integer): Specifies which column the email address is found in? (0 = first column)
 
-**metadata**
-* paramType: query
-* required: true
-* type: string
-* description: Specifies if metadata (non-email) is present in the .csv file (true or false)
+metadata (string): Specifies if metadata (non-email) is present in the .csv file (true or false)
 
-**slug_col**
-* paramType: query
-* required: false
-* type: integer
-* description: Specifies if a unique identifier is available for the address.
-If this is omitted, a slug will be generated automatically for each address.
+slug_col (integer): Specifies if a unique identifier is available for the address. If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 

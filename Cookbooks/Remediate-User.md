@@ -298,21 +298,11 @@ The command's response will show that the member is longer part of the list.
 
 This command will allow you to remove multiple members from a list at once by POSTing a .csv of addresses that you'd like to unsubscribe. After validating a list, specify multiple members to be unsubscribed by passing a .csv list of members to: /{list_slug}/unsubscribe.csv
 
+**Parameters:**
 
-Parameters:
+header (boolean): Specifies if there is a header row present in the .csv file
 
-**header**
-* paramType: query
-* required: true
-* type: boolean
-* description: Specifies if there is a header row present in the .csv file
-
-**slug_col**
-* paramType: query
-* required: false
-* type: integer
-* description: Specifies if a unique identifier is available for the address.
-If this is omitted, a slug will be generated automatically for each address.
+slug_col (integer): Specifies if a unique identifier is available for the address. If this is omitted, a slug will be generated automatically for each address.
 
 Sample Command:
 
