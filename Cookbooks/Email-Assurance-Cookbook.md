@@ -765,6 +765,82 @@ This API does not currently support scheduling jobs. You should set up a periodi
 
 The following process should be repeated in order to monitor user list(s) and keep them up to date in respect to new subscribers, unsubscribes, and grade changes. This process should be used if you are setting up daily or weekly monitoring and remediation. Please use this endpoint in place of the list/list_slug/{csv_link}/import endpoint if you are monitoring lists daily or weekly.
 
+#### Retrieve Changed Validation Results
+
+At this point, you only want to retrieve data for members that have changed. This means that an address has a new Email Assurance Grade or newly appended Deliverability Codes since it’s last validation export by you.
+
+To retrieve a list of changed members, send a GET request to the list/{list_slug}/export.csv endpoint and use the updated_since query parameter. The updated_since parameter is a url encoded ISO format date. If no members have a changed since the date specified, you will receive a 200 ok in your response header.
+
+#### To get results in the output
+
+Sample Command:
+
+~~~~
+    curl -v -X GET \
+    -H "Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
+~~~~
+
+Sample Output:
+
+~~~~
+
+curl -v -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
+elipsis(...)
+> GET /1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z HTTP/1.1
+> User-Agent: curl/7.30.0
+> Host: api.datavalidation.com
+> Accept: */*
+> Authorization: bearer {api_key}
+>
+< HTTP/1.1 200 Ok
+< Content-Type: text/csv; charset=UTF-8
+< Date: Fri, 11 Sep 2015 18:02:19 GMT
+* Server nginx/1.9.2 is not blacklisted
+< Server: nginx/1.9.2
+< Content-Length: 0
+< Connection: keep-alive
+<
+* Connection #0 to host api.datavalidation.com left intact
+
+~~~~
+
+If there are email addresses within your existing list that have changed deliverability information, you will see a response similar to the one below, including the slug_col, email address, Email Assurance Grade, and corresponding Deliverability Codes.
+
+Sample Output:
+
+~~~~
+1,example@synapp.io,A,K0,R0,H4,O4,W4,T4,D4
+10,johndoe@synapp.io,B,K0,R0,H4,O4,W4,T4,D4
+100,janedoe@synapp.io.com,B,K0,R0,H4,O4,W4,T4,D4
+10000,email@synapp.io,A,K0,R0,H4,O4,W4,T4,D4
+~~~~
+
+#### To get results in a download URL
+
+If you would like to get a link to a downloadable .csv file of your 'changed' results, you can use the command listed below. This will be most easiest when attempting to sort your file for addresses you wish to unsubscribe from lists within your API Account. Add this to the end of your command line to get a downloaded .csv file: > new-results.csv
+
+Sample Command:
+
+~~~~
+    curl -v -X GET \
+    -H "Authorization: bearer {api_key}" \
+    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z" > new-results.csv
+~~~~
+
+Sample Output:
+
+~~~~
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
+100  262k    0  262k    0     0   5345      0 --:--:--  0:00:50 --:--:--  6558
+~~~~
+
+Once this has completed, there will be a new file in your Downloads called 'new-results.csv'
+
+Once you have downloaded only the updated results, you'll want to remove any undeliverable addresses from the email list. Undeliverable email addresses will have an Email Assurance Grade of F. Filter the undeliverable addresses within your file so that you can upload this file to your existing list and unsubscribe these addresses.
+
 #### Reset the Changed Flag
 
 First, you’ll want to reset the ‘changed’ flag on the members of your existing lists. This will need to be done before daily Email Assurance runs and your list is re-validated. 'Changed' indicates that the deliverability information on an address has not changed. The following command will set the ‘changed’ flag to ‘false’ for each member in a list. The output will provide the number of changed results.
