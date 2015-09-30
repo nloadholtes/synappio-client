@@ -144,7 +144,7 @@ Sample Output:
 "There are no problems with this request.", "code": 200}
 ~~~~
 
-#### See Individual Import Details
+### See Individual Import Details
 
 Use your "import_slug" to check the status of your import. Checking import details will tell you whether or not there were problems with the import, what mapping you included for the .csv file, and what the import status is. If an import has finished, you'll find "status": "complete" within the details. To get import details, use the endpoint: GET "/campaign-event/{import_slug}/"
 
