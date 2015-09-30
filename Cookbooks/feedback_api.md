@@ -84,7 +84,12 @@ curl -X POST -H "Authorization: bearer {api_key}" "https://api.datavalidation.co
 Sample Output:
 
 ~~~~
-{"status": {"status": 200, "message": "Everything's cool!", "developerMessage": "There are no problems with this request.", "code": 200}, "meta": {"href": "https://api.datavalidation.com/1.0/campaign-event/j7PdptJC74SOxMWp/", "etag": "BjRAWI8t"}, "data": {"status": "processing", "import_slug": "j7PdptJC74SOxMWp", "rows_imported": 0, "mapping": {"email_col": 0, "type_col": 2, "header_row": true, "ts_col": 1}, "status_detail": ""}}
+{"status": {"status": 200, "message": "Everything's cool!", "developerMessage": \
+"There are no problems with this request.", "code": 200}, "meta": \
+{"href": "https://api.datavalidation.com/1.0/campaign-event/j7PdptJC74SOxMWp/", \
+"etag": "BjRAWI8t"}, "data": {"status": "processing", "import_slug": "j7PdptJC74SOxMWp", \
+ "rows_imported": 0, "mapping": {"email_col": 0, "type_col": 2, "header_row": true, \
+ "ts_col": 1}, "status_detail": ""}}
 ~~~~
 
 ### Import Feedback Data from a CSV body POST
@@ -135,7 +140,8 @@ data.csv?header_row=true&ts_col=0&email_col=1&type_col=2" \
 Sample Output:
 
 ~~~~
-{"status": 200, "message": "Everything's cool!", "developerMessage": "There are no problems with this request.", "code": 200}
+{"status": 200, "message": "Everything's cool!", "developerMessage": \
+"There are no problems with this request.", "code": 200}
 ~~~~
 
 #### See Individual Import Details
@@ -145,13 +151,19 @@ Use your "import_slug" to check the status of your import. Checking import detai
 Sample Command:
 
 ~~~~
-curl -L -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/campaign-event/{import_slug}/"
+curl -L -H "Authorization: bearer {api_key}" \
+"https://api.datavalidation.com/1.0/campaign-event/{import_slug}/"
 ~~~~
 
 Sample Output:
 
 ~~~~
-{"status": {"status": 200, "message": "Everything's cool!", "developerMessage": "There are no problems with this request.", "code": 200}, "meta": {"href": "https://api.datavalidation.com/1.0/campaign-event/j7PdptJC74SOxMWp/", "etag": "BjRAWI8t"}, "data": {"status": "complete", "import_slug": "j7PdptJC74SOxMWp", "rows_imported": 0, "mapping": {"email_col": 0, "type_col": 2, "header_row": true, "ts_col": 1}, "status_detail": ""}}
+{"status": {"status": 200, "message": "Everything's cool!", "developerMessage": \
+"There are no problems with this request.", "code": 200}, "meta": \
+{"href": "https://api.datavalidation.com/1.0/campaign-event/j7PdptJC74SOxMWp/", \
+"etag": "BjRAWI8t"}, "data": {"status": "complete", "import_slug": "j7PdptJC74SOxMWp", \
+"rows_imported": 0, "mapping": {"email_col": 0, "type_col": 2, "header_row": true, \
+"ts_col": 1}, "status_detail": ""}}
 ~~~~
 
 ### See Which Imports Are In Progress & Complete
@@ -171,13 +183,20 @@ Check the progress of imports within your API Account. Using the "campaign-detai
 Sample Command:
 
 ~~~~
-curl -L -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/campaign-event/?status=complete"
+curl -L -H "Authorization: bearer {api_key}" \
+"https://api.datavalidation.com/1.0/campaign-event/?status=complete"
 ~~~~
 
 Sample Response:
 
 ~~~~
-{"status": {"status": 200, "message": "Everything's cool!", "developerMessage": "There are no problems with this request.", "code": 200}, "meta": {"href": "https://api.datavalidation.com/1.0/campaign-event/"}, "data": {"items": [{"meta": {"href": "https://api.datavalidation.com/1.0/campaign-event/j7PdptJC74SOxMWp/", "etag": "BjRAWI8t"}, "data": {"status": "complete", "import_slug": "j7PdptJC74SOxMWp", "rows_imported": 0, "mapping": {"email_col": 0, "type_col": 2, "header_row": true, "ts_col": 1}, "status_detail": ""}}], "paging": {"skip": 0, "total": 1, "limit": 0}
+{"status": {"status": 200, "message": "Everything's cool!", "developerMessage": \
+"There are no problems with this request.", "code": 200}, "meta": \
+{"href": "https://api.datavalidation.com/1.0/campaign-event/"}, "data": \
+{"items": [{"meta": {"href": "https://api.datavalidation.com/1.0/campaign-event/j7PdptJC74SOxMWp/", \
+"etag": "BjRAWI8t"}, "data": {"status": "complete", "import_slug": "j7PdptJC74SOxMWp", \
+"rows_imported": 0, "mapping": {"email_col": 0, "type_col": 2, "header_row": true, \
+"ts_col": 1}, "status_detail": ""}}], "paging": {"skip": 0, "total": 1, "limit": 0}
 ~~~~
 
 For more information on the deliverability data provided by DataValidation, please visit our <a href="http://www.datavalidation.com/kb/">Knowledge Base</a>.
