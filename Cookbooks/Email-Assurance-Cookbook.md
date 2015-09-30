@@ -133,11 +133,11 @@ Sample Command:
     $ curl -X POST \
     -H "Content-Type: text/csv \
         Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/?header=true&email=0&metadata=true&slug_col=2" \
-    -d "email_address,first_name,ID, \
-        foo@example.com,foo,001, \
-        bar@example.com,bar,002, \
-        baz@example.com,baz,003," \
+        "https://api.datavalidation.com/1.0/list/?header=true&email=0&metadata=true&slug_col=2" \
+    -d "email_address,first_name,ID,
+        foo@example.com,foo,001,
+        bar@example.com,bar,002,
+        baz@example.com,baz,003,"
 
 Sample Output:
 
@@ -168,7 +168,7 @@ Note: Be sure to store the slug, as this will be needed to access the list in th
 
 ##### Import via download URL
 
-If you import a list via URL, you will need to create an empty list and then import using the download URL. Note: You must provide mapping data in the URL parameters for the email list.
+If you import a list via URL, you will need to create an empty list and then import using the download URL. You must provide mapping data in the URL parameters for the email list. Note: If you use a Dropbox link as you list_url, be sure to use dl=1 at the end of the link so that we can access the actual data within the .csv file.
 
 To create an empty list:
 
