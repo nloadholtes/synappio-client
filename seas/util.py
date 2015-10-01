@@ -4,19 +4,22 @@ import sys
 import string
 import base64
 import logging.config
+import urllib2
 import urlparse
 import threading
 import bson
 import calendar
 import time
 import chardet
+import random
 import requests
 import pkg_resources
+import mimetypes
 
 from datetime import datetime
 from cStringIO import StringIO
 from bag import csv2
-import requests
+import paramiko
 
 
 TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -230,6 +233,35 @@ def nonce(size=48, encoding='base64url'):
     else:
         return raw.encode(encoding).strip()
 
+
+class SFTPHandler(urllib2.BaseHandler):
+    '''urllib2 handler for sftp'''
+
+    def sftp_open(self, req):
+        url = req.get_full_url()
+        p = urlparse.urlparse(url)
+        try:
+            transport = paramiko.Transport((p.hostname, (p.port or 22)))
+            transport.connect(username=p.username, password=p.password)
+            sftp = paramiko.SFTPClient.from_transport(transport)
+            filename = os.path.basename(p.path)
+            path_to_file = os.path.dirname(p.path)
+            sftp.chdir(path_to_file)
+            size = sftp.stat(filename).st_size
+            content_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+            headers = {
+                'Content-type': content_type,
+                'Content-length': size}
+            fp = sftp.open(filename)
+            return urllib2.addinfourl(fp, headers, url)
+        except paramiko.ssh_exception.BadAuthenticationType as e:  # Bad Login Credentials
+            raise urllib2.HTTPError(url=url, code=403, msg=e, hdrs=None, fp=None)
+        except IOError as e:  # File not found
+            raise urllib2.HTTPError(url=url, code=404, msg=e, hdrs=None, fp=None)
+        except Exception as e:
+            raise urllib2.HTTPError(url=url, code=400, msg=e, hdrs=None, fp=None)
+
+
 class Retrying(object):
     '''Class that retries its __call__() method n times on a given set of exceptions'''
 
@@ -243,6 +275,27 @@ class Retrying(object):
                 return func(*args, **kwargs)
             except self.exception_classes as err:
                 info = sys.exc_info()
+        raise info[0], info[1], info[2]
+
+
+class DelayedRetrying(object):
+    '''Class that retries its __call__() method n times with a delay between retries.'''
+
+    def __init__(self, retries, seconds_delay=3, *exception_classes):
+        self.retries = retries
+        self.seconds_delay = seconds_delay
+        self.exception_classes = exception_classes
+
+    def __call__(self, func, *args, **kwargs):
+        from time import sleep
+
+        for attempt in range(self.retries + 1):
+            try:
+                return func(*args, **kwargs)
+            except self.exception_classes as err:
+                info = sys.exc_info()
+                max_delay = self.seconds_delay * (2 ** attempt)
+                sleep(random.random() * max_delay)
         raise info[0], info[1], info[2]
 
 
