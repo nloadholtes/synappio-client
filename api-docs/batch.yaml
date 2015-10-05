@@ -157,6 +157,12 @@ apis:
           Use this method for bulk export of list subscribers.
         parameters:
           - *list_slug
+          - name: updated_since
+            description: Filter the members based on the given date
+            required: false
+            paramType: query
+            type: string
+            format: date-time
           - &changed
             name: changed
             description: Filter the members based on the changed flag
