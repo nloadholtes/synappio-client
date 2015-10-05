@@ -780,14 +780,17 @@ Sample Command:
 ~~~~
     curl -v -X GET \
     -H "Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/ \
+    export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
 ~~~~
 
 Sample Output:
 
 ~~~~
 
-curl -v -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
+curl -v -X GET -H "Authorization: bearer {api_key}" \
+"https://api.datavalidation.com/1.0/list/{list_slug}/ \
+export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
 elipsis(...)
 > GET /1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z HTTP/1.1
 > User-Agent: curl/7.30.0
@@ -827,7 +830,8 @@ Sample Command:
 ~~~~
     curl -v -X GET \
     -H "Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z" > new-results.csv
+    "https://api.datavalidation.com/1.0/list/{list_slug}/ \
+    export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z" > new-results.csv
 ~~~~
 
 Sample Output:
@@ -888,14 +892,16 @@ Sample Command:
 ~~~~
     curl -v -X GET \
     -H "Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/ \
+    export.csv?changed=true"
 ~~~~
 
 Sample Output:
 
 ~~~~
 
-curl -v -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
+curl -v -X GET -H "Authorization: bearer {api_key}" \
+"https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
 elipsis(...)
 > GET /1.0/list/{list_slug}/export.csv?changed=true HTTP/1.1
 > User-Agent: curl/7.30.0
@@ -935,7 +941,8 @@ Sample Command:
 ~~~~
     curl -v -X GET \
     -H "Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true" > new-results.csv
+    "https://api.datavalidation.com/1.0/list/{list_slug}/ \
+    export.csv?changed=true" > new-results.csv
 ~~~~
 
 Sample Output:
@@ -963,13 +970,16 @@ This command will allow you to remove individual subscribers from email lists by
 
 Command:
 
-    curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list \
-    /{list_slug}/member/{member_slug}"
+~~~~
+curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list \
+/{list_slug}/member/{member_slug}"
+~~~~
 
 Sample output:
 
-    Status code: 204 No Content
-
+~~~~
+Status code: 204 No Content
+~~~~
 
 #### Unsubscribe Multiple Members from a List:
 
