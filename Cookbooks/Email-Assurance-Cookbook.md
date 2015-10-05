@@ -767,9 +767,9 @@ The following process should be repeated in order to monitor user list(s) and ke
 
 ### Retrieve Changed Validation Results
 
-Monitor the quality of email lists in your API Account by exporting only the addresses that have changed since a specific time stamp. If an email address have 'changed' This means that an address has a new Email Assurance Grade or newly appended Deliverability Codes since it’s last validation export by you.
+Monitor the quality of email lists in your API Account by exporting only the addresses that have changed since a specific time stamp. If an email address have 'changed' This means that an address has a new Email Assurance Grade or newly appended Deliverability Codes since it’s last validation export by you. Retrieve changed validation results by specific timestamp or since last validation. We **highly recommend** retrieving results since last timestanp, as the ability to retrieve all changed results by resetting the 'changed flag' will be gone with the next version of the API.
 
-#### Changed Results since specific Timestamp
+#### Retrieve Changed Results Since Specific Timestamp
 
 To retrieve a list of changed members, send a GET request to the list/{list_slug}/export.csv endpoint and use the updated_since query parameter. The updated_since parameter is a url encoded ISO format date. If no members have a changed since the date specified, you will receive a 200 ok in your response header.
 
@@ -780,14 +780,17 @@ Sample Command:
 ~~~~
     curl -v -X GET \
     -H "Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
+    "https://api.datavalidation.com/1.0/list/{list_slug}/ \
+    export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
 ~~~~
 
 Sample Output:
 
 ~~~~
 
-curl -v -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
+curl -v -X GET -H "Authorization: bearer {api_key}" \
+"https://api.datavalidation.com/1.0/list/{list_slug}/ \
+export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
 elipsis(...)
 > GET /1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z HTTP/1.1
 > User-Agent: curl/7.30.0
@@ -827,7 +830,8 @@ Sample Command:
 ~~~~
     curl -v -X GET \
     -H "Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z" > new-results.csv
+    "https://api.datavalidation.com/1.0/list/{list_slug}/ \
+    export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z" > new-results.csv
 ~~~~
 
 Sample Output:
@@ -843,7 +847,7 @@ Once this has completed, there will be a new file in your Downloads called 'new-
 
 Once you have downloaded only the updated results, you'll want to remove any undeliverable addresses from the email list. Undeliverable email addresses will have an Email Assurance Grade of F. Filter the undeliverable addresses within your file so that you can upload this file to your existing list and unsubscribe these addresses.
 
-#### Changed Results Since Last Validation
+#### Retrieve All Changed Results from Specific Lists
 
 **Please Note: Restting the changed flag on addresses and exporting only changed results since your latest validation will be gone in the next version of DataValidation's API. We recommend maintaining the qulity of email lists by exporting changed results since specific timestamp.**
 
@@ -895,7 +899,8 @@ Sample Output:
 
 ~~~~
 
-curl -v -X GET -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
+curl -v -X GET -H "Authorization: bearer {api_key}" \
+"https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true"
 elipsis(...)
 > GET /1.0/list/{list_slug}/export.csv?changed=true HTTP/1.1
 > User-Agent: curl/7.30.0
@@ -926,7 +931,7 @@ Sample Output:
 10000,email@synapp.io,A,K0,R0,H4,O4,W4,T4,D4
 ~~~~
 
-#### To get results in a download URL
+**To get results in a download URL**
 
 If you would like to get a link to a downloadable .csv file of your 'changed' results, you can use the command listed below. This will be most easiest when attempting to sort your file for addresses you wish to unsubscribe from lists within your API Account. Add this to the end of your command line to get a downloaded .csv file: > new-results.csv
 
@@ -935,7 +940,8 @@ Sample Command:
 ~~~~
     curl -v -X GET \
     -H "Authorization: bearer {api_key}" \
-    "https://api.datavalidation.com/1.0/list/{list_slug}/export.csv?changed=true" > new-results.csv
+    "https://api.datavalidation.com/1.0/list/{list_slug}/ \
+    export.csv?changed=true" > new-results.csv
 ~~~~
 
 Sample Output:
@@ -963,7 +969,8 @@ This command will allow you to remove individual subscribers from email lists by
 
 Command:
 
-    curl -X DELETE -H "Authorization: bearer {api_key}" "https://api.datavaliadtion.com/1.0/list \
+    curl -X DELETE -H "Authorization: bearer {api_key}" \
+    "https://api.datavaliadtion.com/1.0/list \
     /{list_slug}/member/{member_slug}"
 
 Sample output:
