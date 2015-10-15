@@ -24,8 +24,6 @@ We run Email Assurance daily on all of the email addresses in our database. When
 
 >This is important:
 
->You **must PUT member updates on *all* the members in your database at least once every 30 days**. When an email address or list has not been touched in 30 days, we remove it from our database. If this happens, the email list and all members will need to be created in the API again.
-
 >This API does not currently support scheduling jobs. You should set up a periodic task in your code to create jobs in the API. These periodic tasks can be utilized to set up ongoing monitoring and ongoing remediation.
 
 >Because the grades are being updated daily in our system, you can retrieve the member level grades for all lists daily or weekly. Export.csv does not PUT updates to the members on a list.
@@ -756,7 +754,6 @@ If new addresses have been added to existing lists within the API, Email Assuran
 
 >This is important!
 
->For email addresses to be maintained with the most recent deliverability information, you must PUT member updates on all the members in your database (within lists) at least once every 30 days. When an email address or list has not been touched in 30 days, we remove it from our database. If this happens, the email list and all members will need to be created in the API again.
 This API does not currently support scheduling jobs. You should set up a periodic task in your code to create jobs in the API. These periodic tasks can be utilized to set up ongoing monitoring and ongoing remediation.
 
 >Because the grades are being updated daily in our system, you can retrieve the member level grades for all lists daily or weekly. Export.csv does not PUT updates to the members on a list.
@@ -1047,7 +1044,7 @@ Using the ‘Changed’ flag when monitoring and continuously remediating existi
 
 Exporting only the changed results will ensure that you do not consume more API Remediation Tokens than necessary, and will provide you (the ESP) with the most recent deliverability information we have on the addresses within your lists.
 
-ESPs should retrieve changed results as necessary for their users and compliance standards. Whether you want to retrieve results daily, weekly or monthly, DataValidation will maintain the deliverability status of the addresses in your emai lists as long as you keep them updated! (See information above on updating every 30 days)
+ESPs should retrieve changed results as necessary for their users and compliance standards. Whether you want to retrieve results daily, weekly or monthly, DataValidation will maintain the deliverability status of the addresses in your emai lists as long as you keep them updated!
 
 #### API Token Consumption
 
