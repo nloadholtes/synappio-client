@@ -33,11 +33,12 @@ class Request(object):
         else:
             raise self._result[0], self._result[1], self._result[2]
 
+
 class ThreadPool(object):
 
-    def __init__(self, size):
+    def __init__(self, size, qsize=None):
         self.size = size
-        self.q = Queue()
+        self.q = Queue(maxsize=qsize)
         self.quitting = False
         self.threads = []
         self._local = threading.local()
