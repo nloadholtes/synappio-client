@@ -253,7 +253,7 @@ You can easily retrieve summary or detailed information about all of the lists y
     curl -X GET \
     -H "Authorization: bearer {api_key}" \
     -H "Content-Type: application/json" \
-    "https://api/datavalidation.com/1.0/list/"
+    "https://api.datavalidation.com/1.0/list/"
 ~~~~
 
 If you see the response below, then you have not uploaded any lists to your account.
@@ -744,6 +744,16 @@ Sample Output:
 
 A single Remediation Token will be charged for each call to the '/member/{member_slug}' endpoint.
 
+#### Deleting Lists From Your Account:
+
+To delete lists from your account, you can simply provide the list_slug in the command listed below. You will receive back an empty response, and the list will be deleted from your account.
+
+Sample Command:
+
+curl -X DELETE
+    -H 'authorization: bearer f53d1d01095503b177119842b3a5b28e'
+    "https://api.datavalidation.com/1.0/list/y_NfWp2JCrq46bNt/"
+
 ### Managing Existing Lists and Retrieving Changed Results
 
 List maintenance is the key to upholding great deliverability. Using DataValidation’s API, ESPs can monitor the quality of email lists within their system, and provide a way email marketers to always know where they stand prior to sending. List maintenance can be achieved by continuous remediation existing lists.
@@ -1033,6 +1043,16 @@ Sample Output:
             "metadata": {}
         }
     ]
+
+#### Deleting Lists From Your Account:
+
+To delete lists from your account, you can simply provide the list_slug in the command listed below. You will receive back an empty response, and the list will be deleted from your account.
+
+Sample Command:
+
+curl -X DELETE
+    -H 'authorization: bearer f53d1d01095503b177119842b3a5b28e'
+    "https://api.datavalidation.com/1.0/list/y_NfWp2JCrq46bNt/"
 
 Once you've retrieved 'changed' results, and updated your email lists with any unsubscribes, you can continue to add any new subscribers to existing lists. New members can be added to an existing list by posting a .csv file OR by providing a URL link to the .csv file of new subscribers. This will be done exactly as documented in the Initial Validation section of this Cookbook.
 
