@@ -750,9 +750,11 @@ To delete lists from your account, you can simply provide the list_slug in the c
 
 Sample Command:
 
+~~~~
 curl -X DELETE
     -H 'authorization: bearer f53d1d01095503b177119842b3a5b28e'
     "https://api.datavalidation.com/1.0/list/y_NfWp2JCrq46bNt/"
+~~~~
 
 ### Managing Existing Lists and Retrieving Changed Results
 
@@ -1050,9 +1052,11 @@ To delete lists from your account, you can simply provide the list_slug in the c
 
 Sample Command:
 
+~~~~
 curl -X DELETE
     -H 'authorization: bearer f53d1d01095503b177119842b3a5b28e'
     "https://api.datavalidation.com/1.0/list/y_NfWp2JCrq46bNt/"
+~~~~
 
 Once you've retrieved 'changed' results, and updated your email lists with any unsubscribes, you can continue to add any new subscribers to existing lists. New members can be added to an existing list by posting a .csv file OR by providing a URL link to the .csv file of new subscribers. This will be done exactly as documented in the Initial Validation section of this Cookbook.
 
