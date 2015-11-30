@@ -719,7 +719,7 @@ Sample Command:
     curl -v -X GET \
     -H "Authorization: bearer {api_key}" \
     "https://api.datavalidation.com/1.0/list/{list_slug}/ \
-    export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
+    export.csv?updated_since=2015-11-30+16%3A44%3A42.276751"
 ~~~~
 
 Sample Output:
@@ -728,9 +728,9 @@ Sample Output:
 
 curl -v -X GET -H "Authorization: bearer {api_key}" \
 "https://api.datavalidation.com/1.0/list/{list_slug}/ \
-export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z"
+export.csv?updated_since=2015-11-30+16%3A44%3A42.276751"
 elipsis(...)
-> GET /1.0/list/{list_slug}/export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z HTTP/1.1
+> GET /1.0/list/{list_slug}/export.csv?updated_since=2015-11-30+16%3A44%3A42.276751 HTTP/1.1
 > User-Agent: curl/7.30.0
 > Host: api.datavalidation.com
 > Accept: */*
@@ -773,7 +773,7 @@ Sample Command:
 =======
     "https://api.datavalidation.com/1.0/list/{list_slug}/ \
 >>>>>>> origin/master
-    export.csv?updated_since=2015-09-29T20%3A43%3A47.300080Z" > new-results.csv
+    export.csv?updated_since=2015-11-30+16%3A44%3A42.276751" > new-results.csv
 ~~~~
 
 Sample Output:
