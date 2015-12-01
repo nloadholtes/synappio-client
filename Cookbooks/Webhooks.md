@@ -66,16 +66,29 @@ Using this Webhook, you can see when email addresses get validated in real-time.
 Request:
 
 ~~~~
-curl -X PUT -d '{"href":"http://requestb.in/abcdefg"}' -H "Authorization: bearer {api_key}" "https://api.datavalidation.com/1.0/webhook/realtime/"
+curl -X PUT -d '{"href":"http://requestb.in/abcdefg"}' -H "Authorization: bearer {api_key}" \
+"https://api.datavalidation.com/1.0/webhook/realtime/?pretty=true"
 ~~~~
 
 Response:
 When the Webhook has been successfully setup, you'll see a response similar to the one below.
 
 ~~~~
-{"status": {"status": 200, "message": "Everything's cool!", "developerMessage": "There are no problems with this request.", \
-"code": 200}, "meta": {"href": "http://core-hook/hook/1.0/hook/realtime/"}, "data": {"href": "http://requestb.in/abcdefg", \
-"type": "realtime", "created": "2015-12-01T17:01:57.010650Z"}}
+{
+    "status": {
+        "status": 200,
+        "message": "Everything's cool!",
+        "developerMessage": "There are no problems with this request.",
+        "code": 200
+    },
+    "meta": {
+        "href": "http://core-hook/hook/1.0/hook/realtime/"
+    },
+    "data": {
+        "href": "http://requestb.in/abcdefg",
+        "type": "realtime",
+        "created": "2015-12-01T21:42:13.461382Z"
+    }
 ~~~~
 
 ### Batch Notifications
@@ -86,16 +99,28 @@ Request:
 
 ~~~~
 curl -X PUT -d '{"href":"http://requestb.in/abcdefg"}' -H "Authorization: bearer {api_key}" \
-"https://api.datavalidation.com/1.0/webhook/batch/"
+"https://api.datavalidation.com/1.0/webhook/batch/?pretty=true"
 ~~~~
 
 Response:
 When the Webhook has been successfully setup, you'll see a response similar to the one below.
 
 ~~~~
-{"status": {"status": 200, "message": "Everything's cool!", "developerMessage": \
-"There are no problems with this request.", "code": 200}, "meta": {"href": "http://core-hook/hook/1.0/hook/batch/"}, \
-"data": {"href": "http://requestb.in/17b73g01", "type": "batch", "created": "2015-12-01T18:56:27.534737Z"}}
+{
+    "status": {
+        "status": 200,
+        "message": "Everything's cool!",
+        "developerMessage": "There are no problems with this request.",
+        "code": 200
+    },
+    "meta": {
+        "href": "http://core-hook/hook/1.0/hook/batch/"
+    },
+    "data": {
+        "href": "http://requestb.in/abcdefg",
+        "type": "batch",
+        "created": "2015-12-01T21:43:26.346268Z"
+    }
 ~~~~
 
 #### Import Complete
@@ -103,12 +128,29 @@ When the Webhook has been successfully setup, you'll see a response similar to t
 Imports must be 100% complete prior to creating a Validation Job. Using the Batch Notififcation Webhook, you'll see a notification similar to the one below when a list Import is complete.
 
 ~~~~
-{"subject": "import.complete", "type": "batch", "slug": "{list_slug}", "ts": "2015-12-01T19:23:31.090000Z", \
-"detail": {"status": "Complete", "list_slug": "{list_slug}", "account_id": "{account_id}", "tags": [], \
-"created": "2015-12-01T19:23:28.358000Z", "mapping": {"header_row": false, "email_col": 0, \
-"include_metadata": false}, "note": "Changed Results Test", "href": \
-"https://www.dropbox.com/s/kshfkjdfkjhas/Test-List.csv?dl=1", "validate": false, \
-"total_imported": 5347, "slug": "{import_slug}"}}
+{
+   "detail" : {
+      "mapping" : {
+         "header_row" : false,
+         "include_metadata" : false,
+         "email_col" : 0
+      },
+      "status" : "Complete",
+      "list_slug" : "{list_slug}",
+      "total_imported" : 5347,
+      "note" : "Changed Results Test",
+      "tags" : [],
+      "account_id" : "{account_id}",
+      "created" : "2015-12-01T19:23:28.358000Z",
+      "href" : "https://www.dropbox.com/s/kshfkjdfkjhas/Test-List.csv?dl=1",
+      "slug" : "{import_slug}",
+      "validate" : false
+   },
+   "ts" : "2015-12-01T19:23:31.090000Z",
+   "subject" : "import.complete",
+   "slug" : "{list_slug}",
+   "type" : "batch"
+}
 ~~~~
 
 #### Validation Job Complete
@@ -116,22 +158,141 @@ Imports must be 100% complete prior to creating a Validation Job. Using the Batc
 Validation Jobs must be 100% complete before results can be exported. Using the Batch Notification Webhook, you'll see a notfication similar to the one below when a Validation Job is complete.
 
 ~~~~
-
-{"subject": "job.complete", "type": "batch", "slug": "{list_slug}", "ts": "2015-12-01T19:57:12.533000Z", \
-"detail": {"stats_only": false, "status": "Ready", "list_slug": "__assurance__", "stats": {"optout": \
-[{"count": 343574693, "name": "O4"}], "grade": [{"count": 158965414, "name": "A"}, {"count": 26792972, \
-"name": "A+"}, {"count": 67511213, "name": "B"}, {"count": 47398587, "name": "D"}, {"count": 42906507, \
-"name": "F"}], "hard": [{"count": 115225, "name": "H3"}, {"count": 343459468, "name": "H4"}], "click": \
-[{"count": 261777857, "name": "K0"}, {"count": 77926837, "name": "K1"}, {"count": 1362009, "name": \
-"K2"}, {"count": 405075, "name": "K3"}, {"count": 2102915, "name": "K4"}], "trap": [{"count": 5193413, \
-"name": "T1"}, {"count": 338381280, "name": "T4"}], "open": [{"count": 260876503, "name": "R0"}, \
-{"count": 66001344, "name": "R1"}, {"count": 4474422, "name": "R2"}, {"count": 2103798, "name": "R3"}, \
-{"count": 10118626, "name": "R4"}], "complain": [{"count": 9439, "name": "W3"}, {"count": 343565254, \
-"name": "W4"}], "deceased": [{"count": 289180, "name": "D1"}, {"count": 343285513, "name": "D4"}]}, \
-"account_id": "jazimba", "created": "2015-11-22T02:00:52.259000Z", \
-"skip_dha": false, "priority": {"mu": -1000, "sigma": 500}, "analyze_only": false, \
-"pct_complete": 100, "slug": "{job_slug}"}}
-
+{
+   "detail" : {
+      "priority" : {
+         "sigma" : 500,
+         "mu" : -1000
+      },
+      "status" : "Ready",
+      "stats" : {
+         "complain" : [
+            {
+               "count" : 9439,
+               "name" : "W3"
+            },
+            {
+               "count" : 343565254,
+               "name" : "W4"
+            }
+         ],
+         "grade" : [
+            {
+               "count" : 158965414,
+               "name" : "A"
+            },
+            {
+               "count" : 26792972,
+               "name" : "A+"
+            },
+            {
+               "count" : 67511213,
+               "name" : "B"
+            },
+            {
+               "count" : 47398587,
+               "name" : "D"
+            },
+            {
+               "count" : 42906507,
+               "name" : "F"
+            }
+         ],
+         "deceased" : [
+            {
+               "count" : 289180,
+               "name" : "D1"
+            },
+            {
+               "count" : 343285513,
+               "name" : "D4"
+            }
+         ],
+         "optout" : [
+            {
+               "count" : 343574693,
+               "name" : "O4"
+            }
+         ],
+         "open" : [
+            {
+               "count" : 260876503,
+               "name" : "R0"
+            },
+            {
+               "count" : 66001344,
+               "name" : "R1"
+            },
+            {
+               "count" : 4474422,
+               "name" : "R2"
+            },
+            {
+               "count" : 2103798,
+               "name" : "R3"
+            },
+            {
+               "count" : 10118626,
+               "name" : "R4"
+            }
+         ],
+         "click" : [
+            {
+               "count" : 261777857,
+               "name" : "K0"
+            },
+            {
+               "count" : 77926837,
+               "name" : "K1"
+            },
+            {
+               "count" : 1362009,
+               "name" : "K2"
+            },
+            {
+               "count" : 405075,
+               "name" : "K3"
+            },
+            {
+               "count" : 2102915,
+               "name" : "K4"
+            }
+         ],
+         "trap" : [
+            {
+               "count" : 5193413,
+               "name" : "T1"
+            },
+            {
+               "count" : 338381280,
+               "name" : "T4"
+            }
+         ],
+         "hard" : [
+            {
+               "count" : 115225,
+               "name" : "H3"
+            },
+            {
+               "count" : 343459468,
+               "name" : "H4"
+            }
+         ]
+      },
+      "analyze_only" : false,
+      "list_slug" : "__assurance__",
+      "stats_only" : false,
+      "account_id" : "jazimba",
+      "created" : "2015-11-22T02:00:52.259000Z",
+      "pct_complete" : 100,
+      "slug" : "{job_slug}",
+      "skip_dha" : false
+   },
+   "ts" : "2015-12-01T19:57:12.533000Z",
+   "subject" : "job.complete",
+   "slug" : "{list_slug}",
+   "type" : "batch"
+}
 ~~~~
 
 ### Delete a Webhook
