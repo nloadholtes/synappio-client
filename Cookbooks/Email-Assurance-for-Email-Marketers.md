@@ -147,6 +147,26 @@ Sample Output:
 
 When importing to the empty list (via URL), be sure to include mapping data for URL, header row, email column, metadata, and slug column (if you have one). Use this command to create an import from a URL.
 
+### Import via FTP, SFTP, HTTPS:
+
+Lists can also be imported securely via FTP, SFTP, or HTTPS. To import files this way, you'll use the ftp URL syntax **ftp://username:password@hostname:port/path**. You can substitute "sftp" or "https" for "ftp" if applicable, but the URL formatting stays the same.
+
+"href": Example: ftp://snappybird:secret@yoururl.com:21/secret_files/list.csv
+
+Sample Command:
+
+    curl -X POST -H "Authorization: bearer {api_key}" \
+        "https://api.datavalidation.com/1.0/list/{list_slug}/import/" -d
+            '{
+                "href": "{ftp://username:password@host.com:port/path}",
+                "note": "{notes}",
+                "mapping": {
+                    "header_row": true,
+                    "email_col": 0,
+                    "include_metadata": false
+            }
+         }'
+
 #### Check the Status of an Import
 
 Imports must be 100% complete before starting a job! To check the status of an import, use the endpoint: GET /list/{list_slug}/import/{import_slug}/

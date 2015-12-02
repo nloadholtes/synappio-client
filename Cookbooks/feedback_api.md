@@ -3,11 +3,11 @@ Feedback API for Email Service Providers
 
 ### The Feedback API by DataValidation
 
-Datavalidation works with email service providers to help onboard, monitor, and remediate user email data on an ongoing basis. Email Assurance, DataValidation's list maintenance solution, analyzes any new data from ESPs on a daily basis and any existing data on a weekly basis - allowing ESPs to keep their database of addresses up-to-date with most recent deliverability information.
+DataValidation works with email service providers to help onboard, monitor, and remediate user email data on an ongoing basis. Email Assurance, DataValidation's list maintenance solution, analyzes any new data from ESPs on a daily basis and any existing data on a weekly basis - allowing ESPs to keep their database of addresses up-to-date with most recent deliverability information.
 
-To determine whether email data is deliverable or not, DataValidation looks at the entire deliverability history of an email address, including: A history of hard bounces, complaints, unsubscribes, spam trap information, and whether or not an the owner of an address has a history of being deceased. In addition to this deliverability history, we look to see whether or not an address has a recent history of opening or clicking within email campaigns. This campaign history is provided by Partner ESPs and allows us to determine that an address is deliverable, or that it's deliverable with recent engagement.
+To determine whether email data is deliverable or not, DataValidation looks at the entire deliverability history of an email address, including: A history of hard bounces, complaints, unsubscribes, spam trap information, and whether or not an the owner of an address is deceased. In addition to this deliverability history, we look to see whether or not an address has a recent history of opening or clicking within email campaigns. This campaign history is provided by Partner ESPs and helps in determining that an address is deliverable, or that its deliverable with recent engagement.
 
-By using the Feedback API, ESPs not only benefit from their own campaign history but from that of all Partner ESPs who choose participate - making deliverability reporting even more accurate and up-to-date.
+By using the Feedback API, ESPs not only benefit from their own campaign history but from that of other Partner ESPs who choose participate - making deliverability reporting even more accurate and up-to-date.
 
 **What is the Feedback API?**
 
@@ -15,13 +15,13 @@ DataValidation's Feedback API allows Email Service Providers to feed campaign hi
 
 Email Service Providers taking advantage of DataValidation's Feedback API can benefit from more accurate and up-to-date deliverability reporting by providing us with campaign history. This API is available only to Partner ESPs, and the information we recieve is for the benefit of all ESPs taking advantage of the Feedback API.
 
-Currently, the feedback API is only available for Email Service Providers. ESP Partners will go through a vetting process to be considered, and any data received through the Feedback API will be closely monitored to prevent bad data from entering the system. See below for details on how to submit campaign history.
+Currently, the Feedback API is **only available for Email Service Providers, and is by invitation only.** ESP Partners will go through a vetting process to be considered, and any data received through the Feedback API will be closely monitored to prevent bad data from entering the system. See below for details on how to submit campaign history.
 
 ### Submit a CSV File containing Campaign History
 
 When using the Feedback API, ESPs should submit .csv files containing email addresses and corresponding campaign history. These files should specifically contain columns within the .csv file for the following parameters:
 
-- Timestamp: What time did the event occure?
+- Timestamp: What time did the event occur?
 
 - Email Address: Which address are you providing campaign history for? Only one per row.
 
