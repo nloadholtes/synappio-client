@@ -276,11 +276,12 @@ class RPCOp(object):
             for k, v in header_args.items()
             if v)
         body = self.collect('body', arguments)
+        if 'headers' in request_kwargs:
+            request_kwargs['headers'].update(header_args)
         request_kwargs.update(
             method=self.method,
             path=quote(self.path.format(**path_args)),
-            params=query_args,
-            headers=header_args)
+            params=query_args)
         if body is not None:
             if 'application/json' in self.opspec.get('consumes', ['application/json']):
                 request_kwargs['data'] = json.dumps(jsonify(body))
