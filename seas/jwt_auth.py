@@ -23,7 +23,7 @@ class JWTAuthenticationPolicy(CallbackAuthenticationPolicy):
             bearer, data = header.split(' ')
             if bearer.lower() != 'bearer':
                 return
-            claims = jwt.decode(data, self.secret)
+            claims = jwt.decode(data, self.secret, leeway=5)
             request.claims = claims
             return claims['sub']
         except Exception as err:
